@@ -1,0 +1,37 @@
+---
+- name: Install Operator
+  ansible.builtin.import_playbook: base.yml
+  vars:
+    operator_name: "{{ keycloak_operator }}"
+    operator_namespace: keycloak
+    operator_channel: "{{ keycloak_channel }}"
+    operator_source: "{{ keycloak_source }}"
+    operator_create_group: true
+
+- name: Configure Keycloak Operator
+  hosts: localhost
+  become: true
+  gather_facts: false
+  # module_defaults:
+  #   kubernetes.core.k8s:
+  #     kubeconfig: $HOME/.kube/config
+  tasks:
+    - name: Create postgresql database secrets
+      kubernetes.core.k8s:
+        state: present
+
+    - name: Create postgresql persistent volume claim
+      kubernetes.core.k8s:
+        state: present
+
+    - name: Create postgresql deployment
+      kubernetes.core.k8s:
+        state: present
+
+    - name: Create postgresql service
+      kubernetes.core.k8s:
+        state: present
+
+    - name: Create keycloak instance
+      kubernetes.core.k8s:
+        state: present

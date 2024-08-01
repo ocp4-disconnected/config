@@ -1,0 +1,12 @@
+---
+- name: Login to Container Registry
+  hosts: quay-host
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Login into RedHat.io
+      containers.podman.podman_login:
+        registry: registry.redhat.io
+        username: "{{ podman_username }}"
+        password: "{{ podman_password }}"

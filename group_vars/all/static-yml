@@ -1,0 +1,18 @@
+openshift_cluster_install_dir: "{{ openshift_dir }}/install-{{ ansible_date_time.date }}"
+openshift_cluster_config_dir: "{{ openshift_dir }}/configs"
+openshift_client_bin: "{{ openshift_dir }}/bin"
+openshift_download_dir: "{{ openshift_dir }}/downloads"
+openshift_oc_mirror_dir: "{{ openshift_dir }}/images"
+openshift_download_base_url: https://mirror.openshift.com/pub/openshift-v4/{{ openshift_bastion_platform }}/clients
+openshift_bastion_platform: x86_64
+
+## Location of specific files
+ca_cert_location: /etc/pki/ca-trust/source/anchors/Home+CA.pem
+ssh_key: /home/matt/test/test-key.pub
+
+
+registry: "{{ registry_fqdn }}:{{ registry_port }}" ##TODO add logic to add ':' when registry port is defenided and not 443
+registry_pod_name: registry
+
+cluster_fqdn: "{{ cluster_name }}.{{ cluster_domain }}"
+cluster_network: "{{ cluster_cidr | ansible.netcommon.ipv4 }}"

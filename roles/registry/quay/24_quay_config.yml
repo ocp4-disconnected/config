@@ -1,0 +1,17 @@
+---
+- name: Configure Red Hat Quay
+  hosts: quay-host
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Start Config Server
+      containers.podman.podman_container:
+        name: quay_config
+        image: registry.redhat.io/quay/quay-rhel8:v3.11.0
+        ports:
+          - "81:8080"
+          - "444:8443"
+        command:
+          - config
+          - secret

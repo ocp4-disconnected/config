@@ -1,0 +1,9 @@
+---
+- name: Download clients
+  ansible.builtin.import_playbook: openshift/tools/download.yml
+- name: Install openshift client cli
+  ansible.builtin.import_playbook: openshift/tools/clients.yml
+- name: Install trident cli
+  ansible.builtin.import_playbook: openshift/tools/trident.yml
+- name: Install butane cli
+  ansible.builtin.import_playbook: openshift/tools/butane.yml

@@ -1,0 +1,12 @@
+---
+- name: NXOS Backups
+  hosts: cisco
+  gather_facts: false
+  tasks:
+    - name: Backup current config
+      when: ansible_network_os == 'cisco.nxos.nxos'
+      cisco.nxos.nxos_config:
+        backup: true
+        backup_options:
+          filename: "{{ inventory_host }}_config.{{ lookup('pipe', 'date +%F@%T') }}.conf"
+          dir_path: ./backups

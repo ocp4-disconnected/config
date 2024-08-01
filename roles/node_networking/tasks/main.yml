@@ -1,0 +1,16 @@
+---
+- name: Configure base interfaces
+  ansible.builtin.template:
+    src: bond.yaml.j2
+    dest:
+
+- name: Configure Node IPs
+  kubernetes.core.k8s:
+    state: present
+    template: "{{ item.name }}.yaml.j2"
+  loop: "{{ nodes }}"
+
+- name: Create management pod network for Trident
+  kubernetes.core.k8s:
+    state: present
+    template: mgmt.yaml.j2

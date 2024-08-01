@@ -1,0 +1,81 @@
+---
+- name: Provision NetApp = Configuration
+  hosts: netapp
+  connection: local
+  gather_facts: false
+
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      username: admin
+      password: "{{ netapp_admin_password }}"
+      hostname: "{{ netapp_node_a_ip }}"
+      validate_certs: false
+      https: true
+      # use_rest: always
+
+  tasks:
+    - name: Create Aggregates
+      netapp.ontap.na_ontap_aggregate:
+        state: present
+        service_state: online
+        name: aggr1_data
+        disk_count: 9
+        wait_for_online: true
+        time_out: 300
+        # snaplock_type: non_snaplock
+
+    - name: Create SVM
+      netapp.ontap.na_ontap_svm:
+        state: present
+        name: nfssvm
+        root_volume: nfsRoot
+        root_volume_aggregate: aggr1_data
+        root_volume_security_style: unix
+
+    - name: Create ifgrp for Data
+      netapp.ontap.na_ontap_net_ifgrp:
+        state: present
+        distribution_function: ip
+        node: "{{ netapp_cluster_name }}-01"
+        name: a0i
+        mode: multimode
+        ports:
+          - e0c
+          - e0d
+
+    - name: Create Storage Broadcast-Domain
+      netapp.ontap.na_ontap_broadcast_domain:
+        state: present
+        name: a0i_data
+        mtu: 1500
+        ports:
+          - "{{ netapp_cluster_name }}-01:a0i"
+
+    - name: Subnet Creation
+      netapp.ontap.na_ontap_net_subnet:
+        state: present
+        name: Storage
+        subnet: 172.16.100.0/24
+        ip_ranges:
+          - '172.16.100.30-172.16.100.40'
+          - '172.16.100.51'
+        gateway: 172.16.100.1
+        ipspace: Default
+        broadcast_domain: a0i_data
+
+    - name: Create an NFS Lif
+      netapp.ontap.na_ontap_interface:
+        state: present
+        interface_name: lif1
+        home_node: "{{ netapp_cluster_name }}-01"
+        home_port: a0i
+        subnet_name: Storage
+        protocols:
+          - nfs
+        vserver: nfssvm
+        failover_policy: system-defined
+        firewall_policy: data
+        role: data
+
+    # - name: Create first NFS Volume
+    # - name: Create an additional NFS Volume

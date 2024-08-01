@@ -1,0 +1,9 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+mirror:
+  platform:
+    channels:
+    - name: stable-{{ openshift_release.split('.')[0] }}.{{ openshift_release.split('.')[1] }}
+      minVersion: {{ previous_openshift_release }}
+      maxVersion: {{ openshift_release }}
+      shortestPath: true

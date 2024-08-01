@@ -1,0 +1,106 @@
+- name: "Create Directories"
+  file:
+    mode: '0774'
+    path: '{{ item }}'
+    state: directory
+    owner: sysadmin
+    group: wheel
+  with_items:
+      - "{{ ansible_user_dir }}/.docker/"
+      - "{{ registry_volume }}/data"
+      - "{{ registry_volume }}/auth"
+      - "{{ registry_volume }}/certs"
+      - "{{ ansible_user_dir }}/.config/systemd/user"
+  become: true
+
+- name: "Import Regstry Image"
+  command:
+    cmd: podman load -i {{ role_path}}/files/registry.tar
+
+- name: "Generate Registry Basic Auth"
+  command:
+    cmd: htpasswd -Bbn {{ registry_username }} {{ registry_password }}
+  register: bcrypt_htpasswd
+
+- name: "Write Registry htpasswd credential config"
+  copy:
+    content: '{{ bcrypt_htpasswd.stdout }}'
+    dest: '{{ registry_volume }}/auth/htpasswd'
+    mode: 0760
+
+- name: "Generate encrypted password"
+  shell:
+    cmd: "echo {{ registry_username }}:{{ registry_password }} | base64 -w0"
+  register: docker_pass
+
+- name: "Generate certs"
+  shell:
+    cmd: "bash generateCert.sh {{ bastion_hostname }}.{{ cluster_name }}.{{ cluster_domain }} {{ bastion_hostname }}"
+  args:
+    chdir: "{{ role_path}}/files/"
+
+- name: "Set permission on generated certs"
+  file:
+    path: "{{ certs_location }}/{{ item['name'] }}"
+    state: file
+    owner: "{{ lookup('env','USER') }}"
+    group: "{{ lookup('env','USER') }}"
+    mode: "0755"
+  with_items: "{{ cert_names }}"
+  become: true
+
+- name: "Copy over generated certs"
+  copy:
+    src: "{{ certs_location }}/{{ item['name'] }}"
+    dest: "{{ registry_volume }}/certs"
+  with_items: "{{ cert_names }}"
+  become: true
+
+- name: "Create Registry Container"
+  command:
+    cmd: podman create --name {{ registry_pod_name }} -p {{ registry_port }}:5000 -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry" -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/{{ cert_crt_name }}" -e "REGISTRY_HTTP_TLS_KEY=/certs/{{ cert_key_name }}" -e "REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true" -v {{ registry_volume }}/data:/var/lib/registry:z -v {{ registry_volume }}/auth:/auth:z -v {{ registry_volume }}/certs:/certs:z docker.io/library/registry:latest
+  register: container_created
+
+- name: "Create Registry Container Service"
+  command:
+    cmd: podman generate systemd --name {{ registry_pod_name }} --files
+  args:
+    chdir: "{{ ansible_user_dir }}/.config/systemd/user"
+
+- name: "Enable Linger | Allows Service to Start without user logging in"
+  command:
+    cmd: loginctl enable-linger "{{ lookup('env','USER') }}"
+  become: true
+
+- name: "Reload users systemd"
+  systemd:
+    daemon_reload: yes
+    scope: user
+
+- name: "Start and Enable Registry Service"
+  systemd:
+    name: "container-{{ registry_pod_name }}.service"
+    state: started
+    enabled: yes
+    scope: user
+
+- name: "Open port {{ registry_port }} on the firewall permanently"
+  firewalld: 
+    port: "{{ registry_port }}/tcp"
+    permanent: yes
+    immediate: yes
+    state: enabled
+  become: true
+
+- name: "Login to registry"
+  command:
+     cmd: podman login https://{{ bastion_hostname }}.{{ cluster_name }}.{{ cluster_domain }}:{{ registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
+  register: registry_logedin
+  retries: 5
+  delay: 2
+  until: registry_logedin.rc == 0 
+
+- name: "copy /run/user/1000/containers/auth.json to {{ ansible_user_dir }}/.docker/config.json"
+  copy:
+    src: /run/user/1000/containers/auth.json
+    dest: "{{ ansible_user_dir }}/.docker/config.json"

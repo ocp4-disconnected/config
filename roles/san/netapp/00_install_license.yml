@@ -1,0 +1,28 @@
+---
+- name: Provision NetApp
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  # vars: {}
+
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      username: admin
+      password: "{{ netapp_admin_password }}"
+      hostname: "{{ netapp_node_a_ip }}"
+      validate_certs: false
+      https: true
+      # use_rest: always
+
+  tasks:
+    - name: Install Licenses
+      netapp.ontap.na_ontap_license:
+        state: present
+        license_codes:
+          # - CEGETODPDUEVQEAAAAAAAAAAAAAA
+          - QLNSUUORYVHXCFAAAAAAAAAAAAAA
+          # - ETUGWAAUTXKZOFAAAAAAAAAAAAAA
+          - APJJXZPISPYQSDAAAAAAAAAAAAAA  # NFS
+          - YDFNYZPISPYQSDAAAAAAAAAAAAAA  # iSCSI
+          # - ITVRHAQISPYQSDAAAAAAAAAAAAAA  # TPM

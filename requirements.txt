@@ -1,0 +1,2 @@
+netapp-lib>=2020.3.12
+psycopg2

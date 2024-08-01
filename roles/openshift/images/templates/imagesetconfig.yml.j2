@@ -1,0 +1,30 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+mirror:
+  platform:
+    channels:
+    - name: stable-{{ openshift_release.split('.')[0] }}.{{ openshift_release.split('.')[1] }}
+      minVersion: {{ openshift_release }}
+      maxVersion: {{ openshift_release }}
+  operators:
+{% for index_dict in operators %}
+  {% for index, packages in index_dict.items() -%}
+    {% if packages %}
+- catalog: registry.redhat.io/redhat/{{ index }}:v{{ openshift_release.split('.')[0] }}.{{ openshift_release.split('.')[1] }}
+    packages:
+    {% for package in packages -%}
+    - name: {{ package.name }}
+      {% if 'channel' in package %} 
+      channels: 
+        - name: {{ package.channel }}
+    {% endif %} 
+    {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endfor %}
+{% if additionalImages +%}
+  additionalImages:
+  {% for image in additionalImages %}
+- name: {{ image.name }}
+  {% endfor %}
+{% endif %}

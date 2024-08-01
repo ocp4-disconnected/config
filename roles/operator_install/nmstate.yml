@@ -1,0 +1,43 @@
+---
+
+- name: "Create list of Openshift Operator Subscriptions"
+  find: 
+    paths: "{{ role_path}}/files/operators"
+    patterns: '*.yaml,*.yml'
+  register: operators
+
+- name: "Apply the Openshift Operator Subscriptions"
+  command:
+    cmd: "oc apply -f {{ item.path }}"
+  with_items: "{{ operators.files }}"
+
+- name: "{{ role_name }} | Pause for 2 minutes to Allow Openshift Virtualizaion to get installed"
+  pause:
+    minutes: 2
+
+- name: "{{ role_name }} | Deploy hyperconverged for Openshift Virtualizaion"
+  command:
+    cmd: "oc apply -f {{ role_path}}/files/cnv/hyperconverged.yaml"
+  register: deployed_hyperconverged
+  retries: 5
+  delay: 15
+  until: deployed_hyperconverged.rc == 0
+
+
+- name: Configure NMState Operator
+  hosts: localhost
+  become: true
+  gather_facts: false
+  # module_defaults:
+  #   kubernetes.core.k8s:
+  #     kubeconfig: $HOME/.kube/config
+  tasks:
+    - name: Configure NMState
+      kubernetes.core.k8s:
+        state: present
+        definition:
+          apiVersion: nmstate.io/v1
+          kind: NMState
+          metadata:
+            name: nmstate
+          spec: {}

@@ -1,0 +1,47 @@
+- name: Provision NetApp = Fix Cluster
+  hosts: netapp
+  connection: local
+  gather_facts: false
+
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      username: admin
+      password: "{{ netapp_admin_password }}"
+      hostname: "{{ netapp_node_a_ip }}"
+      validate_certs: false
+      https: true
+      # use_rest: always
+
+  tasks:
+    # - name: Rename the Root Aggregate
+    #   netapp.ontap.na_ontap_aggregate:
+    #     state: present
+    #     service_state: online
+    #     from_name: aggr0
+    #     name: aggr0_node1
+    #     disk_count: 20
+
+    - name: Remove ports from Default Broadcast-Domain
+      netapp.ontap.na_ontap_broadcast_domain_ports:
+        state: absent
+        ipspace: Default
+        broadcast_domain: Default
+        ports:
+          - "{{ netapp_cluster_name }}-01:e0a"
+          - "{{ netapp_cluster_name }}-01:e0b"
+          - "{{ netapp_cluster_name }}-01:e0c"
+          - "{{ netapp_cluster_name }}-01:e0d"
+          # - "{{ netapp_cluster_name }}-01:e0e"
+          # - "{{ netapp_cluster_name }}-01:e0f"
+
+    - name: Add ports to Cluster Broadcast-Domain
+      failed_when: false
+      netapp.ontap.na_ontap_broadcast_domain_ports:
+        state: present
+        ipspace: Cluster
+        broadcast_domain: Cluster
+        ports:
+          - "{{ netapp_cluster_name }}-01:e0a"
+          - "{{ netapp_cluster_name }}-01:e0b"
+          # - "{{ netapp_cluster_name }}-01:e0e"
+          # - "{{ netapp_cluster_name }}-01:e0f"

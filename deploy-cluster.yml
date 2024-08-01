@@ -1,0 +1,7 @@
+---
+- hosts: localhost
+  gather_facts: true
+  roles:
+#    - validate_dns
+    - generate_agent_iso
+    - idrac

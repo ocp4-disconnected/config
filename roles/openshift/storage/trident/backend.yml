@@ -1,0 +1,20 @@
+---
+- name: NetApp Trident CSI
+  hosts: localhost
+  gather_facts: false
+  # module_defaults:
+  #   kubernetes.core.k8s:
+  #     kubeconfig: $HOME/.kube/config
+  tasks:
+    - name: Generate backend configuration
+      ansible.builtin.template:
+        src: backend.json.j2
+        dest: "{{ lookup('env', 'PWD') }}/backend.json"
+        mode: '0644'
+
+    - name: Configure Trident backend
+      ansible.builtin.command: tridentctl create backend \
+        --namespace {{ trident_namespace }} \
+        -f "{{ lookup('env', 'PWD') }}/backend.json"
+      register: trident_backend
+      changed_when: "trident_backend.rc != 0"

@@ -1,0 +1,55 @@
+---
+- name: Create {{ openshift_oc_mirror_dir }}
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0755'
+    state: directory
+  with_items:
+  - "{{ openshift_oc_mirror_dir }}"
+
+- name: generete oc-mirror imagesetconfig
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ openshift_download_dir }}/{{ item }}"
+  with_items:
+    - cluster-images.yml
+    - operators.yml  
+
+- name: Fix formating of generated imagesetconfig
+  ansible.builtin.replace:
+    path: "{{ openshift_download_dir }}/{{ item }}"
+    regexp: '^\s*$'
+    replace: ""
+  with_items: 
+    - cluster-images.yml
+    - operators.yml
+
+- name: Fix formating of generated imagesetconfig
+  ansible.builtin.replace:
+    path: "{{ openshift_download_dir }}/{{ item }}"
+    regexp: '[ \t]+$'
+    replace: ""
+  with_items: 
+    - cluster-images.yml
+    - operators.yml
+
+- name: remove empty lines with sed
+  ansible.builtin.shell: sed -i '/^$/d' {{ openshift_download_dir }}/{{ item }}
+  with_items: 
+    - cluster-images.yml
+    - operators.yml
+
+- name: fix permisison on oc-mirror to make executable
+  ansible.builtin.file:
+    path: "{{ openshift_client_bin }}/oc-mirror"
+    mode: '0755'
+
+- name: Run oc-mirror to generate image tar
+  ansible.builtin.command: "{{ openshift_client_bin }}/oc-mirror --config {{ item }} \ 
+    file://{{ openshift_oc_mirror_dir }}/"
+  args:
+    chdir: "{{ openshift_download_dir }}"
+  when: pull_mirror | bool
+  with_items: 
+    - cluster-images.yml
+    - operators.yml

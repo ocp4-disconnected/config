@@ -1,0 +1,31 @@
+apiVersion: nmstate.io/v1beta1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: vm-network
+spec:
+  nodeSelector:
+    node-role.kubernetes.io/master: ''
+  desiredState:
+    interfaces:
+      - name: bond0.120
+        description: VM Network VLAN10 using bond0
+        state: up
+        type: vlan
+        vlan:
+          base-iface: bond0
+          id: 120
+      - name: vm-network
+        description: Linux bridge with bond0.10 as a port
+        type: linux-bridge
+        state: up
+        ipv4:
+          enabled: true
+          # address:
+          # - ip: 192.168.122.250 
+          #   prefix-length: 24
+        bridge:
+          options:
+            stp:
+              enabled: false
+          port:
+            - name: bond0.10

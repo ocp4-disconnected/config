@@ -1,0 +1,65 @@
+openshift_dir:
+
+## Location of specific files
+ca_cert_location:
+ssh_key:
+
+# Registry
+registry_volume:
+registry_username:
+registry_password:
+registry_port:
+cluster_name:
+cluster_domain:
+pull_secret:
+pull_mirror:
+registry_fqdn:
+registry_port:
+
+## Routing
+ip_space:
+cluster_cidr:
+dns_resolver:
+gateway_ip:
+openshift_interface:
+api_ip:
+ingress_ip:
+table_id:
+idrac_user:
+idrac_password:
+
+## Cluster Node Config
+nodes:
+  - name:
+    ip:
+    mac:
+  - name:
+    ip:
+    mac:
+  - name:
+    ip:
+    mac:
+  - name:
+    ip:
+    mac:
+idrac:
+  - name:
+    ip:
+  - name:
+    ip:
+  - name:
+    ip:
+  - name:
+    ip:
+
+bond_name:
+bond_mode:
+bond_interfaces:
+  - name:
+  - name:
+  - name:
+  - name:
+
+vlans:
+  - id:
+  - id:

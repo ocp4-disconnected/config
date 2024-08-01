@@ -1,0 +1,65 @@
+- name: Provision NetApp = Initialize
+  hosts: netapp
+  connection: local
+  gather_facts: false
+
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      username: admin
+      password: "{{ netapp_admin_password }}"
+      hostname: "{{ netapp_node_a_ip }}"
+      validate_certs: false
+      https: true
+      # use_rest: always
+
+  tasks:
+    - name: Create management LIFs
+      failed_when: false
+      netapp.ontap.na_ontap_interface:
+        state: present
+        interface_name: cluster_mgmt
+        home_port: e0M
+        home_node: "{{ netapp_cluster_name }}-01"
+        role: cluster-mgmt
+        admin_status: up
+        failover_policy: broadcast-domain-wide
+        firewall_policy: mgmt
+        is_auto_revert: false
+        address: 172.16.100.21
+        netmask: 255.255.255.0
+        force_subnet_association:
+        vserver: "{{ netapp_cluster_name }}"
+
+    - name: Set NTP
+      netapp.ontap.na_ontap_ntp:
+        state: present
+        server_name: "172.16.100.1"
+      # loop:
+      #   - "172.16.1.1"
+      #   - "172.16.100.1"
+
+    - name: Set DNS
+      netapp.ontap.na_ontap_dns:
+        state: present
+        vserver: "{{ netapp_cluster_name }}"
+        domains: storage.hkn.lab
+        nameservers:
+          - "172.16.3.13"
+          - "172.16.3.11"
+        skip_validation: false
+
+    - name: Disable autosupport
+      netapp.ontap.na_ontap_autosupport:
+        state: absent
+        node_name: "{{ netapp_cluster_name }}-01"
+        # node_name: "{{ item }}"
+      # loop:
+      #   - node01
+
+    # - name: Rename the Root Aggregate
+    #   netapp.ontap.na_ontap_aggregate:
+    #     state: present
+    #     service_state: online
+    #     from_name: aggr0
+    #     name: aggr0_node1
+    #     disk_count: 20

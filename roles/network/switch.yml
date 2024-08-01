@@ -1,0 +1,17 @@
+---
+- name: Provision Switch
+  hosts: cisco
+  gather_facts: false
+
+  vars:
+    boot_source_mode: "UEFI"
+
+  # module_defaults:
+  #   dellemc.openmanage.idrac_virtual_media:
+  #   dellemc.openmanage.idrac_boot:
+
+  tasks:
+    - name: Configure user
+    - name: Configure VLANs
+    - name: Configure Port-Channels
+    - name: Configure Ethernet Ports

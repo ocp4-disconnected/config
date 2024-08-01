@@ -1,0 +1,29 @@
+---
+- name: Provision NetApp = Create Cluster
+  hosts: netapp
+  connection: local
+  gather_facts: false
+
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      username: admin
+      password: "{{ netapp_admin_password }}"
+      hostname: "{{ netapp_node_a_ip }}"
+      validate_certs: false
+      https: true
+      # use_rest: always
+
+  tasks:
+    - name: Create cluster
+      netapp.ontap.na_ontap_cluster:
+        state: present
+        cluster_name: "{{ netapp_cluster_name }}"
+        # timezone:
+        #   name:
+        single_node_cluster: true
+
+    # - name: Add Second Node
+    #   netapp.ontap.na_ontap_cluster:
+    #     state: present
+    #     cluster_ip_address: "{{ netapp_node_b_ip }}"
+    #     node_name: "{{ netapp_cluster_name }}-02"

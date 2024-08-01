@@ -1,0 +1,26 @@
+---
+- name: Insert image file using HTTP.
+  delegate_to: localhost
+  dellemc.openmanage.idrac_virtual_media:
+    idrac_ip: "{{ item.ip }}"
+    idrac_user: "{{ idrac_user }}"
+    idrac_password: "{{ idrac_password }}"
+    validate_certs: false
+    force: true
+    virtual_media:
+      - insert: true
+        image: "http://{{ ansible_default_ipv4.address }}/agent.x86_64.iso"
+        media_type: "DVD"
+  loop: "{{ idrac }}"
+
+- name: Boot Once via CD
+  delegate_to: localhost
+  dellemc.openmanage.idrac_boot:
+    idrac_ip: "{{ item.ip }}"
+    idrac_user: "{{ idrac_user }}"
+    idrac_password: "{{ idrac_password }}"
+    validate_certs: false
+    boot_source_override_target: cd
+    boot_source_override_enabled: once
+    reset_type: force_restart
+  loop: "{{ idrac }}"

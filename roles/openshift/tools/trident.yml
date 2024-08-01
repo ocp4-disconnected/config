@@ -1,0 +1,24 @@
+---
+- name: Install NetApp Trident utilities
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Install tridentctl
+      ansible.builtin.unarchive:
+        src: "{{ openshift_download_dir }}/trident-installer-{{ trident_version | replace('v', '') }}.tar.gz"
+        remote_src: true
+        include:
+          - trident-installer/tridentctl
+        dest: "{{ openshift_client_bin }}"
+
+    - name: Move tridentctl to proper location
+      ansible.builtin.copy:
+        remote_src: true
+        src: "{{ openshift_client_bin }}/trident-installer/tridentctl"
+        dest: "{{ openshift_client_bin }}/tridentctl"
+        mode: '0755'
+
+    - name: Remove trident-installer/tridentctl
+      ansible.builtin.file:
+        path: "{{ openshift_client_bin }}/trident-installer"
+        state: absent

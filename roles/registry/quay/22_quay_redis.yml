@@ -1,0 +1,17 @@
+---
+- name: Configure Redis for Red Hat Quay
+  hosts: quay-host
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Start Redis Server
+      containers.podman.podman_container:
+        state: started
+        name: quay-redis
+        image: registry.redhat.io/rhel8/redis-6:1-110
+        hostname: "{{ quay_redis_hostname | default(omit) }}"
+        env:
+          REDIS_PASSWORD: "{{ quay_redis_password }}"
+        publish:
+          - "{{ quay_redis_ip | default('0.0.0.0') }}:6379:6379"

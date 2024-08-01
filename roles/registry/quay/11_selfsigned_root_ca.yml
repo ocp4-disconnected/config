@@ -1,0 +1,44 @@
+---
+- name: Generate Root CA Cert for Quay
+  hosts: quay-host
+  # connection: local
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Create RootCA Save Location
+      ansible.builtin.file:
+        state: directory
+        path: /etc/containers/certs.d/{{ quay_hostname }}
+        mode: '0755'
+
+    - name: Generate rootCA Private Key
+      community.crypto.openssl_privatekey:
+        path: "{{ rootca_privatekey_path }}"
+        # size: 2048
+
+    - name: Generate rootCA CSR
+      community.crypto.openssl_csr_pipe:
+        country_name: "{{ cert_country_name }}"
+        state_or_province_name: "{{ cert_state_or_province_name }}"
+        locality_name: "{{ cert_locality_name }}"
+        organization_name: "{{ cert_organization_name }}"
+        organizational_unit_name: "{{ cert_organizational_unit_name }}"
+        common_name: "{{ cert_common_name }}"
+        use_common_name_for_san: false
+        basic_constraints:
+          - 'CA:TRUE'
+        basic_constraints_critical: true
+        key_usage:
+          - keyCertSign
+        key_usage_critical: true
+        privatekey_path: "{{ rootca_privatekey_path }}"
+      register: rootca_csr
+
+    - name: Generate rootCA Cert
+      community.crypto.x509_certificate:
+        csr_content: "{{ rootca_csr.csr }}"
+        privatekey_path: "{{ rootca_privatekey_path }}"
+        path: "{{ rootca_path }}"
+        provider: selfsigned
+        selfsigned_not_after: +1024d

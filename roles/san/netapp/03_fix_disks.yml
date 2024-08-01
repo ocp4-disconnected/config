@@ -1,0 +1,20 @@
+---
+- name: Provision NetApp = Fix Disks
+  hosts: netapp
+  connection: local
+  gather_facts: false
+
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      username: admin
+      password: "{{ netapp_admin_password }}"
+      hostname: "{{ netapp_node_a_ip }}"
+      validate_certs: false
+      https: true
+      # use_rest: always
+
+  tasks:
+    - name: Assign all disks
+      netapp.ontap.na_ontap_disks:
+        node: "{{ netapp_cluster_name }}-01"
+

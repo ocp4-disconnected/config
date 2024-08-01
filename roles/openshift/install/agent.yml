@@ -1,0 +1,47 @@
+---
+- name: Agent-based Installer
+  hosts: localhost
+  # module_defaults:
+  #   kubernetes.core.k8s:
+  #     kubeconfig: $HOME/.kube/config
+  tasks:
+    - name: Create cluster install dir
+      ansible.builtin.file:
+        path: "{{ openshift_cluster_install_dir }}"
+        mode: '0755'
+        state: directory
+
+    - name: Generate agent-config.yaml
+      ansible.builtin.template:
+        src: "{{ item }}.j2"
+        dest: "{{ openshift_cluster_install_dir }}/{{ item }}"
+        mode: '0644'
+      with_items:
+       - install-config.yaml
+       - agent-config.yaml
+
+    - name: Create copys of agent-config and install configuration
+      ansible.builtin.copy:
+        src: "{{ openshift_cluster_install_dir }}/{{ item }}"
+        dest: "{{ openshift_cluster_install_dir }}/{{ item }}-copy"
+        remote_src: yes
+      with_items:
+       - install-config.yaml
+       - agent-config.yaml
+
+    - name: Generate ISO
+      register: generate_iso
+      changed_when:
+        - generate_iso.rc == 0
+      ansible.builtin.command: |
+        {{ openshift_client_bin }}/openshift-install \
+        agent create image \
+        --log-level debug \
+        --dir {{ openshift_cluster_install_dir }}
+
+    - name: Move generated ISO to webroot
+      ansible.builtin.copy:
+        src: "{{ openshift_cluster_install_dir}}/agent.x86_64.iso"
+        dest: /var/www/html
+        remote_src: true
+      become: true

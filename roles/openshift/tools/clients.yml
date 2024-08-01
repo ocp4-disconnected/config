@@ -1,0 +1,22 @@
+---
+- name: Install client utilities
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create cluster bin dir
+      ansible.builtin.file:
+        path: "{{ openshift_client_bin }}"
+        mode: '0755'
+        state: directory
+
+    - name: Install oc tools
+      ansible.builtin.unarchive:
+        src: "{{ openshift_download_dir }}/{{ item }}"
+        remote_src: true
+        exclude:
+          - README.md
+        dest: "{{ openshift_client_bin }}"
+      with_items:
+        - openshift-client-linux.tar.gz
+        - oc-mirror.tar.gz
+        - openshift-install-linux.tar.gz

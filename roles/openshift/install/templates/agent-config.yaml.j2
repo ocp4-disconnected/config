@@ -1,0 +1,35 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: {{ cluster_name }}
+rendezvousIP: {{ nodes[0].ip }}
+hosts:
+{% for node in nodes %}
+  - hostname: {{ node.name }}
+    role: {{ node.name | regex_replace('-.*', '') }}
+    interfaces:
+      - name: eno1
+        macAddress: {{ node.mac }}
+    networkConfig:
+      interfaces:
+        - name: eno1
+          type: ethernet
+          state: up
+          mac-address: {{ node.mac }}
+          ipv4:
+            enabled: true
+            address: 
+              - ip: {{ node.ip }}
+                prefix-length: 23
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - {{ dns_resolver }}
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: {{ next_hop_address }}
+            next-hop-interface: {{ next_hop_interface }}
+            table-id: {{ table_id }}
+{% endfor %}

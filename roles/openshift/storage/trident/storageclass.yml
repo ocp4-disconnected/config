@@ -1,0 +1,12 @@
+---
+- name: NetApp Trident CSI
+  hosts: localhost
+  gather_facts: false
+  # module_defaults:
+  #   kubernetes.core.k8s:
+  #     kubeconfig: $HOME/.kube/config
+  tasks:
+    - name: Configure default StorageClass
+      kubernetes.core.k8s:
+        state: present
+        template: class.yaml.j2

@@ -1,0 +1,51 @@
+---
+- name: Create GitLab Directories
+  hosts: quay-host
+  gather_facts: false
+  become: true
+
+  vars:
+    gitlab_path: /home/gitlab
+
+  tasks:
+    - name: Create GitLab Configuration Directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ gitlab_path }}/config"
+        mode: '0755'
+
+    - name: Create GitLab Logs Directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ gitlab_path }}/logs"
+        mode: '0755'
+
+    - name: Create GitLab Data Directory
+      ansible.builtin.file:
+        state: directory
+        path: "{{ gitlab_path }}/data"
+        mode: '0755'
+
+    # - name: Set File ACLs on GitLab Configuration Directory
+    #   ansible.posix.acl:
+    #     state: present
+    #     path: "{{ quay_config_path }}"
+    #     etype: user
+    #     entity: 1001
+    #     permissions: -wx
+
+    # - name: Set File ACLs on GitLab Logs Directory
+    #   ansible.posix.acl:
+    #     state: present
+    #     path: "{{ quay_storage_path }}"
+    #     etype: user
+    #     entity: 1001
+    #     permissions: -wx
+
+    # - name: Set File ACLs on GitLab Data Directory
+    #   ansible.posix.acl:
+    #     state: present
+    #     path: "{{ quay_storage_path }}"
+    #     etype: user
+    #     entity: 1001
+    #     permissions: -wx

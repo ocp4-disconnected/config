@@ -1,0 +1,44 @@
+---
+- name: Generate Self-Signed Certs for Quay
+  hosts: quay-host
+  # connection: local
+  gather_facts: false
+  become: true
+
+  tasks:
+    - name: Generate Quay Private Key
+      community.crypto.openssl_privatekey:
+        path: "{{ cert_privatekey_path }}"
+        # size: 2048
+        mode: '0777'
+
+    - name: Generate Quay CSR
+      community.crypto.openssl_csr_pipe:
+        country_name: "{{ cert_country_name }}"
+        state_or_province_name: "{{ cert_state_or_province_name }}"
+        locality_name: "{{ cert_locality_name }}"
+        organization_name: "{{ cert_organization_name }}"
+        organizational_unit_name: "{{ cert_organizational_unit_name }}"
+        common_name: "{{ cert_common_name }}"
+        use_common_name_for_san: false
+        basic_constraints:
+          - 'CA:FALSE'
+        key_usage:
+          - nonRepudiation
+          - digitalSignature
+          - keyEncipherment
+        # subject:
+        #   CN: quay-enterprise
+        subject_alt_name: "{{ cert_subject_alt_name }}"
+        privatekey_path: "{{ cert_privatekey_path }}"
+      register: quay_csr
+
+    - name: Generate Quay Cert
+      community.crypto.x509_certificate:
+        csr_content: "{{ quay_csr.csr }}"
+        privatekey_path: "{{ cert_privatekey_path }}"
+        path: "{{ cert_path }}"
+        provider: ownca
+        ownca_path: "{{ rootca_path }}"
+        ownca_privatekey_path: "{{ rootca_privatekey_path }}"
+        ownca_not_after: +365d

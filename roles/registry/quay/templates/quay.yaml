@@ -1,0 +1,104 @@
+ALLOWED_OCI_ARTIFACT_TYPES:
+    application/vnd.oci.image.config.v1+json:
+        - application/vnd.oci.image.layer.v1.tar+zstd
+    application/vnd.sylabs.sif.config.v1+json:
+        - application/vnd.sylabs.sif.layer.v1+tar
+AUTHENTICATION_TYPE: Database
+AVATAR_KIND: local
+BUILDLOGS_REDIS:
+    host: {{ quay_redis_hostname }}
+    password: {{ quay_redis_password }}
+    port: {{ quay_redis_port }}
+DATABASE_SECRET_KEY: 0ce4f796-c295-415b-bf9d-b315114704b8 # {{ 999999999 | random(seed=inventory_hostname) | ansible.builtin.to_uuid | lower }}
+DB_CONNECTION_ARGS: {}
+DB_URI: postgresql://{{ quay_postgresql_username }}:{{ quay_postgresql_password }}@{{ quay_postgresql_hostname }}:{{ quay_postgresql_port }}/{{ quay_postgresql_database }}
+DEFAULT_TAG_EXPIRATION: 2w
+DISTRIBUTED_STORAGE_CONFIG:
+    default:
+        - LocalStorage
+        - storage_path: /datastorage/registry
+DISTRIBUTED_STORAGE_DEFAULT_LOCATIONS: []
+DISTRIBUTED_STORAGE_PREFERENCE:
+    - default
+EXTERNAL_TLS_TERMINATION: false
+FEATURE_ACI_CONVERSION: false
+FEATURE_ACTION_LOG_ROTATION: false
+FEATURE_ANONYMOUS_ACCESS: true
+FEATURE_APP_REGISTRY: true
+FEATURE_APP_SPECIFIC_TOKENS: true
+FEATURE_BITBUCKET_BUILD: false
+FEATURE_BLACKLISTED_EMAILS: false
+FEATURE_BUILD_SUPPORT: false
+FEATURE_CHANGE_TAG_EXPIRATION: true
+FEATURE_DIRECT_LOGIN: true
+FEATURE_EXTENDED_REPOSITORY_NAMES: true
+FEATURE_FIPS: false
+FEATURE_GITHUB_BUILD: false
+FEATURE_GITHUB_LOGIN: false
+FEATURE_GITLAB_BUILD: false
+FEATURE_GOOGLE_LOGIN: false
+FEATURE_INVITE_ONLY_USER_CREATION: false
+FEATURE_MAILING: false
+FEATURE_NONSUPERUSER_TEAM_SYNCING_SETUP: false
+FEATURE_PARTIAL_USER_AUTOCOMPLETE: true
+FEATURE_PROXY_STORAGE: false
+FEATURE_REPO_MIRROR: false
+FEATURE_REQUIRE_TEAM_INVITE: true
+FEATURE_RESTRICTED_V1_PUSH: true
+FEATURE_SECURITY_NOTIFICATIONS: false
+FEATURE_SECURITY_SCANNER: true
+FEATURE_STORAGE_REPLICATION: false
+FEATURE_TEAM_SYNCING: false
+FEATURE_USER_CREATION: true
+FEATURE_USER_LAST_ACCESSED: true
+FEATURE_USER_LOG_ACCESS: false
+FEATURE_USER_METADATA: false
+FEATURE_USER_RENAME: false
+FEATURE_USERNAME_CONFIRMATION: true
+FRESH_LOGIN_TIMEOUT: 10m
+GITHUB_LOGIN_CONFIG: {}
+GITHUB_TRIGGER_CONFIG: {}
+GITLAB_TRIGGER_KIND: {}
+LDAP_ALLOW_INSECURE_FALLBACK: false
+LDAP_EMAIL_ATTR: mail
+LDAP_UID_ATTR: uid
+LDAP_URI: ldap://localhost
+LOG_ARCHIVE_LOCATION: default
+LOGS_MODEL: database
+LOGS_MODEL_CONFIG: {}
+MAIL_DEFAULT_SENDER: support@quay.io
+MAIL_PORT: 587
+MAIL_USE_AUTH: false
+MAIL_USE_TLS: false
+PREFERRED_URL_SCHEME: https
+REGISTRY_TITLE: Project Quay
+REGISTRY_TITLE_SHORT: Project Quay
+REPO_MIRROR_INTERVAL: 30
+REPO_MIRROR_TLS_VERIFY: true
+SEARCH_MAX_RESULT_PAGE_COUNT: 10
+SEARCH_RESULTS_PER_PAGE: 10
+SECRET_KEY: e8f9fe68-1f84-48a8-a05f-02d72e6eccba # {{ 999999999 | random(seed=inventory_hostname) | ansible.builtin.to_uuid | lower }}
+SECURITY_SCANNER_INDEXING_INTERVAL: 30
+SECURITY_SCANNER_V4_ENDPOINT: http://{{ clair_hostname }}:8081
+SECURITY_SCANNER_V4_PSK: {{ clair_psk }}
+SERVER_HOSTNAME: {{ quay_hostname }}
+SETUP_COMPLETE: true
+SUPER_USERS:
+    - quayadmin
+TAG_EXPIRATION_OPTIONS:
+    - 0s
+    - 1d
+    - 1w
+    - 2w
+    - 4w
+TEAM_RESYNC_STALE_TIME: 30m
+TESTING: false
+USE_CDN: false
+USER_EVENTS_REDIS:
+  host: {{ quay_redis_hostname }}
+  password: {{ quay_redis_password }}
+  port: {{ quay_redis_port }}
+USER_RECOVERY_TOKEN_LIFETIME: 30m
+USERFILES_LOCATION: default
+CREATE_NAMESPACE_ON_PUSH: true
+# FEATURE_USER_INITIALIZE: true

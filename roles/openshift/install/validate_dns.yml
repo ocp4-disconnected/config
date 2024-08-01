@@ -1,0 +1,14 @@
+---
+- name: Validate DNS configuration
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Check DNS records
+      command: dig +short {{ item }}
+      register: dns_lookup
+      with_items:
+        - "api.{{ cluster_fqdn }}"
+        - "testurl.apps.{{ cluster_fqdn }}"
+        - "{{ registry_fqdn }}"
+      failed_when: dns_lookup.stdout == ''
+      changed_when: false
