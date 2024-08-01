@@ -28,7 +28,7 @@ platform:
     ingressVIPs:
       - {{ ingress_ip }}
 fips: true
-pullSecret: '{{ pull_secret }}'
+pullSecret: {{ lookup('ansible.builtin.file', pull_secret ) | to_nice_json }}
 sshKey: "{{ lookup('ansible.builtin.file', ssh_key) }}"
 additionalTrustBundle: |
 {{ lookup('ansible.builtin.file',  ca_cert_location) | indent(2, true) }}
