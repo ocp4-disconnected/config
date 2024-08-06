@@ -7,6 +7,7 @@
   with_items:
   - "{{ openshift_download_dir }}"
   - "{{ openshift_client_bin }}"
+  - "{{ openshift_oc_mirror_dir }}"
 
 - name: Download oc tools
   ansible.builtin.get_url:
@@ -60,14 +61,25 @@
     dest: "{{ openshift_client_bin }}/tridentctl"
     mode: '0755'
 
+- name: Remove tools tar
+  ansible.builtin.file:
+    path: "{{ openshift_download_dir }}"
+    state: absent
+
 - name: Remove trident-installer/tridentctl
   ansible.builtin.file:
     path: "{{ openshift_client_bin }}/trident-installer"
     state: absent
 
-### - name: TODO find and list all images to pull for quay 
-#  with_itmes:
-#    - "{{ quay_images }}"
+- name: pull registry image
+  containers.podman.podman_image:
+    name: docker.io/library/registry
 
+- name: save registry image
+  containers.podman.podman_save:
+    image: docker.io/library/registry
+    dest: "{{ openshift_oc_mirror_dir }}/registry.tar"
+
+  
 ### Get a way to pull RHCOS iso
 # openshift-install coreos print-stream-json

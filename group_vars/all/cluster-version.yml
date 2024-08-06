@@ -8,7 +8,6 @@ ca_cert_location:
 ssh_key:
 
 registry:
-pull_secret:
 pull_mirror:
 
 ## Operators To be mirrored, based on index they are in

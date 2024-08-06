@@ -8,8 +8,8 @@ spec:
       - name: {{ bond_name }}
         type: bond
         link-aggregation:
-          mode: 802.3ad
-          slaves:
-{% for nic inbond_interfaces %}          
+          mode: {{ bond_mode }}
+          port:
+{% for nic in bond_interfaces %}          
           -  {{ nic.name }}
 {% endfor %}

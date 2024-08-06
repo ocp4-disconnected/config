@@ -1,7 +1,0 @@
----
-- name: Validate DNS
-  ansible.builtin.import_playbook: openshift/install/validate_dns.yml
-- name: Install cluster
-  ansible.builtin.import_playbook: openshift/install/agent.yml
-# - name: Bootstrap via iDRAC
-#   ansible.builtin.import_playbook: openshift/idrac/boot.yml

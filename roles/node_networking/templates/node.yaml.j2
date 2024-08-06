@@ -1,34 +1,23 @@
 apiVersion: nmstate.io/v1beta1
 kind: NodeNetworkConfigurationPolicy
 metadata:
-  name: bond-ips
+  name: bond-ips-{{ item.name }}
 spec:
   nodeSelector:
-    kubernetes.io/hostname: master-2
+    kubernetes.io/hostname: {{ item.name }}
   desiredState:
     interfaces:
-      - name: bond0.670
+{% for vlan in vlans %}
+      - name: {{ bond_name }}.{{ vlan.id }}
         type: vlan
         state: up
         vlan:
-          base-iface: bond0
-          id: 670
+          base-iface: {{ bond_name }}
+          id: {{ vlan.id }}
         ipv4:
           enabled: true
           dhcp: false
           address:
-          - ip: 10.6.70.127
+          - ip: {{ vlan.ip}}.{{ item.ip }}
             prefix-length: 24
-
-      - name: bond0.672
-        type: vlan
-        state: up
-        vlan:
-          base-iface: bond0
-          id: 672
-        ipv4:
-          enabled: true
-          dhcp: false
-          address:
-          - ip: 10.6.72.127
-            prefix-length: 24
+{% endfor %}

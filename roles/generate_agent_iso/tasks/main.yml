@@ -1,9 +1,12 @@
 ---
 - name: Create cluster install dir
   ansible.builtin.file:
-    path: "{{ openshift_cluster_install_dir }}"
+    path: "{{ item }}"
     mode: '0755'
     state: directory
+  with_items:
+    - "{{ openshift_cluster_install_dir }}"
+    - "{{ openshift_cluster_config_dir }}"
 
 - name: Generate agent-config.yaml
   ansible.builtin.template:

@@ -8,6 +8,9 @@ temp/
 inventories/host_vars/**
 inventories/**
 
+# Log files
+*log
+**/*log
 
 # Ansible Vaults
 vault.yml

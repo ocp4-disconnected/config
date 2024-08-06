@@ -1,13 +1,13 @@
 host_fqdn=$1
 hostname=$2
-cert_c="US"   # Country Name (C, 2 letter code)
-cert_s="California"          # Certificate State (S)
-cert_l="San Diego"       # Certificate Locality (L)
-cert_o="USN NIWC PAC"   # Certificate Organization (O)
-cert_ou="CTU-2"      # Certificate Organizational Unit (OU)
+cert_c="FB"   # Country Name (C, 2 letter code)
+cert_s="."          # Certificate State (S)
+cert_l="."       # Certificate Locality (L)
+cert_o="foo"   # Certificate Organization (O)
+cert_ou="bar"      # Certificate Organizational Unit (OU)
 cert_cn="${host_fqdn}"    # Certificate Common Name (CN)
 
-sudo openssl req \
+openssl req \
     -newkey rsa:4096 \
     -nodes \
     -sha256 \
