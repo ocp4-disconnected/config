@@ -1,0 +1,2 @@
+registry_port: 5000
+registry_pod_name: registry

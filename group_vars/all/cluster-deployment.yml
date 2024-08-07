@@ -1,7 +1,7 @@
 openshift_dir:
+install_dir:
 
 ## Location of specific files
-ca_cert_location:
 ssh_key:
 
 # Registry
@@ -10,13 +10,11 @@ registry_username:
 registry_password:
 cluster_name:
 cluster_domain:
-pull_secret:
 pull_mirror:
-registry_fqdn:
-registry_port:
 
 ## Routing
 ip_space:
+subnet_mask:
 cluster_cidr:
 dns_resolver:
 gateway_ip:

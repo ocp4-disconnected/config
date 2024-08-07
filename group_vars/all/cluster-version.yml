@@ -1,13 +1,7 @@
-openshift_dir:
 openshift_release:
 previous_openshift_release:
 trident_version:
 
-## Location of specific files
-ca_cert_location:
-ssh_key:
-
-registry:
 pull_mirror:
 
 ## Operators To be mirrored, based on index they are in
@@ -25,19 +19,5 @@ additionalImages:
   - name:
   - name:
 
-install_operators:
+ansible_collection_requirements:
   - name:
-    namespace:
-    source_index:
-  - name:
-    namespace:
-    source_index:
-
-quay_images:
-- name:
-- name:
-- name:
-- name:
-- name:
-- name:
-

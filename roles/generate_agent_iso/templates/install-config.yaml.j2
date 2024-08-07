@@ -28,10 +28,11 @@ platform:
     ingressVIPs:
       - {{ ingress_ip }}
 fips: true
-pullSecret: {{ lookup('ansible.builtin.file', pull_secret ) | to_nice_json }}
-sshKey: "{{ lookup('ansible.builtin.file', ssh_key) }}"
+pullSecret: '{{ lookup('ansible.builtin.file', ansible_user_dir + '/.docker/config.json' ) }}'
+sshKey: "{{ lookup('ansible.builtin.file', ssh_key + '.pub' ) }}"
 additionalTrustBundle: |
-{{ lookup('ansible.builtin.file',  ca_cert_location) | indent(2, true) }}
+{{ lookup('ansible.builtin.file', registry_volume + '/certs/domain.crt') | indent(2, true) }}
+
 imageDigestSources:
   - mirrors:
     - {{ registry }}/openshift/release

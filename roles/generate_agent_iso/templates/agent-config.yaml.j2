@@ -20,7 +20,7 @@ hosts:
             enabled: true
             address: 
               - ip: {{ ip_space }}.{{ node.ip }}
-                prefix-length: 16
+                prefix-length: {{ subnet_mask }}
             dhcp: false
       dns-resolver:
         config:

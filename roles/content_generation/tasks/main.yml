@@ -42,7 +42,7 @@
       - trident-installer/tridentctl
     dest: "{{ openshift_client_bin }}"
 
-- name: Install oc tools
+- name: Extract oc tools
   ansible.builtin.unarchive:
     src: "{{ openshift_download_dir }}/{{ item }}"
     remote_src: true
@@ -61,25 +61,45 @@
     dest: "{{ openshift_client_bin }}/tridentctl"
     mode: '0755'
 
-- name: Remove tools tar
+- name: Remove oc tools tar
   ansible.builtin.file:
-    path: "{{ openshift_download_dir }}"
+    path: "{{ item }}"
     state: absent
+  with_fileglob:
+    - "{{ openshift_download_dir }}/*tar.gz"
 
 - name: Remove trident-installer/tridentctl
   ansible.builtin.file:
     path: "{{ openshift_client_bin }}/trident-installer"
     state: absent
 
-- name: pull registry image
+- name: Pull registry image
   containers.podman.podman_image:
     name: docker.io/library/registry
 
-- name: save registry image
+- name: Save registry image
   containers.podman.podman_save:
     image: docker.io/library/registry
     dest: "{{ openshift_oc_mirror_dir }}/registry.tar"
 
-  
-### Get a way to pull RHCOS iso
-# openshift-install coreos print-stream-json
+- name: Detect RHCOS image URL
+  command: "{{ openshift_client_bin }}/openshift-install coreos print-stream-json"
+  register: rhcos_image_info
+
+- name: Parse RHCOS image URL
+  set_fact:
+    rhcos_image_url: "{{ rhcos_image_info.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
+
+- name: Download RHCOS image
+  get_url:
+    url: "{{ rhcos_image_url }}"
+    dest: "{{ openshift_download_dir }}/"
+    mode: '0644'
+
+- name: Download required ansible collection
+  ansible.builtin.command: |
+    ansible-galaxy collection download {{ item.name }}
+  args:
+    chdir: "{{ openshift_download_dir }}"
+  with_items:
+    - "{{ ansible_collection_requirements }}"

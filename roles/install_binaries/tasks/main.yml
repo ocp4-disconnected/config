@@ -1,0 +1,23 @@
+- name: Ensure destination directory exists
+  ansible.builtin.file:
+    path: /usr/local/bin
+    state: directory
+    mode: '0755'
+
+- name: Move binaries to destination directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /usr/local/bin/
+    mode: '0755'
+    remote_src: yes
+  become: true
+  with_fileglob:
+    - "{{ openshift_client_bin }}/*"
+
+- name: Ensure binaries are executable
+  ansible.builtin.file:
+    path: "/usr/local/bin/{{ item }}"
+    mode: '0755'
+  become: true
+  with_items:
+    - "{{ lookup('fileglob', '/usr/local/bin/*', wantlist=True) | map('basename') | list }}"

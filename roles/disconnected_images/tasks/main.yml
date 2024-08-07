@@ -64,3 +64,12 @@
   with_items: 
     - cluster-images.yml
     - operators.yml
+
+- name: Remove pull oc-mirror-workspace
+  ansible.builtin.file:
+    path: "{{ openshift_oc_mirror_dir }}/{{ item }}/oc-mirror-workspace"
+    state: absent
+  when: pull_mirror | bool
+  with_items: 
+    - cluster-images
+    - operators

@@ -1,0 +1,29 @@
+- name: Ensure required packages are installed
+  ansible.builtin.package:
+    name: nmstate,openssl,httpd-tools
+    state: present
+  become: true
+
+- name: Find all collection tars
+  ansible.builtin.find:
+    paths: "{{ openshift_download_dir }}/collections"
+    patterns: '*.tar.gz'
+  register: collection_tars
+
+- name: Install ansible collections 
+  ansible.builtin.command:
+    cmd: "ansible-galaxy collection install {{ item.path }}"
+  with_items:
+    -  "{{ collection_tars.files }}"
+
+- name: Create RHCOS iso prestage directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.cache/agent/image_cache"
+    state: directory
+
+- name: Prestage RHCOS iso to {{ ansible_user_dir }}/.cache/agent/image_cache
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ ansible_user_dir }}/.cache/agent/image_cache"
+  with_fileglob:
+    - "{{ openshift_download_dir }}/*iso"
