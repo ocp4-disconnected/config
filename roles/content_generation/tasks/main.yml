@@ -99,8 +99,4 @@
 
 - name: Download required ansible collections
   ansible.builtin.command: 
-    cmd: ansible-galaxy collection download {{ item.name }}
-  args:
-    chdir: "{{ openshift_download_dir }}"
-  with_items:
-    - "{{ ansible_collection_requirements }}"
+    cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.txt --download-path {{ openshift_download_dir }}

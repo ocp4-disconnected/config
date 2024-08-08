@@ -53,7 +53,7 @@
     - cluster-images
     - operators
 
-- name: Run oc-mirror to generate image tar
+- name: Run oc-mirror to generate image tars
   ansible.builtin.command: 
     cmd: "{{ openshift_client_bin }}/oc-mirror --config {{ openshift_oc_mirror_dir }}/{{ item }} \
       file://{{ openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
