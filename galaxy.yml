@@ -7,6 +7,8 @@ authors:
 dependencies:
     "dellemc.openmanage": ">=1.0.0"
     "containers.podman": "*"
+    "ansible.posix": "*"
+    "cisco.nxos": "*"
 license:
     - "MIT"
 repository: "https://github.com/mriensch/ocp4-disconnected-agent.git"
