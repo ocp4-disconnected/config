@@ -1,4 +1,4 @@
-namespace: "ocp4-disconnected"
+namespace: "ocp4_disconnected"
 name: "agent"
 version: "0.1.1"
 readme: "README.md"
