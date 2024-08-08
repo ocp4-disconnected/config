@@ -1,0 +1,11 @@
+namespace: "ocp4-disconnected"
+name: "agent"
+version: "0.1.1"
+readme: "README.md"
+authors:
+    - "Matt Riensch (example@gmail.com)"
+dependencies:
+    "dellemc.openmanage"
+license:
+    - "MIT"
+repository: "https://github.com/cjnovak98/homelab-automation.git"
