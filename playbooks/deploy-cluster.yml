@@ -2,7 +2,7 @@
 - hosts: localhost
   gather_facts: true
   roles:
-    - network_checks
-    - generate_agent_iso
-    - idrac
-    - push_operator_images
+    - ocp4.disconnected.network_checks
+    - ocp4.disconnected.generate_agent_iso
+    - ocp4.disconnected.idrac
+    - ocp4.disconnected.push_operator_images

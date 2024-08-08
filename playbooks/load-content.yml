@@ -1,7 +1,7 @@
 #!/usr/bin/ansible-playbook -K
 - hosts: localhost
   roles:
-    - install_binaries
-    - package_check
-    - registry
-    - push_cluster_images
+    - ocp4.disconnected.install_binaries
+    - ocp4.disconnected.package_check
+    - ocp4.disconnected.registry
+    - ocp4.disconnected.push_cluster_images

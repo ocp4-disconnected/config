@@ -2,5 +2,5 @@
 - hosts: localhost
   gather_facts: false
   roles:
-    - content_generation
-    - disconnected_images
+    - ocp4.disconnected.content_generation
+    - ocp4.disconnected.disconnected_images
