@@ -1,5 +1,5 @@
-namespace: "ocp4_disconnected"
-name: "agent"
+namespace: "ocp4"
+name: "disconnected"
 version: "0.1.1"
 readme: "README.md"
 authors:
