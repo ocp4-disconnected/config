@@ -1,0 +1,27 @@
+# Visual Studio Code
+.vscode
+
+# Ansible Generated Files
+temp/
+
+# Inventories
+inventories/host_vars/**
+inventories/**
+
+# Log files
+*log
+**/*log
+
+# Ansible Vaults
+vault.yml
+
+# Ansible Network Backups
+backups/**
+
+# Test playbooks
+playbooks/test.yml
+
+# Ignore all *-orig files in any subdirectory
+**/*-orig
+**/conf-*
+

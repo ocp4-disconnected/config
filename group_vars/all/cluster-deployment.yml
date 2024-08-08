@@ -1,0 +1,64 @@
+openshift_dir: "/home/user/content"
+install_dir: "{{ ansible_user_dir }}"
+
+## Location of specific files
+ssh_key: "{{ ansible_user_dir + '/.ssh/id_rsa' }}"
+
+# Registry
+registry_volume: /srv/registry
+registry_username: openshift
+registry_password: CHANGEME
+cluster_name: ocp-sno
+cluster_domain: example.com
+pull_mirror: true
+
+## Routing
+ip_space: 192.168.0 ## TODO add some logic to validate/create based on facts see about dynamiclly calculated based on entry
+subnet_mask: 24
+cluster_cidr: '{{ ip_space }}.0/{{ subnet_mask }}'
+dns_resolver: '{{ ip_space }}.51'
+gateway_ip: '{{ ip_space }}.1'
+openshift_interface: eno1
+api_ip: '{{ ip_space }}.50'
+ingress_ip: '{{ ip_space }}.51'
+table_id: 254
+idrac_user: test
+idrac_password: tester
+
+## Cluster Node Config
+nodes:
+  - name: master-0
+    ip: '17'
+    mac: be:47:95:d0:01:51
+  - name: master-1
+    ip: '18'
+    mac: be:47:95:d0:01:52
+  - name: master-2
+    ip: '19'
+    mac: be:47:95:d0:01:53
+  - name: worker-0
+    ip: '20'
+    mac: be:47:95:d0:01:54
+idrac:
+  - name: master-0
+    ip: '{{ ip_space }}.5'
+  - name: master-1
+    ip: '{{ ip_space }}.6'
+  - name: master-2
+    ip: '{{ ip_space }}.7'
+  - name: worker-0
+    ip: '{{ ip_space }}.8'
+
+bond_name: bond0
+bond_mode: 802.3ad
+bond_interfaces:
+  - name: eno1
+  - name: eno2
+  - name: eno3
+  - name: eno4
+
+vlans:
+  - id: 111
+    ip: 10.11.1
+  - id: 112
+    ip: 10.11.2

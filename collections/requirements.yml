@@ -1,0 +1,5 @@
+---
+collections:
+  - name: https://github.com/mriensch/ocp4-disconnected-agent.git
+    type: git
+    version: main

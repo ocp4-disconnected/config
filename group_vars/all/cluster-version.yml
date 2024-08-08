@@ -1,0 +1,23 @@
+openshift_release: 4.14.16
+previous_openshift_release: 4.14.16
+trident_version: v24.06.0
+
+pull_mirror: true
+
+## Operators To be mirrored, based on index they are in
+disconnected_operators:
+  - redhat-operator-index:
+    - name: kubernetes-nmstate-operator
+    - name: kubevirt-hyperconverged
+  - redhat-marketplace-index:
+  - community-operator-index:
+  - certified-operator-index:
+
+## additionalImages for oc-mirror to pull. Include version
+additionalImages:
+  - name: registry.redhat.io/ubi8/ubi:latest
+  - name: registry.redhat.io/ubi9/ubi:latest
+  - name: quay.io/noseka1/toolbox-container:full
+
+ansible_collection_requirements:
+  - name: dellemc.openmanage

@@ -1,0 +1,6 @@
+#!/usr/bin/ansible-playbook
+- hosts: localhost
+  gather_facts: false
+  roles:
+    - content_generation
+    - disconnected_images
