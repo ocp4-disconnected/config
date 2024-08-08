@@ -1,0 +1,4 @@
+#!/usr/bin/ansible-playbook -K
+- hosts: localhost
+  roles:
+    - git

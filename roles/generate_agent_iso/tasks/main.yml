@@ -9,10 +9,8 @@
     - "{{ openshift_cluster_config_dir }}"
 
 - name: Generate RSA ssh keys
-  ansible.builtin.openssh_keypair:
-    path: "{{ ssh_key }}"
-    type: rsa
-    size: 2048
+  ansible.builtin.command:
+    cmd: "ssh-keygen -t rsa -b 2048 -f {{ ssh_key }} -N ''"
 
 - name: Generate agent-config.yaml
   ansible.builtin.template:
@@ -33,17 +31,12 @@
    - agent-config.yaml
 
 - name: Generate ISO
-  register: generate_iso
-  changed_when:
-    - generate_iso.rc == 0
-  ansible.builtin.command: |
-    openshift-install \
-    agent create image \
-    --dir {{ openshift_cluster_install_dir }}
+  ansible.builtin.command:
+    cmd: openshift-install agent create image --dir {{ openshift_cluster_install_dir }}
 
 - name: Move generated ISO to webroot
   ansible.builtin.copy:
     src: "{{ openshift_cluster_install_dir}}/agent.x86_64.iso"
-    dest: /var/www/html
+    dest: /var/www/html/
     remote_src: true
   become: true

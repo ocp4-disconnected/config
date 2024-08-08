@@ -83,7 +83,8 @@
     dest: "{{ openshift_oc_mirror_dir }}/registry.tar"
 
 - name: Detect RHCOS image URL
-  command: "{{ openshift_client_bin }}/openshift-install coreos print-stream-json"
+  command: 
+    cmd: "{{ openshift_client_bin }}/openshift-install coreos print-stream-json"
   register: rhcos_image_info
 
 - name: Parse RHCOS image URL
@@ -96,9 +97,9 @@
     dest: "{{ openshift_download_dir }}/"
     mode: '0644'
 
-- name: Download required ansible collection
-  ansible.builtin.command: |
-    ansible-galaxy collection download {{ item.name }}
+- name: Download required ansible collections
+  ansible.builtin.command: 
+    cmd: ansible-galaxy collection download {{ item.name }}
   args:
     chdir: "{{ openshift_download_dir }}"
   with_items:

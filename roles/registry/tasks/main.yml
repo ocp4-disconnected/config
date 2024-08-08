@@ -91,17 +91,19 @@
     enabled: yes
     scope: user
 
-- name: "Open port {{ registry_port }} on the firewall permanently"
-  ansible.builtin.firewalld: 
-    port: "{{ registry_port }}/tcp"
-    permanent: yes
-    immediate: yes
-    state: enabled
+- name: "Open port {{ registry_port }} on the firewall"
+  ansible.builtin.command:
+    cmd: firewall-cmd --add-port={{ registry_port }}/tcp
+  become: true
+
+- name: Save running config to permanent
+  ansible.builtin.command:
+    cmd: firewall-cmd --runtime-to-permanent
   become: true
 
 - name: "Login to registry"
   ansible.builtin.command:
-     cmd: podman login https://{{ ansible_nodename }}:{{ registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
+    cmd: podman login https://{{ ansible_nodename }}:{{ registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
   register: registry_logedin
   retries: 5
   delay: 2

@@ -1,7 +1,8 @@
----
+#!/usr/bin/ansible-playbook -K
 - hosts: localhost
   gather_facts: true
   roles:
-#    - validate_dns
+    - network_checks
     - generate_agent_iso
     - idrac
+    - push_operator_images

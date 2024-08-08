@@ -13,11 +13,3 @@
   become: true
   with_fileglob:
     - "{{ openshift_client_bin }}/*"
-
-- name: Ensure binaries are executable
-  ansible.builtin.file:
-    path: "/usr/local/bin/{{ item }}"
-    mode: '0755'
-  become: true
-  with_items:
-    - "{{ lookup('fileglob', '/usr/local/bin/*', wantlist=True) | map('basename') | list }}"

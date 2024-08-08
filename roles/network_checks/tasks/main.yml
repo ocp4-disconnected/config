@@ -1,6 +1,7 @@
 ---
 - name: Check DNS records
-  command: dig +short {{ item }}
+  ansible.builtin.command: 
+    cmd: dig +short {{ item }}
   register: dns_lookup
   with_items:
     - "api.{{ cluster_fqdn }}"

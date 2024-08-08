@@ -1,6 +1,6 @@
-- name: push cluster images into registry
+- name: push operator images into registry
   ansible.builtin.command: 
-    cmd: "oc-mirror --from {{ openshift_oc_mirror_dir }}/cluster-images \
+    cmd: "oc-mirror --from {{ openshift_oc_mirror_dir }}/operators \
       docker://{{ ansible_nodename }}:{{ registry_port }} --dest-skip-tls"
   register: cluster_images
   retries: 5

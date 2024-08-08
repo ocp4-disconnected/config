@@ -1,0 +1,34 @@
+- name: Generate RSA ssh keys
+  ansible.builtin.command:
+    cmd: "ssh-keygen -t rsa -b 2048 -f {{ ssh_key }} -N ''"
+    creates: "{{ ssh_key}}"
+  register: ssh_keygen
+  changed_when: ssh_keygen.rc == 0
+
+- name: Create git user
+  ansible.builtin.user:
+    name: git
+    shell: /bin/bash
+    home: /home/git
+    createhome: true
+    state: present
+    password: !
+  become: true
+
+- name: Create directories needed
+  ansible.builtin.file:
+    path: /home/git/.ssh
+    state: directory
+    owner: git
+    group: git
+    mode: '0700'
+  become: true
+  
+- name: Copy generated ssh key to authorized key
+  ansible.builtin.copy:
+    src: "{{ ansible_user_dir }}/.ssh/id_rsa.pub"
+    dest: /home/git/.ssh/authorized_keys
+    mode: '0600'
+    owner: git
+    group: git
+  become: true

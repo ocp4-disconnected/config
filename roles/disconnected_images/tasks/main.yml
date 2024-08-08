@@ -54,8 +54,9 @@
     - operators
 
 - name: Run oc-mirror to generate image tar
-  ansible.builtin.command: "{{ openshift_client_bin }}/oc-mirror --config {{ openshift_oc_mirror_dir }}/{{ item }} \ 
-    file://{{ openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
+  ansible.builtin.command: 
+    cmd: "{{ openshift_client_bin }}/oc-mirror --config {{ openshift_oc_mirror_dir }}/{{ item }} \
+      file://{{ openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
   register: mirror_pull
   retries: 5
   delay: 10
