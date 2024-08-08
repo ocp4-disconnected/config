@@ -1,7 +1,0 @@
-#!/usr/bin/ansible-playbook -K
-- hosts: localhost
-  roles:
-    - install_binaries
-    - package_check
-    - registry
-    - push_cluster_images
