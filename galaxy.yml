@@ -1,0 +1,11 @@
+namespace: "ocp4_disconnected"
+name: "agent"
+version: "0.1.1"
+readme: "README.md"
+authors:
+    - "Matt Riensch (example@gmail.com)"
+dependencies:
+    "dellemc.openmanage": ">=1.0.0"
+license:
+    - "MIT"
+repository: "https://github.com/mriensch/ocp4-disconnected-agent.git"
