@@ -6,6 +6,7 @@ authors:
     - "Matt Riensch (example@gmail.com)"
 dependencies:
     "dellemc.openmanage": ">=1.0.0"
+    "containers.podman": "*"
 license:
     - "MIT"
 repository: "https://github.com/mriensch/ocp4-disconnected-agent.git"
