@@ -8,4 +8,4 @@ dependencies:
     "dellemc.openmanage"
 license:
     - "MIT"
-repository: "https://github.com/cjnovak98/homelab-automation.git"
+repository: "https://github.com/mriensch/ocp4-disconnected-agent.git"
