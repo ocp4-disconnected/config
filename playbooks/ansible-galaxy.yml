@@ -1,0 +1,5 @@
+#!/usr/bin/ansible-playbook
+- hosts: localhost
+  roles:
+    - role: import_collection
+      tags: import_collection, always
