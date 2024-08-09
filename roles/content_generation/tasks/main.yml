@@ -8,6 +8,7 @@
   - "{{ openshift_download_dir }}"
   - "{{ openshift_client_bin }}"
   - "{{ openshift_oc_mirror_dir }}"
+  - "{{ openshift_download_dir }}/collections"
 
 - name: Download oc tools
   ansible.builtin.get_url:
@@ -99,4 +100,4 @@
 
 - name: Download required ansible collections
   ansible.builtin.command: 
-    cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.txt --download-path {{ openshift_download_dir }}
+    cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ openshift_download_dir }}/collections

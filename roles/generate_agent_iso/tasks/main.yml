@@ -40,3 +40,4 @@
     dest: /var/www/html/
     remote_src: true
   become: true
+  tags: idrac
