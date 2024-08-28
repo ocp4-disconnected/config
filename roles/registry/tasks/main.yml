@@ -13,6 +13,10 @@
       - "{{ ansible_user_dir }}/.config/systemd/user"
   become: true
 
+- name: Set fact for {{ ip_space }} IPv4 address
+  set_fact:
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
+
 - name: "Import Regstry Image"
   ansible.builtin.command:
     cmd: podman load -i {{ openshift_oc_mirror_dir }}/registry.tar
@@ -35,7 +39,7 @@
 
 - name: "Generate certs"
   ansible.builtin.shell:
-    cmd: "bash generateCert.sh {{ ansible_hostname }}.{{ cluster_name }}.{{ cluster_domain }} {{ ansible_fqdn }}"
+    cmd: "bash generateCert.sh {{ ansible_hostname }}.{{ cluster_name }}.{{ cluster_domain }} {{ ansible_fqdn }} {{ ipv4_address | first }}"
   args:
     chdir: "{{ role_path }}/files/"
 
@@ -103,7 +107,7 @@
 
 - name: "Login to registry"
   ansible.builtin.command:
-    cmd: podman login https://{{ ansible_nodename }}:{{ registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
+    cmd: podman login https://{{ ipv4_address | first  }}:{{ registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
   register: registry_logedin
   retries: 5
   delay: 2

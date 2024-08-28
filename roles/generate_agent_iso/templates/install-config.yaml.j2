@@ -35,8 +35,8 @@ additionalTrustBundle: |
 
 imageDigestSources:
   - mirrors:
-    - {{ registry }}/openshift/release
+    - {{ ipv4_address | first  }}:{{ registry_port }}/openshift/release
     source: quay.io/openshift-release-dev/ocp-v4.0-art-dev
   - mirrors:
-    - {{ registry }}/openshift/release-images
+    - {{ ipv4_address | first  }}:{{ registry_port }}/openshift/release-images
     source: quay.io/openshift-release-dev/ocp-release

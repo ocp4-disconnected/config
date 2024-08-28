@@ -9,3 +9,4 @@
     - "{{ registry_fqdn }}"
   failed_when: dns_lookup.stdout == ''
   changed_when: false
+  when: network_checks | bool

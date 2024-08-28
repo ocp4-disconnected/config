@@ -1,5 +1,6 @@
 host_fqdn=$1
 hostname=$2
+host_ip=$3
 cert_c="FB"   # Country Name (C, 2 letter code)
 cert_s="."          # Certificate State (S)
 cert_l="."       # Certificate Locality (L)
@@ -15,5 +16,5 @@ openssl req \
     -x509 \
     -days 365 \
     -out domain.crt \
-    -addext "subjectAltName = DNS:${host_fqdn},DNS:${hostname},DNS:localhost" \
+    -addext "subjectAltName = DNS:${host_fqdn},DNS:${hostname},DNS:localhost,IP:${host_ip}" \
     -subj "/C=${cert_c}/ST=${cert_s}/L=${cert_l}/O=${cert_o}/OU=${cert_ou}/CN=${cert_cn}"
