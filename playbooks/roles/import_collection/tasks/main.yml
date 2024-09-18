@@ -31,8 +31,8 @@
 
 - name: Install ansible collection from the internet
   ansible.builtin.command:
-    cmd: ansible-galaxy collection install ocp4.disconnected
+    cmd: ansible-galaxy collection install git+https://github.com/cjnovak98/ocp4-disconnected-collection.git
   when:
     - "'ocp4.disconnected' not in collection_installed.stdout"
-    - "(internet.status | default(0)) != 200"
+    - "(internet.status | default(0)) == 200"
     - "update_collection | bool"

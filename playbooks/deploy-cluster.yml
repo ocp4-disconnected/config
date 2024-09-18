@@ -10,15 +10,20 @@
       tags: packages_check, stage_0
     - role: ocp4.disconnected.registry
       tags: registry, stage_0
-    - role: ocp4.disconnected.push_cluster_images
+    - role: ocp4.disconnected.push_images
       tags: push_cluster_images, stage_0
+      vars:
+        image_source: cluster-images
     - role: ocp4.disconnected.network_checks
       tags: network_checks, stage_0
     - role: ocp4.disconnected.generate_agent_iso
       tags: generate_agent_iso, stage_1
     - role: ocp4.disconnected.idrac
       tags: idrac, stage_1
+      when: idrac | bool
     - role: ocp4.disconnected.git
       tags: git, stage_2
-    - role: ocp4.disconnected.push_operator_images
+    - role: ocp4.disconnected.push_images
       tags: push_operator_images, stage_2
+      vars:
+        image_source: operators
