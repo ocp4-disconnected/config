@@ -5,15 +5,16 @@ install_dir: "{{ ansible_user_dir }}"
 ssh_key: "{{ ansible_user_dir + '/.ssh/id_rsa' }}"
 
 # Registry
-registry_volume: /srv/registry
+registry_volume: /pods/registry
 registry_username: openshift
 registry_password: CHANGEME
 cluster_name: ocp-sno
 cluster_domain: example.com
 pull_mirror: true
+network_checks: false
 
 ## Routing
-ip_space: 192.168.0 ## TODO add some logic to validate/create based on facts see about dynamiclly calculated based on entry
+ip_space: 192.168.1 ## TODO add some logic to validate/create based on facts see about dynamiclly calculated based on entry
 subnet_mask: 24
 cluster_cidr: '{{ ip_space }}.0/{{ subnet_mask }}'
 dns_resolver: '{{ ip_space }}.51'
@@ -22,6 +23,9 @@ openshift_interface: eno1
 api_ip: '{{ ip_space }}.50'
 ingress_ip: '{{ ip_space }}.51'
 table_id: 254
+
+# idrac settings
+idrac: false
 idrac_user: test
 idrac_password: tester
 
@@ -39,7 +43,7 @@ nodes:
   - name: worker-0
     ip: '20'
     mac: be:47:95:d0:01:54
-idrac:
+idracs:
   - name: master-0
     ip: '{{ ip_space }}.5'
   - name: master-1
@@ -57,6 +61,7 @@ bond_interfaces:
   - name: eno3
   - name: eno4
 
+# Configure vlans (for managment networks on nodes for HA deployment or Single node Master only)
 vlans:
   - id: 111
     ip: 10.11.1
