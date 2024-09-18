@@ -4,7 +4,7 @@ metadata:
   name: {{ cluster_name }}
 rendezvousIP: {{ ip_space }}.{{ nodes[0].ip }}
 hosts:
-{% for node in nodes %}
+{% for node in nodes | selectattr('name', 'search', '^master') | list %}
   - hostname: {{ node.name }}
     role: {{ node.name | regex_replace('-.*', '') }}
     interfaces:
@@ -33,3 +33,34 @@ hosts:
             next-hop-interface: {{ openshift_interface }}
             table-id: {{ table_id }}   
 {% endfor %}
+{% if nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
+{% for node in nodes | selectattr('name', 'search', '^worker') | list %}
+  - hostname: {{ node.name }}
+    role: {{ node.name | regex_replace('-.*', '') }}
+    interfaces:
+      - name: "{{ openshift_interface }}"
+        macAddress: {{ node.mac }}
+    networkConfig:
+      interfaces:
+        - name: "{{ openshift_interface }}"
+          type: ethernet
+          state: up
+          mac-address: {{ node.mac }}
+          ipv4:
+            enabled: true
+            address: 
+              - ip: {{ ip_space }}.{{ node.ip }}
+                prefix-length: {{ subnet_mask }}
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - {{ dns_resolver }}
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: {{ gateway_ip }}
+            next-hop-interface: {{ openshift_interface }}
+            table-id: {{ table_id }}
+{% endfor %}
+{% endif %}

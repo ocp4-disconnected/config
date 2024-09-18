@@ -16,6 +16,7 @@
 - name: Set fact for {{ ip_space }} IPv4 address
   set_fact:
     ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
+  when: ipv4_address is undefined
 
 - name: "Import Regstry Image"
   ansible.builtin.command:
@@ -39,13 +40,15 @@
 
 - name: "Generate certs"
   ansible.builtin.shell:
-    cmd: "bash generateCert.sh {{ ansible_hostname }}.{{ cluster_name }}.{{ cluster_domain }} {{ ansible_fqdn }} {{ ipv4_address | first }}"
+    cmd: openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt -addext "subjectAltName = DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}" -subj "/C={{ cert_c }}/ST={{ cert_s }}/L={{ cert_l }}/O={{ cert_o }}/OU={{ cert_ou }}/CN={{ ansible_fqdn }}"
+#    cmd: "bash generateCert.sh {{ ansible_hostname }}.{{ cluster_name }}.{{ cluster_domain }} {{ ansible_fqdn }} {{ ipv4_address | first }}"
   args:
-    chdir: "{{ role_path }}/files/"
+    chdir: "{{ registry_volume }}/certs"
+
 
 - name: "Set permission on generated certs"
   ansible.builtin.file:
-    path: "{{ role_path }}/files/domain.{{ item }}"
+    path: "{{ registry_volume }}/certs/domain.{{ item }}"
     state: file
     owner: "{{ ansible_user_id }}"
     group: "{{ ansible_user_id }}"
@@ -55,17 +58,17 @@
     - key
   become: true
 
-- name: "Copy over generated certs"
-  ansible.builtin.copy:
-    src: "{{ role_path }}/files/domain.{{ item }}"
-    dest: "{{ registry_volume }}/certs"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: "0755"
-  with_items: 
-    - crt
-    - key
-  become: true
+#- name: "Copy over generated certs"
+#  ansible.builtin.copy:
+#    src: "{{ role_path }}/files/domain.{{ item }}"
+#    dest: "{{ registry_volume }}/certs"
+#    owner: "{{ ansible_user_id }}"
+#    group: "{{ ansible_user_id }}"
+#    mode: "0755"
+#  with_items: 
+#    - crt
+#    - key
+#  become: true
 
 - name: "Create Registry Container"
   ansible.builtin.command:

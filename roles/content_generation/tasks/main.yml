@@ -35,6 +35,13 @@
     mode: '0644'
   register: download_butane
 
+- name: Download helm
+  ansible.builtin.get_url:
+    url: "{{ openshift_download_base_url }}/helm/latest/helm-linux-amd64"
+    dest: "{{ openshift_client_bin }}/helm"
+    mode: '0644'
+  register: download_helm
+
 - name: Extract trident binary
   ansible.builtin.unarchive:
     src: "{{ openshift_download_dir }}/trident-installer-{{ trident_version | replace('v', '') }}.tar.gz"

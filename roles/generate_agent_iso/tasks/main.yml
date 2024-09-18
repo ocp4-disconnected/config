@@ -15,6 +15,11 @@
   register: ssh_keygen
   changed_when: ssh_keygen.rc == 0
 
+- name: Set fact for {{ ip_space }} IPv4 address
+  set_fact:
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
+  when: ipv4_address is undefined
+
 - name: Generate agent-config.yaml
   ansible.builtin.template:
     src: "{{ item }}.j2"
@@ -36,11 +41,3 @@
 - name: Generate ISO
   ansible.builtin.command:
     cmd: openshift-install agent create image --dir {{ openshift_cluster_install_dir }}
-
-- name: Move generated ISO to webroot
-  ansible.builtin.copy:
-    src: "{{ openshift_cluster_install_dir}}/agent.x86_64.iso"
-    dest: /var/www/html/
-    remote_src: true
-  become: true
-  tags: idrac

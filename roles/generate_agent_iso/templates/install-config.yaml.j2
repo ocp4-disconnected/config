@@ -1,5 +1,6 @@
 apiVersion: v1
 baseDomain: {{ cluster_domain }}
+{% if nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
 compute: 
 - name: worker
   architecture: amd64
@@ -10,6 +11,18 @@ controlPlane:
   architecture: amd64
   hyperthreading: Enabled
   replicas: {{ nodes | selectattr('name', 'search', '^master') | list | length }}
+{% else %} 
+compute: 
+- name: worker
+  architecture: amd64
+  hyperthreading: Enabled
+  replicas: 0
+controlPlane: 
+  name: master
+  architecture: amd64
+  hyperthreading: Enabled
+  replicas: 1
+{% endif %}
 metadata:
   name: {{ cluster_name }} 
 networking:
@@ -22,17 +35,20 @@ networking:
   serviceNetwork: 
   - 172.30.0.0/16
 platform:
+{% if nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
   baremetal:
     apiVIPs:
       - {{ api_ip }}
     ingressVIPs:
       - {{ ingress_ip }}
+{% else %}
+  none: {}
+{% endif %}
 fips: true
 pullSecret: '{{ lookup('ansible.builtin.file', ansible_user_dir + '/.docker/config.json' ) }}'
 sshKey: "{{ lookup('ansible.builtin.file', ssh_key + '.pub' ) }}"
 additionalTrustBundle: |
 {{ lookup('ansible.builtin.file', registry_volume + '/certs/domain.crt') | indent(2, true) }}
-
 imageDigestSources:
   - mirrors:
     - {{ ipv4_address | first  }}:{{ registry_port }}/openshift/release
