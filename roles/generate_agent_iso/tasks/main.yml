@@ -20,7 +20,7 @@
     ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
-- name: Generate agent-config.yaml
+- name: Generate configuration files
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ openshift_cluster_install_dir }}/{{ item }}"
@@ -29,7 +29,7 @@
    - install-config.yaml
    - agent-config.yaml
 
-- name: Create copys of agent-config and install configuration
+- name: Create copys of configuration files
   ansible.builtin.copy:
     src: "{{ openshift_cluster_install_dir }}/{{ item }}"
     dest: "{{ openshift_cluster_install_dir }}/{{ item }}-copy"

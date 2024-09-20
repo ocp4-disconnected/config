@@ -1,13 +1,13 @@
 - name: Ensure destination directory exists
   ansible.builtin.file:
-    path: /usr/local/bin
+    path: /usr/bin
     state: directory
     mode: '0755'
 
 - name: Move binaries to destination directory
   ansible.builtin.copy:
     src: "{{ item }}"
-    dest: /usr/local/bin/
+    dest: /usr/bin/
     mode: '0755'
     remote_src: yes
   become: true
