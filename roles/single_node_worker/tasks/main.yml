@@ -68,7 +68,7 @@
 
 - name: Run coreos-installer iso customize
   command:
-    cmd: sudo coreos-installer iso customize --network-keyfile {{ openshift_worker_dir }}/custom-connection.nmconnection --dest-ignition {{ openshift_worker_dir}}/ignition/merged-worker.ign --dest-device /dev/sda {{ iso_files.files[0].path }}-o {{ openshift_worker_iso }} 
+    cmd: coreos-installer iso customize --network-keyfile {{ openshift_worker_dir }}/custom-connection.nmconnection --dest-ignition {{ openshift_worker_dir}}/ignition/merged-worker.ign --dest-device /dev/sda {{ iso_files.files[0].path }} -o {{ openshift_worker_iso }} 
  
 - name: next steps
   debug: mount the iso "{{ openshift_worker_iso }}" on idrac, and it will fully install and approve
