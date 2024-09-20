@@ -65,10 +65,14 @@
   args:
     chdir: "{{ openshift_worker_dir }}"
 
+- name: Remove any previous iso generated
+  ansible.builtin.file:
+    path: "{{ openshift_worker_iso }}"
+    state: absent
 
 - name: Run coreos-installer iso customize
   command:
-    cmd: coreos-installer iso customize --network-keyfile {{ openshift_worker_dir }}/custom-config.nmconnection --dest-ignition {{ openshift_worker_dir}}/merged-worker.ign --dest-device /dev/sda {{ iso_files.files[0].path }} -o {{ openshift_worker_iso }} 
+    cmd: coreos-installer iso customize --network-keyfile {{ openshift_worker_dir }}/custom-config.nmconnection --dest-ignition {{ openshift_worker_dir}}/merged-worker.ign --dest-device /dev/{{ disk_type }} {{ iso_files.files[0].path }} -o {{ openshift_worker_iso }} 
  
 - name: next steps
   debug: 
