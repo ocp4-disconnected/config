@@ -62,6 +62,9 @@
     with open('merged-worker.ign', 'w') as f:
         json.dump(merged_ignition, f, indent=4)
     "
+  args:
+    chdir: "{{ openshift_worker_dir }}"
+
 
 - name: Run coreos-installer iso customize
   command:
