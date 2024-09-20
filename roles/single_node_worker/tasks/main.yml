@@ -71,7 +71,8 @@
     cmd: coreos-installer iso customize --network-keyfile {{ openshift_worker_dir }}/custom-config.nmconnection --dest-ignition {{ openshift_worker_dir}}/merged-worker.ign --dest-device /dev/sda {{ iso_files.files[0].path }} -o {{ openshift_worker_iso }} 
  
 - name: next steps
-  debug: mount the iso "{{ openshift_worker_iso }}" on idrac, and it will fully install and approve
+  debug: 
+    msg: mount the iso "{{ openshift_worker_iso }}" on idrac, and it will fully install and approve
 
 - name: Pause for 3 minutes to allow time to mount iso
   ansible.builtin.pause:
