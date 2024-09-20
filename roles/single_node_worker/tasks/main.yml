@@ -24,7 +24,7 @@
     dest: "{{ openshift_worker_dir }}/{{ item }}"
     mode: '0644'
   with_items:
-    - custom-connection.nmconnection
+    - custom-config.nmconnection
     - init-worker.ign
 
 - name: pull worker ignition file from master
