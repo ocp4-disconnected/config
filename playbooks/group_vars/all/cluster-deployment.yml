@@ -1,8 +1,6 @@
+## Location of the mirrored openshift content for installation/hydration
 openshift_dir: "/home/user/content"
 install_dir: "{{ ansible_user_dir }}"
-
-## Location of specific files
-ssh_key: "{{ ansible_user_dir + '/.ssh/id_rsa' }}"
 
 # Registry
 registry_volume: /pods/registry
@@ -29,7 +27,7 @@ idrac: false
 idrac_user: test
 idrac_password: tester
 
-## Cluster Node Config
+## Cluster Node Config, The number of master nodes will effect if this a HA or Single node.
 nodes:
   - name: master-0
     ip: '17'
@@ -53,6 +51,7 @@ idracs:
   - name: worker-0
     ip: '{{ ip_space }}.8'
 
+# Single Node worker
 bond_name: bond0
 bond_mode: 802.3ad
 bond_interfaces:

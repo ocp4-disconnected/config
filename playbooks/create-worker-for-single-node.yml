@@ -1,0 +1,8 @@
+#!/usr/bin/ansible-playbook -K
+- hosts: localhost
+  gather_facts: true
+  roles:
+    - role: import_collection
+      tags: import_collection, always
+    - role: ocp4.disconnected.single_node_worker
+      tags: always
