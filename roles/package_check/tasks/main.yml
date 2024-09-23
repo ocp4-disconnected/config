@@ -1,6 +1,6 @@
 - name: Ensure required packages are installed
   ansible.builtin.package:
-    name: nmstate,openssl,httpd-tools,podman,git,python3-jmespath
+    name: nmstate,openssl,httpd-tools,podman,git,python3-jmespath,coreos-installer
     state: present
   become: true
 

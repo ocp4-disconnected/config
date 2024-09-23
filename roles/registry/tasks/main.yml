@@ -18,78 +18,99 @@
     ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
+- name: Check if registry container is running
+  ansible.builtin.shell: 
+    cmd: "podman ps --filter 'name=registry' --filter 'status=running'"
+  register: registry_container
+  ignore_errors: yes 
+
 - name: "Import Regstry Image"
   ansible.builtin.command:
     cmd: podman load -i {{ openshift_oc_mirror_dir }}/registry.tar
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Generate Registry Basic Auth"
   ansible.builtin.command:
     cmd: htpasswd -Bbn {{ registry_username }} {{ registry_password }}
   register: bcrypt_htpasswd
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Write Registry htpasswd credential config"
   ansible.builtin.copy:
     content: '{{ bcrypt_htpasswd.stdout }}'
     dest: '{{ registry_volume }}/auth/htpasswd'
     mode: 0760
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Generate encrypted password"
   ansible.builtin.shell:
     cmd: "echo {{ registry_username }}:{{ registry_password }} | base64 -w0"
   register: docker_pass
+  when: "'registry' not in registry_container.stdout"
 
-- name: "Generate certs"
-  ansible.builtin.shell:
-    cmd: openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt -addext "subjectAltName = DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}" -subj "/C={{ cert_c }}/ST={{ cert_s }}/L={{ cert_l }}/O={{ cert_o }}/OU={{ cert_ou }}/CN={{ ansible_fqdn }}"
-#    cmd: "bash generateCert.sh {{ ansible_hostname }}.{{ cluster_name }}.{{ cluster_domain }} {{ ansible_fqdn }} {{ ipv4_address | first }}"
-  args:
-    chdir: "{{ registry_volume }}/certs"
+- block:
+  - name: Check if domain.key exists
+    ansible.builtin.stat:
+      path: "{{ registry_volume }}/certs/domain.key"
+    register: key_file
+    when: "'registry' not in registry_container.stdout"
 
+  - name: Check if domain.crt exists
+    ansible.builtin.stat:
+      path: "{{ registry_volume }}/certs/domain.crt"
+    register: crt_file
+    when: "'registry' not in registry_container.stdout"
 
-- name: "Set permission on generated certs"
-  ansible.builtin.file:
-    path: "{{ registry_volume }}/certs/domain.{{ item }}"
-    state: file
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: "0755"
-  with_items: 
-    - crt
-    - key
-  become: true
+  - name: "Generate certs"
+    ansible.builtin.shell:
+      cmd: openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt -addext "subjectAltName = DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}" -subj "/C={{ cert_c }}/ST={{ cert_s }}/L={{ cert_l }}/O={{ cert_o }}/OU={{ cert_ou }}/CN={{ ansible_fqdn }}"
+    args:
+      chdir: "{{ registry_volume }}/certs"
+    when:
+      - not key_file.stat.exists
+      - not crt_file.stat.exists
 
-#- name: "Copy over generated certs"
-#  ansible.builtin.copy:
-#    src: "{{ role_path }}/files/domain.{{ item }}"
-#    dest: "{{ registry_volume }}/certs"
-#    owner: "{{ ansible_user_id }}"
-#    group: "{{ ansible_user_id }}"
-#    mode: "0755"
-#  with_items: 
-#    - crt
-#    - key
-#  become: true
+  - name: "Set permission on generated certs"
+    ansible.builtin.file:
+      path: "{{ registry_volume }}/certs/domain.{{ item }}"
+      state: file
+      owner: "{{ ansible_user_id }}"
+      group: "{{ ansible_user_id }}"
+      mode: "0755"
+    with_items: 
+      - crt
+      - key
+    become: true
+    when:
+      - not key_file.stat.exists
+      - not crt_file.stat.exists
+
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Create Registry Container"
   ansible.builtin.command:
     cmd: podman create --name {{ registry_pod_name }} -p {{ registry_port }}:5000 -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry" -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt" -e "REGISTRY_HTTP_TLS_KEY=/certs/domain.key" -e "REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true" -v {{ registry_volume }}/data:/var/lib/registry:z -v {{ registry_volume }}/auth:/auth:z -v {{ registry_volume }}/certs:/certs:z docker.io/library/registry:latest
   register: container_created
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Create Registry Container Service"
   ansible.builtin.command:
     cmd: podman generate systemd --name {{ registry_pod_name }} --files
   args:
     chdir: "{{ ansible_user_dir }}/.config/systemd/user"
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Enable Linger | Allows Service to Start without user logging in"
   ansible.builtin.command:
     cmd: loginctl enable-linger "{{ ansible_user_id }}"
   become: true
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Reload users systemd"
   ansible.builtin.systemd:
     daemon_reload: yes
     scope: user
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Start and Enable Registry Service"
   ansible.builtin.systemd:
@@ -97,16 +118,19 @@
     state: started
     enabled: yes
     scope: user
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Open port {{ registry_port }} on the firewall"
   ansible.builtin.command:
     cmd: firewall-cmd --add-port={{ registry_port }}/tcp
   become: true
+  when: "'registry' not in registry_container.stdout"
 
 - name: Save running config to permanent
   ansible.builtin.command:
     cmd: firewall-cmd --runtime-to-permanent
   become: true
+  when: "'registry' not in registry_container.stdout"
 
 - name: "Login to registry"
   ansible.builtin.command:
@@ -115,8 +139,10 @@
   retries: 5
   delay: 2
   until: registry_logedin.rc == 0 
+  when: "'registry' not in registry_container.stdout"
 
 - name: "copy /run/user/1000/containers/auth.json to {{ ansible_user_dir }}/.docker/config.json"
   ansible.builtin.copy:
     src: /run/user/1000/containers/auth.json
     dest: "{{ ansible_user_dir }}/.docker/config.json"
+  when: "'registry' not in registry_container.stdout"

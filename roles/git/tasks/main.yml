@@ -32,3 +32,31 @@
     owner: git
     group: git
   become: true
+
+- name: create base repo directory 
+  ansible.builtin.file:
+    path: /home/git/repos
+    state: directory
+    owner: git
+    group: git
+    mode: '0755'
+  become: true
+
+- name: Create all inital repos
+  ansible.builtin.command:
+    cmd: git init --bare {{ item }}
+  args:
+    chdir: /home/git
+  with_items:
+    - day2
+    - apps
+  become: true
+
+- name: Ensure ownership of repositories is set to git:git
+  ansible.builtin.file:
+    path: "/home/git"
+    state: directory
+    owner: git
+    group: git
+    recurse: yes
+  become: true
