@@ -66,3 +66,6 @@ vlans:
     ip: 10.11.1
   - id: 112
     ip: 10.11.2
+
+# Define type of drive and which drive to used on system (i.e vd for virtual, sd for disk (both HDD and SDD), nvme0n1 for nvme drives)
+drive_type: vda
