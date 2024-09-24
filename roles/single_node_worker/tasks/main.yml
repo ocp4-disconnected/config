@@ -88,7 +88,8 @@
     I=0
     while [[ $CSR -ne 3 ]]; do
       I=$((I+1))
-      CERT=$(oc --kubeconfig {{ openshift_cluster_install_dir }}/auth/kubeconfig get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' 2>/dev/null)
+      CERT=$(oc --kubeconfig {{ openshift_cluster_install_dir }}/auth/kubeconfig \
+      get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' 2>/dev/null)
       if [[ -n $CERT ]]; then
         oc --kubeconfig {{ openshift_cluster_install_dir }}/auth/kubeconfig adm certificate approve $CERT
         CSR=$((CSR+1))
