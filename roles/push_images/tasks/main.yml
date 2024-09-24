@@ -5,10 +5,13 @@
   when: ipv4_address is undefined
 
 - name: push {{ image_source }} into registry
-  ansible.builtin.command: 
-    cmd: "oc-mirror --from {{ openshift_oc_mirror_dir }}/{{ image_source }} \
+  ansible.builtin.command:
+    cmd: "oc-mirror --from {{ openshift_oc_mirror_dir }}/{{ item }} \
       docker://{{ ipv4_address | first }}:{{ registry_port }} --dest-skip-tls"
   register: cluster_images
   retries: 5
   delay: 10
   until: cluster_images.rc == 0
+  with_items: 
+      - cluster-images.yaml
+      - operators.yaml
