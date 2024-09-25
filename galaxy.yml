@@ -5,7 +5,7 @@ readme: "README.md"
 authors:
     - "Matt Riensch (example@gmail.com)"
 dependencies:
-    "dellemc.openmanage": ">=1.0.0"
+    "dellemc.openmanage": "=9.5.0"
     "containers.podman": "*"
     "ansible.posix": "*"
     "cisco.nxos": "*"
