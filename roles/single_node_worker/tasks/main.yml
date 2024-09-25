@@ -88,7 +88,7 @@
     I=0
     while [[ $CSR -ne 3 ]]; do
       I=$((I+1))
-      CERT=$(oc get csr -o go-template='{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}' 2>/dev/null)
+      CERT=$(oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' 2>/dev/null)
       if [[ -n $CERT ]]; then
         oc adm certificate approve $CERT
         CSR=$((CSR+1))
@@ -98,3 +98,4 @@
       fi
       sleep 30s
     done
+
