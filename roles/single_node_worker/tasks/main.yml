@@ -84,18 +84,33 @@
 
 - name: Auto approve the worker node certificate signing request (CSR) when its up
   shell: |
-    CSR=0
-    I=0
-    while [[ $CSR -ne 3 ]]; do
-      I=$((I+1))
-      CERT=$(oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' 2>/dev/null)
-      if [[ -n $CERT ]]; then
-        oc adm certificate approve $CERT
-        CSR=$((CSR+1))
-        unset $CERT
-      else
-        echo "no certs detected on Iteration $I"
-      fi
-      sleep 30s
-    done
+      CSR=0
+      I=0
+
+      while [[ $CSR -ne 3 ]]; do
+        # Fetch the list of CSRs
+        csr_list=$(oc get csr -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.username}{"\t"}{.status.conditions[*].type}{"\n"}{end}')
+
+        # Extract pending CSRs
+        pending_worker_csrs=$(echo "$csr_list" | grep -v 'Approved')
+
+        # Extract approved worker CSRs
+        approved_worker_csrs=$(echo "$csr_list" | grep "system:node:worker" | grep 'Approved')
+
+        # Count approved worker CSRs
+        CSR=$(echo "$approved_worker_csrs" | wc -l)
+
+        I=$((I+1))
+
+        # Extract the CSR name for pending worker nodes
+        CERT=$(echo "$pending_worker_csrs" | awk '{print $1}')
+
+        if [[ -n $CERT ]]; then
+          # Approve the CSR
+          oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' \
+          | xargs --no-run-if-empty oc adm certificate approve
+          echo "Approved CSR for worker node: $CERT"
+        else
+          echo "No pending worker CSRs detected on iteration $I"
+        fi
 
