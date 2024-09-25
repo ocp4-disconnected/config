@@ -107,8 +107,7 @@
 
         if [[ -n $CERT ]]; then
           # Approve the CSR
-          oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' \
-          | xargs --no-run-if-empty oc adm certificate approve
+          oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' | xargs --no-run-if-empty oc adm certificate approve
           echo "Approved CSR for worker node: $CERT"
         else
           echo "No pending worker CSRs detected on iteration $I"
