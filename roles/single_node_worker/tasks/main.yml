@@ -88,10 +88,10 @@
       I=0
 
       while [[ $CSR -ne 3 ]]; do
-        # Fetch the list of CSRs
+        # Fetch the list of CSRs and filter for worker node CSRs
         csr_list=$(oc get csr -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.username}{"\t"}{.status.conditions[*].type}{"\n"}{end}')
 
-        # Extract pending CSRs
+        # Extract pending worker CSRs (worker nodes often have the subject "system:node:<worker-node-name>")
         pending_worker_csrs=$(echo "$csr_list" | grep -v 'Approved')
 
         # Extract approved worker CSRs
@@ -108,8 +108,11 @@
         if [[ -n $CERT ]]; then
           # Approve the CSR
           oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' | xargs --no-run-if-empty oc adm certificate approve
+          #oc adm certificate approve $CERT
           echo "Approved CSR for worker node: $CERT"
         else
           echo "No pending worker CSRs detected on iteration $I"
         fi
+          sleep 30s
+      done
 
