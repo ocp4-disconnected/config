@@ -7,7 +7,7 @@ authors:
 dependencies:
     "dellemc.openmanage": "=9.5.0"
     "containers.podman": "*"
-    "ansible.posix": "*"
+    "ansible.posix": "1.5.2"
     "cisco.nxos": "*"
     "community.general": "*"
 license:
