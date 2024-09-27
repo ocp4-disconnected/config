@@ -28,6 +28,7 @@
     content: '{{ bcrypt_htpasswd.stdout }}'
     dest: '{{ registry_volume }}/auth/htpasswd'
     mode: 0760
+
 - block:
   - name: Check if domain.key exists
     ansible.builtin.stat:
@@ -75,9 +76,9 @@
     state: present
     ports: "{{ registry_port }}:5000"
     volume:
-      - "{{ registry_volume }}/data:/var/lib/registry"
-      - "{{ registry_volume }}/auth:/auth"
-      - "{{ registry_volume }}/certs:/certs"
+      - "{{ registry_volume }}/data:/var/lib/registry:z"
+      - "{{ registry_volume }}/auth:/auth:z"
+      - "{{ registry_volume }}/certs:/certs:z"
     env:
       REGISTRY_AUTH: "htpasswd"
       REGISTRY_AUTH_HTPASSWD_REALM: "Registry"
@@ -89,14 +90,13 @@
       path: "{{ ansible_user_dir }}/.config/systemd/user/"
       names: true
       time: 1
-  register: registry_container
 
 - name: "{{ role_name }} | Enable Linger | Allows Service to Start without user logging in"
   command:
     cmd: loginctl enable-linger "{{ lookup('env','USER') }}"
   become: true
-    
-- name: Make 
+
+- name: Enforce registry pod to run
   ansible.builtin.systemd_service:
     name: "container-{{ registry_pod_name }}.service"
     state: started
