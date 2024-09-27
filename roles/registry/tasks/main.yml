@@ -28,12 +28,6 @@
     content: '{{ bcrypt_htpasswd.stdout }}'
     dest: '{{ registry_volume }}/auth/htpasswd'
     mode: 0760
-
-- name: "Generate encrypted password"
-  ansible.builtin.shell:
-    cmd: "echo {{ registry_username }}:{{ registry_password }} | base64 -w0"
-  register: docker_pass
-
 - block:
   - name: Check if domain.key exists
     ansible.builtin.stat:
@@ -69,20 +63,18 @@
       - not key_file.stat.exists
       - not crt_file.stat.exists
 
-- containers.podman.podman_load:
+- name: Load registry image to podman storage
+  containers.podman.podman_load:
     input: "{{ openshift_oc_mirror_dir }}/registry.tar"
 
-
-
-- name: Generate systemd file for sushy-emulator
+- name: Generate systemd file for {{ registry_pod_name }}
   containers.podman.podman_container:
     name: "{{ registry_pod_name }}"
     privileged: false
     image: docker.io/library/registry:latest
     state: present
     ports: "{{ registry_port }}:5000"
-    command: "sushy-emulator -i :: -p 8000 --config /etc/sushy/sushy-emulator.conf"
-    volume: 
+    volume:
       - "{{ registry_volume }}/data:/var/lib/registry"
       - "{{ registry_volume }}/auth:/auth"
       - "{{ registry_volume }}/certs:/certs"
@@ -94,17 +86,35 @@
       REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
       REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: "true"
     generate_systemd:
-      path: /etc/systemd/system/
+      path: "{{ ansible_user_dir }}/.config/systemd/user/"
       names: true
       time: 1
+  register: registry_container
 
+- name: "{{ role_name }} | Enable Linger | Allows Service to Start without user logging in"
+  command:
+    cmd: loginctl enable-linger "{{ lookup('env','USER') }}"
+  become: true
 
-- name: Ensure firewalld is configured for external redfish access over port 8000
+- name: Ensure systemd reloads
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: Start and enable 
+  ansible.builtin.service:
+    name: "{{ item }}.service"
+    state: started
+    enabled: true
+  with_items:
+    - "{{ registry_container.container.podman_systemd.[0] }}"
+
+- name: Ensure firewalld is configured for port {{ registry_port }}
   firewalld:
     port: 5000/tcp
     immediate: true
     permanent: true
     state: enabled
+  become: true
 
 - name: "Login to registry"
   ansible.builtin.command:
@@ -113,7 +123,7 @@
   retries: 5
   delay: 2
   until: registry_logedin.rc == 0
-  
+
 - name: "copy /run/user/1000/containers/auth.json to {{ ansible_user_dir }}/.docker/config.json"
   ansible.builtin.copy:
     src: /run/user/1000/containers/auth.json
