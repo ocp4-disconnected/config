@@ -95,18 +95,14 @@
   command:
     cmd: loginctl enable-linger "{{ lookup('env','USER') }}"
   become: true
-
-- name: Ensure systemd reloads
-  ansible.builtin.systemd:
-    daemon_reload: true
-
-- name: Start and enable 
-  ansible.builtin.service:
-    name: "{{ item }}.service"
+    
+- name: Make 
+  ansible.builtin.systemd_service:
+    name: "container-{{ registry_pod_name }}.service"
     state: started
     enabled: true
-  with_items:
-    - "{{ registry_container.container.podman_systemd.[0] }}"
+    daemon_reload: true
+    scope: user
 
 - name: Ensure firewalld is configured for port {{ registry_port }}
   firewalld:
