@@ -18,48 +18,32 @@
     ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
-- name: Check if registry container is running
-  ansible.builtin.shell: 
-    cmd: "podman ps --filter 'name=registry' --filter 'status=running'"
-  register: registry_container
-  ignore_errors: yes 
-
-- name: "Import Regstry Image"
-  ansible.builtin.command:
-    cmd: podman load -i {{ openshift_oc_mirror_dir }}/registry.tar
-  when: "'registry' not in registry_container.stdout"
-
-- name: "Generate Registry Basic Auth"
+- name: "Generate Registry Basic Auth" ## community.general.htpasswd (requires passlib>=1.6)
   ansible.builtin.command:
     cmd: htpasswd -Bbn {{ registry_username }} {{ registry_password }}
   register: bcrypt_htpasswd
-  when: "'registry' not in registry_container.stdout"
 
 - name: "Write Registry htpasswd credential config"
   ansible.builtin.copy:
     content: '{{ bcrypt_htpasswd.stdout }}'
     dest: '{{ registry_volume }}/auth/htpasswd'
     mode: 0760
-  when: "'registry' not in registry_container.stdout"
 
 - name: "Generate encrypted password"
   ansible.builtin.shell:
     cmd: "echo {{ registry_username }}:{{ registry_password }} | base64 -w0"
   register: docker_pass
-  when: "'registry' not in registry_container.stdout"
 
 - block:
   - name: Check if domain.key exists
     ansible.builtin.stat:
       path: "{{ registry_volume }}/certs/domain.key"
     register: key_file
-    when: "'registry' not in registry_container.stdout"
 
   - name: Check if domain.crt exists
     ansible.builtin.stat:
       path: "{{ registry_volume }}/certs/domain.crt"
     register: crt_file
-    when: "'registry' not in registry_container.stdout"
 
   - name: "Generate certs"
     ansible.builtin.shell:
@@ -85,52 +69,42 @@
       - not key_file.stat.exists
       - not crt_file.stat.exists
 
-  when: "'registry' not in registry_container.stdout"
+- containers.podman.podman_load:
+    input: "{{ openshift_oc_mirror_dir }}/registry.tar"
 
-- name: "Create Registry Container"
-  ansible.builtin.command:
-    cmd: podman create --name {{ registry_pod_name }} -p {{ registry_port }}:5000 -e "REGISTRY_AUTH=htpasswd" -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry" -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" -e "REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt" -e "REGISTRY_HTTP_TLS_KEY=/certs/domain.key" -e "REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED=true" -v {{ registry_volume }}/data:/var/lib/registry:z -v {{ registry_volume }}/auth:/auth:z -v {{ registry_volume }}/certs:/certs:z docker.io/library/registry:latest
-  register: container_created
-  when: "'registry' not in registry_container.stdout"
 
-- name: "Create Registry Container Service"
-  ansible.builtin.command:
-    cmd: podman generate systemd --name {{ registry_pod_name }} --files
-  args:
-    chdir: "{{ ansible_user_dir }}/.config/systemd/user"
-  when: "'registry' not in registry_container.stdout"
 
-- name: "Enable Linger | Allows Service to Start without user logging in"
-  ansible.builtin.command:
-    cmd: loginctl enable-linger "{{ ansible_user_id }}"
-  become: true
-  when: "'registry' not in registry_container.stdout"
+- name: Generate systemd file for sushy-emulator
+  containers.podman.podman_container:
+    name: "{{ registry_pod_name }}"
+    privileged: false
+    image: docker.io/library/registry:latest
+    state: present
+    ports: "{{ registry_port }}:5000"
+    command: "sushy-emulator -i :: -p 8000 --config /etc/sushy/sushy-emulator.conf"
+    volume: 
+      - "{{ registry_volume }}/data:/var/lib/registry"
+      - "{{ registry_volume }}/auth:/auth"
+      - "{{ registry_volume }}/certs:/certs"
+    env:
+      REGISTRY_AUTH: "htpasswd"
+      REGISTRY_AUTH_HTPASSWD_REALM: "Registry"
+      REGISTRY_AUTH_HTPASSWD_PATH: "/auth/htpasswd"
+      REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/domain.crt"
+      REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
+      REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: "true"
+    generate_systemd:
+      path: /etc/systemd/system/
+      names: true
+      time: 1
 
-- name: "Reload users systemd"
-  ansible.builtin.systemd:
-    daemon_reload: yes
-    scope: user
-  when: "'registry' not in registry_container.stdout"
 
-- name: "Start and Enable Registry Service"
-  ansible.builtin.systemd:
-    name: "container-{{ registry_pod_name }}.service"
-    state: started
-    enabled: yes
-    scope: user
-  when: "'registry' not in registry_container.stdout"
-
-- name: "Open port {{ registry_port }} on the firewall"
-  ansible.builtin.command:
-    cmd: firewall-cmd --add-port={{ registry_port }}/tcp
-  become: true
-  when: "'registry' not in registry_container.stdout"
-
-- name: Save running config to permanent
-  ansible.builtin.command:
-    cmd: firewall-cmd --runtime-to-permanent
-  become: true
-  when: "'registry' not in registry_container.stdout"
+- name: Ensure firewalld is configured for external redfish access over port 8000
+  firewalld:
+    port: 5000/tcp
+    immediate: true
+    permanent: true
+    state: enabled
 
 - name: "Login to registry"
   ansible.builtin.command:
@@ -138,11 +112,9 @@
   register: registry_logedin
   retries: 5
   delay: 2
-  until: registry_logedin.rc == 0 
-  when: "'registry' not in registry_container.stdout"
-
+  until: registry_logedin.rc == 0
+  
 - name: "copy /run/user/1000/containers/auth.json to {{ ansible_user_dir }}/.docker/config.json"
   ansible.builtin.copy:
     src: /run/user/1000/containers/auth.json
     dest: "{{ ansible_user_dir }}/.docker/config.json"
-  when: "'registry' not in registry_container.stdout"
