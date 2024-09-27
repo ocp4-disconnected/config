@@ -25,21 +25,21 @@
   ansible.builtin.get_url:
     url: "https://github.com/NetApp/trident/releases/download/{{ trident_version }}/trident-installer-{{ trident_version  | replace('v', '') }}.tar.gz"
     dest: "{{ openshift_download_dir }}"
-    mode: '0644'
+    mode: '0755'
   register: download_tridant
 
 - name: Download Butane
   ansible.builtin.get_url:
     url: "{{ openshift_download_base_url }}/butane/latest/butane"
     dest: "{{ openshift_client_bin }}"
-    mode: '0644'
+    mode: '0755'
   register: download_butane
 
 - name: Download helm
   ansible.builtin.get_url:
     url: "{{ openshift_download_base_url }}/helm/latest/helm-linux-amd64"
     dest: "{{ openshift_client_bin }}/helm"
-    mode: '0644'
+    mode: '0755'
   register: download_helm
 
 - name: Extract trident binary
@@ -54,6 +54,7 @@
   ansible.builtin.unarchive:
     src: "{{ openshift_download_dir }}/{{ item }}"
     remote_src: true
+    mode: '0755'
     exclude:
       - README.md
     dest: "{{ openshift_client_bin }}"
