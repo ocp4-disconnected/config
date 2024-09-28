@@ -42,7 +42,7 @@
     mode: '0755'
   become: true
 
-- name: Create all inital repos
+- name: Create all inital repos ## We should probably remove this from the role - Since the repos should be done on customer side or we should have a separate role for hydrating the repos
   ansible.builtin.command:
     cmd: git init --bare {{ item }}
   args:
