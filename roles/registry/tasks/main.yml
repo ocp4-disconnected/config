@@ -29,40 +29,28 @@
     dest: '{{ registry_volume }}/auth/htpasswd'
     mode: 0760
 
-- block:
-  - name: Check if domain.key exists
-    ansible.builtin.stat:
-      path: "{{ registry_volume }}/certs/domain.key"
-    register: key_file
+- name: Generate RSA private key
+  community.crypto.openssl_privatekey:
+    path: "{{ registry_volume }}/certs/domain.key"
+    size: 4096
+    type: RSA
+    cipher: null
+    passphrase: null
 
-  - name: Check if domain.crt exists
-    ansible.builtin.stat:
-      path: "{{ registry_volume }}/certs/domain.crt"
-    register: crt_file
+- name: Generate CSR with SANs
+  community.crypto.openssl_csr:
+    privatekey_path: "{{ registry_volume }}/certs/domain.key"
+    path: "{{ registry_volume }}/certs/doamin.csr"
+    subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
 
-  - name: "Generate certs"
-    ansible.builtin.shell:
-      cmd: openssl req -newkey rsa:4096 -nodes -sha256 -keyout domain.key -x509 -days 365 -out domain.crt -addext "subjectAltName = DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}" -subj "/C={{ cert_c }}/ST={{ cert_s }}/L={{ cert_l }}/O={{ cert_o }}/OU={{ cert_ou }}/CN={{ ansible_fqdn }}"
-    args:
-      chdir: "{{ registry_volume }}/certs"
-    when:
-      - not key_file.stat.exists
-      - not crt_file.stat.exists
-
-  - name: "Set permission on generated certs"
-    ansible.builtin.file:
-      path: "{{ registry_volume }}/certs/domain.{{ item }}"
-      state: file
-      owner: "{{ ansible_user_id }}"
-      group: "{{ ansible_user_id }}"
-      mode: "0755"
-    with_items: 
-      - crt
-      - key
-    become: true
-    when:
-      - not key_file.stat.exists
-      - not crt_file.stat.exists
+- name: Generate self-signed certificate
+  community.crypto.x509_certificate:
+    path: "{{ registry_volume }}/certs/domain.crt"
+    privatekey_path: "{{ registry_volume }}/certs/domain.key"
+    csr_path: "{{ registry_volume }}/certs/doamin.csr"
+    provider: selfsigned
+    owner: "{{ ansible_user_id }}"
+    group: wheel
 
 - name: Load registry image to podman storage
   containers.podman.podman_load:
