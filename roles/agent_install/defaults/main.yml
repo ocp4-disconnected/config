@@ -6,3 +6,4 @@ agent_install_network_checks: false
 agent_install_cluster_name: ocp-sno
 agent_install_dns_resolver: '{{ common_ip_space }}.1'
 agent_install_table_id: 254
+agent_install_cluster_cidr: 24
