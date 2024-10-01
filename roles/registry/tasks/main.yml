@@ -7,9 +7,9 @@
     group: wheel
   with_items:
       - "{{ ansible_user_dir }}/.docker/"
-      - "{{ registry_volume }}/data"
-      - "{{ registry_volume }}/auth"
-      - "{{ registry_volume }}/certs"
+      - "{{ common_registry_volume }}/data"
+      - "{{ common_registry_volume }}/auth"
+      - "{{ common_registry_volume }}/certs"
       - "{{ ansible_user_dir }}/.config/systemd/user"
   become: true
 
@@ -26,12 +26,12 @@
 - name: "Write Registry htpasswd credential config"
   ansible.builtin.copy:
     content: '{{ bcrypt_htpasswd.stdout }}'
-    dest: '{{ registry_volume }}/auth/htpasswd'
+    dest: '{{ common_registry_volume }}/auth/htpasswd'
     mode: 0760
 
 - name: Generate RSA private key
   community.crypto.openssl_privatekey:
-    path: "{{ registry_volume }}/certs/domain.key"
+    path: "{{ common_registry_volume }}/certs/domain.key"
     size: 4096
     type: RSA
     cipher: null
@@ -39,15 +39,15 @@
 
 - name: Generate CSR with SANs
   community.crypto.openssl_csr:
-    privatekey_path: "{{ registry_volume }}/certs/domain.key"
-    path: "{{ registry_volume }}/certs/doamin.csr"
+    privatekey_path: "{{ common_registry_volume }}/certs/domain.key"
+    path: "{{ common_registry_volume }}/certs/doamin.csr"
     subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
 
 - name: Generate self-signed certificate
   community.crypto.x509_certificate:
-    path: "{{ registry_volume }}/certs/domain.crt"
-    privatekey_path: "{{ registry_volume }}/certs/domain.key"
-    csr_path: "{{ registry_volume }}/certs/doamin.csr"
+    path: "{{ common_registry_volume }}/certs/domain.crt"
+    privatekey_path: "{{ common_registry_volume }}/certs/domain.key"
+    csr_path: "{{ common_registry_volume }}/certs/doamin.csr"
     provider: selfsigned
     owner: "{{ ansible_user_id }}"
     group: wheel
@@ -64,9 +64,9 @@
     state: present
     ports: "{{ common_registry_port }}:5000"
     volume:
-      - "{{ registry_volume }}/data:/var/lib/registry:z"
-      - "{{ registry_volume }}/auth:/auth:z"
-      - "{{ registry_volume }}/certs:/certs:z"
+      - "{{ common_registry_volume }}/data:/var/lib/registry:z"
+      - "{{ common_registry_volume }}/auth:/auth:z"
+      - "{{ common_registry_volume }}/certs:/certs:z"
     env:
       REGISTRY_AUTH: "htpasswd"
       REGISTRY_AUTH_HTPASSWD_REALM: "Registry"

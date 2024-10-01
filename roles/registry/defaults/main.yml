@@ -1,4 +1,4 @@
 registry_pod_name: registry
-registry_volume: /pods/registry
+#common_registry_volume: /pods/registry
 registry_username: openshift
 registry_password: CHANGEME

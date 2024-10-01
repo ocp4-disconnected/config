@@ -48,7 +48,7 @@ fips: true
 pullSecret: '{{ lookup('ansible.builtin.file', ansible_user_dir + '/.docker/config.json' ) }}'
 sshKey: "{{ lookup('ansible.builtin.file', common_ssh_key + '.pub' ) }}"
 additionalTrustBundle: |
-{{ lookup('ansible.builtin.file', registry_volume + '/certs/domain.crt') | indent(2, true) }}
+{{ lookup('ansible.builtin.file', common_registry_volume + '/certs/domain.crt') | indent(2, true) }}
 {% if not agent_install_connected | bool %}
 imageDigestSources:
   - mirrors:

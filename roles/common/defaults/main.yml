@@ -10,7 +10,7 @@ common_openshift_release: 4.14.16
 common_openshift_download_base_url: https://mirror.openshift.com/pub/openshift-v4/{{ openshift_bastion_platform }}/clients
 common_cluster_domain: example.com
 common_openshift_bastion_platform: x86_64
-
+common_registry_volume: /pods/registry #### NEED TO RE-EVALUATE. FOR SOME REASON AGENT INSTALL USES THIS
 
 collection_path: "{{ ansible_user_dir }}/.ansible/collections/ansible_collections/ansible/netcommon"
 common_install_dir: "{{ ansible_user_dir }}"
