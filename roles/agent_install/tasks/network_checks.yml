@@ -4,8 +4,8 @@
     cmd: dig +short {{ item }}
   register: dns_lookup
   with_items:
-    - "api.{{ cluster_fqdn }}"
-    - "testurl.apps.{{ cluster_fqdn }}"
+    - "api.{{ agent_install_cluster_fqdn }}"
+    - "testurl.apps.{{ agent_install_cluster_fqdn }}"
     - "{{ registry_fqdn }}"
   failed_when: dns_lookup.stdout == ''
   changed_when: false

@@ -1,7 +1,7 @@
 ---
 - name: Move generated ISO to webroot
   ansible.builtin.copy:
-    src: "{{ openshift_cluster_install_dir}}/agent.x86_64.iso"
+    src: "{{ agent_install_openshift_cluster_install_dir}}/agent.x86_64.iso"
     dest: /var/www/html/
     remote_src: true
   become: true

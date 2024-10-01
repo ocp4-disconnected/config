@@ -1,16 +1,16 @@
 apiVersion: v1
-baseDomain: {{ cluster_domain }}
-{% if nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
+baseDomain: {{ common_cluster_domain }}
+{% if common_nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
 compute: 
 - name: worker
   architecture: amd64
   hyperthreading: Enabled
-  replicas: {{ nodes | selectattr('name', 'search', '^worker') | list | length }}
+  replicas: {{ common_nodes | selectattr('name', 'search', '^worker') | list | length }}
 controlPlane: 
   name: master
   architecture: amd64
   hyperthreading: Enabled
-  replicas: {{ nodes | selectattr('name', 'search', '^master') | list | length }}
+  replicas: {{ common_nodes | selectattr('name', 'search', '^master') | list | length }}
 {% else %} 
 compute: 
 - name: worker
@@ -24,10 +24,10 @@ controlPlane:
   replicas: 1
 {% endif %}
 metadata:
-  name: {{ cluster_name }} 
+  name: {{ agent_install_cluster_name }} 
 networking:
   machineNetwork:
-  - cidr: {{ cluster_cidr }}
+  - cidr: {{ agent_install_cluster_cidr }}
   clusterNetwork:
   - cidr: 10.128.0.0/14 
     hostPrefix: 23 
@@ -35,18 +35,18 @@ networking:
   serviceNetwork: 
   - 172.30.0.0/16
 platform:
-{% if nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
+{% if common_nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
   baremetal:
     apiVIPs:
-      - {{ api_ip }}
+      - {{ agent_install_api_ip }}
     ingressVIPs:
-      - {{ ingress_ip }}
+      - {{ agent_install_ingress_ip }}
 {% else %}
   none: {}
 {% endif %}
 fips: true
 pullSecret: '{{ lookup('ansible.builtin.file', ansible_user_dir + '/.docker/config.json' ) }}'
-sshKey: "{{ lookup('ansible.builtin.file', ssh_key + '.pub' ) }}"
+sshKey: "{{ lookup('ansible.builtin.file', agent_install_ssh_key + '.pub' ) }}"
 additionalTrustBundle: |
 {{ lookup('ansible.builtin.file', registry_volume + '/certs/domain.crt') | indent(2, true) }}
 {% if not connected | bool %}

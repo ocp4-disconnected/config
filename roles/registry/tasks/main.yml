@@ -54,7 +54,7 @@
 
 - name: Load registry image to podman storage
   containers.podman.podman_load:
-    input: "{{ openshift_oc_mirror_dir }}/registry.tar"
+    input: "{{ common_openshift_oc_mirror_dir }}/registry.tar"
 
 - name: Generate systemd file for {{ registry_pod_name }}
   containers.podman.podman_container:

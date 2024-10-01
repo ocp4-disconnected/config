@@ -3,7 +3,7 @@ apiVersion: mirror.openshift.io/v1alpha2
 mirror:
   platform:
     channels:
-    - name: stable-{{ openshift_release.split('.')[0] }}.{{ openshift_release.split('.')[1] }}
-      minVersion: {{ previous_openshift_release }}
-      maxVersion: {{ openshift_release }}
+    - name: stable-{{ common_openshift_release.split('.')[0] }}.{{ common_openshift_release.split('.')[1] }}
+      minVersion: {{ common_previous_openshift_release }}
+      maxVersion: {{ common_openshift_release }}
       shortestPath: true

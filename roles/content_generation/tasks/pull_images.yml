@@ -1,23 +1,23 @@
 ---
-- name: Create {{ openshift_oc_mirror_dir }}
+- name: Create {{ common_openshift_oc_mirror_dir }}
   ansible.builtin.file:
     path: "{{ item }}"
     mode: '0755'
     state: directory
   with_items:
-  - "{{ openshift_oc_mirror_dir }}"
+  - "{{ common_openshift_oc_mirror_dir }}"
 
 - name: generete oc-mirror imagesetconfig
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ openshift_oc_mirror_dir }}/{{ item }}"
+    dest: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
   with_items:
     - cluster-images.yml
     - operators.yml  
 
 - name: Fix formating of generated imagesetconfig
   ansible.builtin.replace:
-    path: "{{ openshift_oc_mirror_dir }}/{{ item }}"
+    path: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
     regexp: '^\s*$'
     replace: ""
   with_items: 
@@ -26,7 +26,7 @@
 
 - name: Fix formating of generated imagesetconfig
   ansible.builtin.replace:
-    path: "{{ openshift_oc_mirror_dir }}/{{ item }}"
+    path: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
     regexp: '[ \t]+$'
     replace: ""
   with_items: 
@@ -34,19 +34,19 @@
     - operators.yml
 
 - name: remove empty lines with sed
-  ansible.builtin.shell: sed -i '/^$/d' {{ openshift_oc_mirror_dir }}/{{ item }}
+  ansible.builtin.shell: sed -i '/^$/d' {{ common_openshift_oc_mirror_dir }}/{{ item }}
   with_items: 
     - cluster-images.yml
     - operators.yml
 
 - name: fix permisison on oc-mirror to make executable
   ansible.builtin.file:
-    path: "{{ openshift_client_bin }}/oc-mirror"
+    path: "{{ common_openshift_client_bin }}/oc-mirror"
     mode: '0755'
 
 - name: Create mirror specific directories
   ansible.builtin.file:
-    path: "{{ openshift_oc_mirror_dir }}/{{ item }}"
+    path: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
     mode: '0755'
     state: directory
   with_items:
@@ -55,22 +55,22 @@
 
 - name: Run oc-mirror to generate image tars
   ansible.builtin.command: 
-    cmd: "{{ openshift_client_bin }}/oc-mirror --config {{ openshift_oc_mirror_dir }}/{{ item }} \
-      file://{{ openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
+    cmd: "{{ common_openshift_client_bin }}/oc-mirror --config {{ common_openshift_oc_mirror_dir }}/{{ item }} \
+      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
   register: mirror_pull
   retries: 5
   delay: 10
   until: mirror_pull.rc == 0
-  when: pull_mirror | bool
+  when: content_generation_pull_mirror | bool
   with_items: 
     - cluster-images.yml
     - operators.yml
 
 - name: Remove pull oc-mirror-workspace
   ansible.builtin.file:
-    path: "{{ openshift_oc_mirror_dir }}/{{ item }}/oc-mirror-workspace"
+    path: "{{ common_openshift_oc_mirror_dir }}/{{ item }}/oc-mirror-workspace"
     state: absent
-  when: pull_mirror | bool
+  when: content_generation_pull_mirror | bool
   with_items: 
     - cluster-images
     - operators

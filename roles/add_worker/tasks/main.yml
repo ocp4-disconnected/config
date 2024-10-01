@@ -10,7 +10,7 @@
     mode: '0755'
     state: directory
   with_items:
-    - "{{ openshift_worker_dir }}"
+    - "{{ add_worker_openshift_worker_dir }}"
 
 - name: Get the RHCOS image name
   ansible.builtin.find:
@@ -21,7 +21,7 @@
 - name: Generate worker configuration files
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ openshift_worker_dir }}/{{ item }}"
+    dest: "{{ add_worker_openshift_worker_dir }}/{{ item }}"
     mode: '0644'
   with_items:
     - custom-config.nmconnection
@@ -29,7 +29,7 @@
 
 - name: pull worker ignition file from master
   shell: |
-     oc extract -n openshift-machine-api secret/worker-user-data --keys=userData --to=-  > {{ openshift_worker_dir }}/worker.ign
+     oc extract -n openshift-machine-api secret/worker-user-data --keys=userData --to=-  > {{ add_worker_openshift_worker_dir }}/worker.ign
 
 - name: Merge pulled ignition with one pulled from master
   ansible.builtin.shell: |
@@ -63,20 +63,20 @@
         json.dump(merged_ignition, f, indent=4)
     "
   args:
-    chdir: "{{ openshift_worker_dir }}"
+    chdir: "{{ add_worker_openshift_worker_dir }}"
 
 - name: Remove any previous iso generated
   ansible.builtin.file:
-    path: "{{ openshift_worker_iso }}"
+    path: "{{ add_worker_openshift_worker_iso }}"
     state: absent
 
 - name: Run coreos-installer iso customize
   command:
-    cmd: coreos-installer iso customize --network-keyfile {{ openshift_worker_dir }}/custom-config.nmconnection --dest-ignition {{ openshift_worker_dir}}/merged-worker.ign --dest-device /dev/{{ disk_type }} {{ iso_files.files[0].path }} -o {{ openshift_worker_iso }} 
+    cmd: coreos-installer iso customize --network-keyfile {{ add_worker_openshift_worker_dir }}/custom-config.nmconnection --dest-ignition {{ add_worker_openshift_worker_dir}}/merged-worker.ign --dest-device /dev/{{ add_worker_disk_type }} {{ iso_files.files[0].path }} -o {{ add_worker_openshift_worker_iso }} 
  
 - name: next steps
   debug: 
-    msg: mount the iso "{{ openshift_worker_iso }}" on idrac, and it will fully install and approve
+    msg: mount the iso "{{ add_worker_openshift_worker_iso }}" on idrac, and it will fully install and approve
 
 - name: Pause for 3 minutes to allow time to mount iso
   ansible.builtin.pause:

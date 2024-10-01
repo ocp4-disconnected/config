@@ -1,3 +1,9 @@
+- name: Ensure required packages are installed
+  ansible.builtin.package:
+    name: nmstate,openssl,httpd-tools,podman,git,python3-jmespath,coreos-installer ## Variablize pls common_packages: (Maybe add extra packages var?)
+    state: present
+  become: true
+
 - name: Ensure destination directory exists
   ansible.builtin.file:
     path: /usr/bin
@@ -13,4 +19,4 @@
     remote_src: yes
   become: true
   with_fileglob:
-    - "{{ openshift_client_bin }}/*"
+    - "{{ common_openshift_client_bin }}/*"
