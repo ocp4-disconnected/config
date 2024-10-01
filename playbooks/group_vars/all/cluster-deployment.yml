@@ -1,46 +1,51 @@
 # Common
-common_network_checks: false
-common_openshift_dir: "/home/user/content"
-common_install_dir: "{{ ansible_user_dir }}"
-common_ip_space: 192.168.1 ## TODO add some logic to validate/create based on facts see about dynamiclly calculated based on entry
+#common_network_checks: false
+#common_openshift_dir: "/home/user/content"
+#common_install_dir: "{{ ansible_user_dir }}"
+#common_ip_space: 192.168.1 ## TODO add some logic to validate/create based on facts see about dynamiclly calculated based on entry
+#common_cluster_domain: example.com
+#common_subnet_mask: 24
+#common_gateway_ip: '{{ ip_space }}.1'
+#common_openshift_interface: eno1
 
-
-# Registry
-registry_volume: /pods/registry
-registry_username: openshift
-registry_password: CHANGEME
-
-
-# Generate Agent ISO
-gen_agent_cluster_name: ocp-sno
-gen_agent_cluster_domain: example.com
-gen_agent_pull_mirror: true
-gen_agent_subnet_mask: 24
-gen_agent_cluster_cidr: '{{ ip_space }}.0/{{ subnet_mask }}'
-gen_agent_dns_resolver: '{{ ip_space }}.51'
-gen_agent_gateway_ip: '{{ ip_space }}.1'
-gen_agent_openshift_interface: eno1
-gen_agent_api_ip: '{{ ip_space }}.50'
-gen_agent_ingress_ip: '{{ ip_space }}.51'
-gen_agent_table_id: 254
-gen_agent_nodes:
+common_ip_space: 192.168.169
+common_nodes:
   - name: master-0
     ip: '17'
     mac: be:47:95:d0:01:51
-  - name: master-1
-    ip: '18'
-    mac: be:47:95:d0:01:52
-  - name: master-2
-    ip: '19'
-    mac: be:47:95:d0:01:53
-  - name: worker-0
-    ip: '20'
-    mac: be:47:95:d0:01:54
+
+# Registry
+#registry_volume: /pods/registry
+#registry_username: openshift
+#registry_password: CHANGEME
+
+
+# Generate Agent ISO
+#agent_install_cluster_name: ocp-sno
+#agent_install_pull_mirror: true
+#agent_install_cluster_cidr: '{{ ip_space }}.0/{{ subnet_mask }}'
+#agent_install_dns_resolver: '{{ ip_space }}.51'
+#agent_install_api_ip: '{{ ip_space }}.50'
+#agent_install_ingress_ip: '{{ ip_space }}.51'
+#agent_install_table_id: 254
+#common_nodes:
+#  - name: master-0
+#    ip: '17'
+#    mac: be:47:95:d0:01:51
+#  - name: master-1
+#    ip: '18'
+#    mac: be:47:95:d0:01:52
+#  - name: master-2
+#    ip: '19'
+#    mac: be:47:95:d0:01:53
+#  - name: worker-0
+#    ip: '20'
+#    mac: be:47:95:d0:01:54
 
 # iDRAC
-idrac: false  ### NEED TO WRITE LOGIC/REMOVE THIS VAR. MAKE IT SMARTER!!!
-idrac_user: test
-idrac_password: tester
+#idrac: false  ### NEED TO WRITE LOGIC/REMOVE THIS VAR. MAKE IT SMARTER!!!
+#idrac_user: test
+#idrac_password: tester
 
 #idracs:
 #  - name: master-0
@@ -54,7 +59,7 @@ idrac_password: tester
 
 # Single Node Worker
 
-single_node_worker_drive_type: vda
+#add_worker_disk_type: vda
 
 
 ## Cluster Node Config, The number of master nodes will effect if this a HA or Single node.

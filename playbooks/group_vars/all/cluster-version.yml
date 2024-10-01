@@ -1,16 +1,16 @@
 # Generate agent
 
-gen_agent_openshift_release: 4.14.16
-gen_agent_previous_openshift_release: 4.14.16
-gen_agent_trident_version: v24.06.0
+#common_openshift_release: 4.14.16
+#common_previous_openshift_release: 4.14.16
+#common_trident_version: v24.06.0
 
 
 # Disconnected Images
 
-disconnected_images_pull_mirror: true
+#content_generation_pull_mirror: true
 
 ## Operators To be mirrored, based on index they are in
-disconnected_images_disconnected_operators:
+content_generation_disconnected_operators:
   - redhat-operator-index:
     - name: kubernetes-nmstate-operator
     - name: kubevirt-hyperconverged
@@ -19,10 +19,14 @@ disconnected_images_disconnected_operators:
   - certified-operator-index:
 
 ## additionalImages for oc-mirror to pull. Include version
-disconnected_images_additionalImages:
+content_generation_additionalImages:
   - name: registry.redhat.io/ubi8/ubi:latest
   - name: registry.redhat.io/ubi9/ubi:latest
   - name: quay.io/noseka1/toolbox-container:full
 
-disconnected_images_ansible_collection_requirements:
-  - name: dellemc.openmanage
+
+
+#### ARCHIVED (?)
+
+#content_generation_ansible_collection_requirements:
+#  - name: dellemc.openmanage

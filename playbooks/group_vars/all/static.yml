@@ -1,17 +1,37 @@
-openshift_cluster_install_dir: "{{ install_dir }}/install-{{ ansible_date_time.date }}"
-openshift_cluster_config_dir: "{{ install_dir }}/configs"
-openshift_client_bin: "{{ openshift_dir }}/bin"
-openshift_download_dir: "{{ openshift_dir }}/downloads"
-openshift_oc_mirror_dir: "{{ openshift_dir }}/images"
-openshift_download_base_url: https://mirror.openshift.com/pub/openshift-v4/{{ openshift_bastion_platform }}/clients
-openshift_bastion_platform: x86_64
+#### AGENT INSTALL
 
-openshift_worker_dir: "{{ install_dir }}/worker"
-openshift_worker_iso: "{{ openshift_worker_dir }}/coreos-worker.iso"
+#openshift_cluster_install_dir: "{{ install_dir }}/install-{{ ansible_date_time.date }}"
+#openshift_cluster_config_dir: "{{ install_dir }}/configs"
+#cluster_fqdn: "{{ cluster_name }}.{{ cluster_domain }}"
+#ssh_key: "{{ ansible_user_dir + '/.ssh/id_rsa' }}"
 
-registry: "{{ registry_fqdn }}{{ '' if registry_port == 443 else ':' ~ registry_port }}"
 
-cluster_fqdn: "{{ cluster_name }}.{{ cluster_domain }}"
-cluster_network: "{{ cluster_cidr | ansible.netcommon.ipv4 }}"
+#### COMMON
+#openshift_client_bin: "{{ openshift_dir }}/bin"
+#openshift_download_dir: "{{ openshift_dir }}/downloads"
+#openshift_oc_mirror_dir: "{{ openshift_dir }}/images"
+#openshift_download_base_url: https://mirror.openshift.com/pub/openshift-v4/{{ openshift_bastion_platform }}/clients
+#openshift_bastion_platform: x86_64
 
-ssh_key: "{{ ansible_user_dir + '/.ssh/id_rsa' }}"
+#### WORKER INSTALL
+
+#openshift_worker_dir: "{{ install_dir }}/worker"
+#openshift_worker_iso: "{{ openshift_worker_dir }}/coreos-worker.iso"
+
+
+
+
+
+
+
+### ARCHIVED (?)
+
+
+## AGENT INSTALL
+
+#cluster_network: "{{ cluster_cidr | ansible.netcommon.ipv4 }}"
+
+
+## REGISTRY
+
+#registry: "{{ registry_fqdn }}{{ '' if registry_port == 443 else ':' ~ registry_port }}"
