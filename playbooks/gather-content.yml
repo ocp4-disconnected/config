@@ -1,6 +1,4 @@
 #!/usr/bin/ansible-playbook
 - hosts: localhost
-  gather_facts: false
   roles:
     - ocp4.disconnected.content_generation
-    - ocp4.disconnected.disconnected_images

@@ -14,8 +14,6 @@
       tags: push_cluster_images, stage_0
       vars:
         image_source: cluster-images
-    - role: ocp4.disconnected.network_checks
-      tags: network_checks, stage_0
     - role: ocp4.disconnected.generate_agent_iso
       tags: generate_agent_iso, stage_1
     - role: ocp4.disconnected.idrac

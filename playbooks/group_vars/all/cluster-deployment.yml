@@ -1,5 +1,5 @@
 ## Location of the mirrored openshift content for installation/hydration
-openshift_dir: "/home/user/content"
+openshift_dir: "{{ ansible_user_dir }}/content"
 install_dir: "{{ ansible_user_dir }}"
 
 # Registry

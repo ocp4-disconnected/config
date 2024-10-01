@@ -15,9 +15,7 @@
   retries: 2
   delay: 1
   failed_when: false
-  when: 
-    - "'ocp4.disconnected' not in collection_installed.stdout"
-    - "update_collection | bool"
+  when: "'ocp4.disconnected' not in collection_installed.stdout or update_collection | bool"
 
 - name: Install ansible collections from local media
   ansible.builtin.command:
@@ -31,8 +29,6 @@
 
 - name: Install ansible collection from the internet
   ansible.builtin.command:
-    cmd: ansible-galaxy collection install git+https://github.com/cjnovak98/ocp4-disconnected-collection.git
+    cmd: ansible-galaxy collection install git+https://github.com/cjnovak98/ocp4-disconnected-collection.git -U
   when:
-    - "'ocp4.disconnected' not in collection_installed.stdout"
-    - "(internet.status | default(0)) == 200"
-    - "update_collection | bool"
+    - update_collection | bool
