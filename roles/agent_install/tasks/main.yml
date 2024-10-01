@@ -51,7 +51,8 @@
    - install-config.yaml
    - agent-config.yaml
 
-- include_tasks: agent_install_network_checks.yml
+- name: Begin Pulling Disconnected Content
+  include_tasks: agent_install_network_checks.yml
   when: agent_install_network_checks | bool
 
 - name: Generate ISO
