@@ -15,7 +15,7 @@ common_registry_volume: /pods/registry #### NEED TO RE-EVALUATE. FOR SOME REASON
 
 collection_path: "{{ ansible_user_dir }}/.ansible/collections/ansible_collections/ansible/netcommon"
 common_install_dir: "{{ ansible_user_dir }}"
-common_ip_space: 24
+common_ip_space: 192.168.69
 common_subnet_mask: 24
 common_gateway_ip: '{{ common_ip_space }}.1'
 common_ssh_key: "{{ ansible_user_dir + '/.ssh/id_rsa' }}"
