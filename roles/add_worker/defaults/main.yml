@@ -1,2 +1,6 @@
 ---
-# defaults file for single-node-worker
+# defaults file for add-worker role
+
+add_worker_openshift_worker_dir: "{{ common_install_dir }}/worker"
+add_worker_disk_type: "vda"
+add_worker_openshift_worker_iso: "{{ openshift_worker_dir }}/coreos-worker.iso"

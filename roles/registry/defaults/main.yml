@@ -1,7 +1,4 @@
-registry_port: 5000
 registry_pod_name: registry
-cert_c: "FB"   # Country Name (C, 2 letter code)
-cert_s: "."          # Certificate State (S)
-cert_l: "."       # Certificate Locality (L)
-cert_o: "foo"   # Certificate Organization (O)
-cert_ou: "bar"      # Certificate Organizational Unit (OU)
+registry_volume: /pods/registry
+registry_username: openshift
+registry_password: CHANGEME

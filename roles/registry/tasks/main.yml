@@ -13,9 +13,9 @@
       - "{{ ansible_user_dir }}/.config/systemd/user"
   become: true
 
-- name: Set fact for {{ ip_space }} IPv4 address
+- name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
-    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
 - name: "Generate Registry Basic Auth" ## community.general.htpasswd (requires passlib>=1.6)
@@ -62,7 +62,7 @@
     privileged: false
     image: docker.io/library/registry:latest
     state: present
-    ports: "{{ registry_port }}:5000"
+    ports: "{{ common_registry_port }}:5000"
     volume:
       - "{{ registry_volume }}/data:/var/lib/registry:z"
       - "{{ registry_volume }}/auth:/auth:z"
@@ -92,7 +92,7 @@
     daemon_reload: true
     scope: user
 
-- name: Ensure firewalld is configured for port {{ registry_port }}
+- name: Ensure firewalld is configured for port {{ common_registry_port }}
   firewalld:
     port: 5000/tcp
     immediate: true
@@ -102,7 +102,7 @@
 
 - name: "Login to registry"
   ansible.builtin.command:
-    cmd: podman login https://{{ ipv4_address | first  }}:{{ registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
+    cmd: podman login https://{{ ipv4_address | first  }}:{{ common_registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
   register: registry_logedin
   retries: 5
   delay: 2

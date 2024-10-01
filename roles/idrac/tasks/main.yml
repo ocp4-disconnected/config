@@ -1,11 +1,16 @@
 ---
 - name: Move generated ISO to webroot
   ansible.builtin.copy:
-    src: "{{ agent_install_openshift_cluster_install_dir}}/agent.x86_64.iso"
+    src: "{{ common_openshift_cluster_install_dir}}/agent.x86_64.iso"
     dest: /var/www/html/
     remote_src: true
   become: true
   
+- name: Set fact for {{ common_ip_space }} IPv4 address
+  set_fact:
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
+  when: ipv4_address is undefined
+
 - name: Insert image file using HTTP.
   delegate_to: localhost
   dellemc.openmanage.idrac_virtual_media:
@@ -16,7 +21,7 @@
     force: true
     virtual_media:
       - insert: true
-        image: "http://{{ ansible_default_ipv4.address }}/agent.x86_64.iso"
+        image: "http://{{ ipv4_address | first }}/agent.x86_64.iso"
         media_type: "DVD"
   loop: "{{ idracs }}"
 

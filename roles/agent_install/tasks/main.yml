@@ -5,7 +5,7 @@
     mode: '0755'
     state: directory
   with_items:
-    - "{{ agent_install_openshift_cluster_install_dir }}"
+    - "{{ common_openshift_cluster_install_dir }}"
     - "{{ agent_install_openshift_cluster_config_dir }}"
     - "{{ ansible_user_dir }}/.kube"
 
@@ -23,20 +23,20 @@
 
 - name: Generate RSA ssh keys
   ansible.builtin.command:
-    cmd: "ssh-keygen -t rsa -b 2048 -f {{ agent_install_ssh_key }} -N ''"
-    creates: "{{ agent_install_ssh_key}}"
+    cmd: "ssh-keygen -t rsa -b 2048 -f {{ common_ssh_key }} -N ''"
+    creates: "{{ common_ssh_key}}"
   register: ssh_keygen
   changed_when: ssh_keygen.rc == 0
 
-- name: Set fact for {{ ip_space }} IPv4 address
+- name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
-    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
 - name: Generate configuration files
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ agent_install_openshift_cluster_install_dir }}/{{ item }}"
+    dest: "{{ common_openshift_cluster_install_dir }}/{{ item }}"
     mode: '0644'
   with_items:
    - install-config.yaml
@@ -44,23 +44,23 @@
 
 - name: Create copys of configuration files
   ansible.builtin.copy:
-    src: "{{ agent_install_openshift_cluster_install_dir }}/{{ item }}"
-    dest: "{{ agent_install_openshift_cluster_install_dir }}/{{ item }}-copy"
+    src: "{{ common_openshift_cluster_install_dir }}/{{ item }}"
+    dest: "{{ common_openshift_cluster_install_dir }}/{{ item }}-copy"
     remote_src: yes
   with_items:
    - install-config.yaml
    - agent-config.yaml
 
-- include_tasks: network_checks.yml
-  when: network_checks | bool
+- include_tasks: agent_install_network_checks.yml
+  when: agent_install_network_checks | bool
 
 - name: Generate ISO
   ansible.builtin.command:
-    cmd: openshift-install agent create image --dir {{ agent_install_openshift_cluster_install_dir }}
+    cmd: openshift-install agent create image --dir {{ common_openshift_cluster_install_dir }}
 
 - name: copy new kubeconfig to {{ ansible_user_dir }}/.kube/config, will make backup if something exsists
   ansible.builtin.copy:
-    src: "{{ agent_install_openshift_cluster_install_dir }}/auth/kubeconfig"
+    src: "{{ common_openshift_cluster_install_dir }}/auth/kubeconfig"
     dest: '{{ ansible_user_dir }}/.kube/config'
     remote_src: true
     mode: '0644'

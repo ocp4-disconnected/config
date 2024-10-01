@@ -1,3 +1,8 @@
-registry_fqdn: "{{ ansible_nodename }}"
-registry_port: 5000
-connected: false
+#agent_install_registry_fqdn: "{{ ansible_nodename }}"
+agent_install_cluster_fqdn: "{{ agent_install_cluster_name }}.{{ common_cluster_domain }}"
+agent_install_connected: true
+agent_install_openshift_cluster_config_dir: "{{ common_install_dir }}/configs"
+agent_install_network_checks: false
+agent_install_cluster_name: ocp-sno
+agent_install_dns_resolver: '{{ common_ip_space }}.1'
+agent_install_table_id: 254

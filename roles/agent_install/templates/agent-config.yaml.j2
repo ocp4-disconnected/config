@@ -2,7 +2,7 @@ apiVersion: v1alpha1
 kind: AgentConfig
 metadata:
   name: {{ agent_install_cluster_name }}
-rendezvousIP: {{ ip_space }}.{{ common_nodes[0].ip }}
+rendezvousIP: {{ common_ip_space }}.{{ common_nodes[0].ip }}
 hosts:
 {% for node in common_nodes | selectattr('name', 'search', '^master') | list %}
   - hostname: {{ node.name }}
@@ -19,7 +19,7 @@ hosts:
           ipv4:
             enabled: true
             address: 
-              - ip: {{ ip_space }}.{{ node.ip }}
+              - ip: {{ common_ip_space }}.{{ node.ip }}
                 prefix-length: {{ common_subnet_mask }}
             dhcp: false
       dns-resolver:
@@ -49,7 +49,7 @@ hosts:
           ipv4:
             enabled: true
             address: 
-              - ip: {{ ip_space }}.{{ node.ip }}
+              - ip: {{ common_ip_space }}.{{ node.ip }}
                 prefix-length: {{ common_subnet_mask }}
             dhcp: false
       dns-resolver:

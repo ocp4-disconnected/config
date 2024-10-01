@@ -6,7 +6,7 @@
   with_items:
     - "api.{{ agent_install_cluster_fqdn }}"
     - "testurl.apps.{{ agent_install_cluster_fqdn }}"
-    - "{{ registry_fqdn }}"
+    - "{{ agent_install_registry_fqdn }}"
   failed_when: dns_lookup.stdout == ''
   changed_when: false
-  when: network_checks | bool
+  when: agent_install_network_checks | bool

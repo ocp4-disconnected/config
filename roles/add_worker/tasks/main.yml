@@ -1,7 +1,7 @@
 ---
-- name: Set fact for {{ ip_space }} IPv4 address
+- name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
-    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
 - name: Create cluster install dir
