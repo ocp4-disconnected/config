@@ -4,5 +4,5 @@
   roles:
     - role: import_collection
       tags: import_collection, always
-    - role: ocp4.disconnected.single_node_worker
+    - role: ocp4.disconnected.add_worker
       tags: always
