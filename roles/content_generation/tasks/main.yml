@@ -109,3 +109,6 @@
 - name: Download required ansible collections
   ansible.builtin.command: 
     cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ openshift_download_dir }}/collections
+
+- include_tasks: pull_images.yml
+  when: pull_mirror | bool

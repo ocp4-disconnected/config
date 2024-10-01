@@ -42,17 +42,7 @@
     mode: '0755'
   become: true
 
-- name: Create all inital repos ## We should probably remove this from the role - Since the repos should be done on customer side or we should have a separate role for hydrating the repos
-  ansible.builtin.command:
-    cmd: git init --bare {{ item }}
-  args:
-    chdir: /home/git
-  with_items:
-    - day2
-    - apps
-  become: true
-
-- name: Ensure ownership of repositories is set to git:git
+- name: Ensure ownership is set to git:git
   ansible.builtin.file:
     path: "/home/git"
     state: directory
