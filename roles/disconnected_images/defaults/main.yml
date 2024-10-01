@@ -1,1 +1,0 @@
-previous_openshift_release: "{{ openshift_release }}"

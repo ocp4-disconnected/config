@@ -79,7 +79,7 @@
       names: true
       time: 1
 
-- name: "{{ role_name }} | Enable Linger | Allows Service to Start without user logging in"
+- name: Allows Service to Start without user logging in
   command:
     cmd: loginctl enable-linger "{{ lookup('env','USER') }}"
   become: true
@@ -112,3 +112,5 @@
   ansible.builtin.copy:
     src: /run/user/1000/containers/auth.json
     dest: "{{ ansible_user_dir }}/.docker/config.json"
+    backup: true
+    
