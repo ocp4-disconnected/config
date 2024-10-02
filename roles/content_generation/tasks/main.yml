@@ -23,9 +23,7 @@
   when: 
     - install_check.rc != 0 or "common_openshift_release not in install_check.stdout"
   notify:
-    - Download_oc_tools
-    - Extract_oc_tools
-    - Remove_oc_tools_tar
+    - Download_oc
 
 - name: Check if "trident" binary is present
   ansible.builtin.stat:

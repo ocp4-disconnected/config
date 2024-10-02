@@ -9,6 +9,7 @@
     - oc-mirror.tar.gz
     - openshift-install-linux.tar.gz
   register: download_tools
+  listen: "Download_oc"
 
 - name: Extract_oc_tools
   ansible.builtin.unarchive:
@@ -22,6 +23,7 @@
     - openshift-client-linux.tar.gz
     - oc-mirror.tar.gz
     - openshift-install-linux.tar.gz
+  listen: "Download_oc"
 
 - name: Remove_oc_tools_tar
   ansible.builtin.file:
@@ -29,6 +31,7 @@
     state: absent
   with_fileglob:
     - "{{ common_openshift_download_dir }}/*tar.gz"
+  listen: "Download_oc"
 
 - name: Download_trident
   ansible.builtin.get_url:
