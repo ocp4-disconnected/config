@@ -69,8 +69,8 @@
   ansible.builtin.command: 
     cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ common_openshift_download_dir }}/collections
 
-- name: Trigger any handlers if necessary
-  meta: flush_handlers
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
 
 - include_tasks: pull_images.yml
   when: content_generation_pull_mirror | bool
