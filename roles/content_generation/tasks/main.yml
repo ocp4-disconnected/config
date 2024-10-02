@@ -31,6 +31,8 @@
     - Extract oc tools
     - Remove oc tools tar
 
+- meta: flush_handlers
+
 - name: Check if "trident" binary is present
   ansible.builtin.stat:
     path: /usr/bin/trident
