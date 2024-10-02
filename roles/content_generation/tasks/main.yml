@@ -26,7 +26,6 @@
     msg: incorrect version found
   when: 
     - install_check.rc != 0 or "common_openshift_release not in install_check.stdout"
-    - install_check.stdout "{{ common }}"
   notify:
     - Download oc tools
     - Extract oc tools
