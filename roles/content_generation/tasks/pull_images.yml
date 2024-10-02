@@ -45,11 +45,11 @@
     path: "{{ common_openshift_client_bin }}/oc-mirror"
     mode: '0755'
 
-- name: Run oc-mirror to generate image tars #### Found bug with file:/// being output when using ansible_user_dir. Removed redundant / to make work
+- name: Run oc-mirror to generate image tars
   ansible.builtin.shell: |
     "{{ common_openshift_client_bin }}/oc-mirror \
     --config {{ common_openshift_oc_mirror_dir }}/{{ item }}.yml \
-    file:/{{ common_openshift_oc_mirror_dir }}/{{ item }}"
+    file://{{ common_openshift_oc_mirror_dir }}/{{ item }}"
   register: mirror_pull
   retries: 5
   delay: 10
