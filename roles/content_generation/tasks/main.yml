@@ -18,7 +18,8 @@
   failed_when: false   # Prevent failure when the command is not found
 
 - name: Set tools to download if openshift-install is missing or incorrect
-  set_fact:
+  set_fact: 
+    dev-null: true
   when: 
     - install_check.rc != 0 or "common_openshift_release not in install_check.stdout"
   notify: 
