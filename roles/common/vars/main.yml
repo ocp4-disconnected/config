@@ -6,4 +6,4 @@ common_openshift_client_bin: "{{ common_openshift_dir }}/bin"
 common_openshift_dir: "{{ ansible_user_dir }}/content"
 common_openshift_download_dir: "{{ common_openshift_dir }}/downloads"
 common_openshift_bastion_platform: x86_64
-common_openshift_download_base_url: https://mirror.openshift.com/pub/openshift-v4/{{ openshift_bastion_platform }}/clients
+common_openshift_download_base_url: https://mirror.openshift.com/pub/openshift-v4/{{ common_openshift_bastion_platform }}/clients

@@ -5,7 +5,7 @@
 ## Global variables used by most/all roles
 common_install_dir: "{{ ansible_user_dir }}"
 common_trident_version: v24.06.0
-
+common_fips_enabled: true
 
 ## OpenShift Connected Install Variables
 common_openshift_interface: eno1
