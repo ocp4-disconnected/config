@@ -14,52 +14,54 @@
   ansible.builtin.shell: "openshift-install version"
   register: install_check
   ignore_errors: true
-
-- name: Set tools to download if openshift-install is missing or incorrect
-  ansible.builtin.debug: 
-    msg: Checking version for openshift-install
-  when: 
-    - install_check.rc != 0 or "common_openshift_release not in install_check.stdout"
+  changed_when: 'install_check.rc != 0 or "common_openshift_release not in install_check.stdout"'
   notify:
     - Download_oc
 
 - name: Check if "trident" binary is present
   ansible.builtin.stat:
     path: /usr/bin/trident
-  failed_when: false
+  register: trident
+  changed_when: 'trident.rc != 0'
   notify:
     - Download_trident
-    - Extract_trident_binary
-    - Move_tridentctl_to_proper_location
-    - Remove_trident-installer/tridentctl
 
-- name: Check if {{ item }} binary is present
+- name: Check if butane binary is present
   ansible.builtin.stat:
-    path: /usr/bin/{{ item }}
-  with_items:
-    - butane
-    - helm
+    path: /usr/bin/butane
   failed_when: false
+  register: butane
+  changed_when: 'butane.rc != 0'
   notify:
-    - Download {{ item }}
+    - Download butane
+
+- name: Check if helm binary is present
+  ansible.builtin.stat:
+    path: /usr/bin/helm
+  failed_when: false
+  register: helm
+  changed_when: 'helm.rc != 0'
+  notify:
+    - Download helm
 
 - name: Check for saved registry
   ansible.builtin.stat:
     path:  "{{ common_openshift_oc_mirror_dir }}/registry.tar"
+  register: registry
+  changed_when: 'registry.rc != 0'
   failed_when: false
   notify:
-    - Pull_registry_image
-    - Save_registry_image
+    - Registry_image
 
 - name: Check for pre-staged RHCOS image
   ansible.builtin.find:
     paths: "{{ ansible_user_dir }}/.cache/agent/image_cache"
     patterns: "*.iso"
+  register: rhcos
+  changed_when: 'rhcos.rc != 0'
   failed_when: false
   notify:
-    - Detect_RHCOS_image_URL
-    - Parse_RHCOS_image_URL
-    - Downlaod_RHCOS_image
+    - rhcos_image
 
 - name: Download required ansible collections
   ansible.builtin.command: 

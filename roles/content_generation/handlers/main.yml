@@ -8,7 +8,7 @@
     - openshift-client-linux.tar.gz
     - oc-mirror.tar.gz
     - openshift-install-linux.tar.gz
-  register: download_tools
+  listen: download_tools
   listen: "Download_oc"
 
 - name: Extract_oc_tools
@@ -38,7 +38,7 @@
     url: "https://github.com/NetApp/trident/releases/download/{{ common_trident_version }}/trident-installer-{{ common_trident_version  | replace('v', '') }}.tar.gz"
     dest: "{{ common_openshift_download_dir }}"
     mode: '0755'
-  register: download_tridant
+  listen: "Download_tridant"
 
 - name: Extract_trident_binary
   ansible.builtin.unarchive:
@@ -47,6 +47,7 @@
     include:
       - trident-installer/tridentctl
     dest: "{{ common_openshift_client_bin }}"
+  listen: "Download_tridant"
 
 - name: Move_tridentctl_to_proper_location
   ansible.builtin.copy:
@@ -54,47 +55,53 @@
     src: "{{ common_openshift_client_bin }}/trident-installer/tridentctl"
     dest: "{{ common_openshift_client_bin }}/tridentctl"
     mode: '0755'
+  listen: "Download_tridant"
 
 - name: Remove_trident-installer/tridentctl
   ansible.builtin.file:
     path: "{{ common_openshift_client_bin }}/trident-installer"
     state: absent
+  listen: "Download_tridant"
 
 - name: Download_butane
   ansible.builtin.get_url:
     url: "{{ common_openshift_download_base_url }}/butane/latest/butane"
     dest: "{{ common_openshift_client_bin }}"
     mode: '0755'
-  register: download_butane
+  listen: download_butane
 
 - name: Download_helm
   ansible.builtin.get_url:
     url: "{{ common_openshift_download_base_url }}/helm/latest/helm-linux-amd64"
     dest: "{{ common_openshift_client_bin }}/helm"
     mode: '0755'
-  register: download_helm
+  listen: download_helm
 
 - name: Pull_registry_image
   containers.podman.podman_image:
     name: docker.io/library/registry
+  listen: Registry_image
 
 - name: Save_registry_image
   containers.podman.podman_save:
     image: docker.io/library/registry
     dest: "{{ common_openshift_oc_mirror_dir }}/registry.tar"
+  listen: Registry_image
 
 - name: Detect_RHCOS_image_URL
   command: 
     cmd: "{{ common_openshift_client_bin }}/openshift-install coreos print-stream-json"
-  register: rhcos_image_info
+  listen: rhcos_image
 
 - name: Parse_RHCOS_image_URL
   set_fact:
     rhcos_image_url: "{{ rhcos_image_info.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
+  listen: rhcos_image
 
 - name: Download_RHCOS_image
   get_url:
     url: "{{ rhcos_image_url }}"
     dest: "{{ common_openshift_download_dir }}/"
     mode: '0644'
+  listen: rhcos_image
 
