@@ -1,5 +1,10 @@
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v1alpha2
+{% if content_generation_backend +%}
+storageConfig:
+  local:
+    path: {{ content_generation_backend.location }}
+{% endif %}
 mirror:
   platform:
     channels:
