@@ -46,17 +46,17 @@
     mode: '0755'
 
 - name: Run oc-mirror to generate image tars
-  ansible.builtin.shell: |
-    "{{ common_openshift_client_bin }}/oc-mirror \
-    --config {{ common_openshift_oc_mirror_dir }}/{{ item }}.yml \
-    file://{{ common_openshift_oc_mirror_dir }}/{{ item }}"
+  ansible.builtin.command: 
+    cmd: "{{ openshift_client_bin }}/oc-mirror --config {{ openshift_oc_mirror_dir }}/{{ item }} \
+      file://{{ openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
   register: mirror_pull
   retries: 5
   delay: 10
   until: mirror_pull.rc == 0
-  with_items:
-    - cluster-images
-    - operators
+  when: pull_mirror | bool
+  with_items: 
+    - cluster-images.yml
+    - operators.yml
 
 - name: Remove pull oc-mirror-workspace
   ansible.builtin.file:
