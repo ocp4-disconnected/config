@@ -14,8 +14,6 @@
   ansible.builtin.shell: "openshift-install version"
   register: install_check
   ignore_errors: true
-  changed_when: false  # Prevent the playbook from being marked as changed if the command is missing
-  failed_when: false   # Prevent failure when the command is not found
 
 - name: Set tools to download if openshift-install is missing or incorrect
   ansible.builtin.debug: 
