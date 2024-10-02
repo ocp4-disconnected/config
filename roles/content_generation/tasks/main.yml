@@ -23,19 +23,19 @@
   when: 
     - install_check.rc != 0 or "common_openshift_release not in install_check.stdout"
   notify:
-    - Download oc tools
-    - Extract oc tools
-    - Remove oc tools tar
+    - Download_oc_tools
+    - Extract_oc_tools
+    - Remove_oc_tools_tar
 
 - name: Check if "trident" binary is present
   ansible.builtin.stat:
     path: /usr/bin/trident
   failed_when: false
   notify:
-    - Downlaod trident
-    - Extract trident binary
-    - Move tridentctl to proper location
-    - Remove trident-installer/tridentctl
+    - Download_trident
+    - Extract_trident_binary
+    - Move_tridentctl_to_proper_location
+    - Remove_trident-installer/tridentctl
 
 - name: Check if {{ item }} binary is present
   ansible.builtin.stat:
@@ -45,15 +45,15 @@
     - helm
   failed_when: false
   notify:
-    - Downlaod {{ item }}
+    - Download {{ item }}
 
 - name: Check for saved registry
   ansible.builtin.stat:
     path:  "{{ common_openshift_oc_mirror_dir }}/registry.tar"
   failed_when: false
   notify:
-    - Pull registry image
-    - Save registry image
+    - Pull_registry_image
+    - Save_registry_image
 
 - name: Check for pre-staged RHCOS image
   ansible.builtin.find:
@@ -61,10 +61,10 @@
     patterns: "*.iso"
   failed_when: false
   notify:
-    - Detect RHCOS image URL
-    - Parse RHCOS image URL
-    - Downlaod RHCOS image
-  
+    - Detect_RHCOS_image_URL
+    - Parse_RHCOS_image_URL
+    - Downlaod_RHCOS_image
+
 - name: Download required ansible collections
   ansible.builtin.command: 
     cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ common_openshift_download_dir }}/collections
