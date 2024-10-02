@@ -5,7 +5,7 @@
     mode: '0755'
     state: directory
   with_items:
-  - "{{ common_openshift_oc_mirror_dir }}"
+    - "{{ common_openshift_oc_mirror_dir }}"
 
 - name: generete oc-mirror imagesetconfig
   ansible.builtin.template:
@@ -95,6 +95,8 @@
   until: mirror_pull.rc == 0
   when: item in files_to_mirror
   with_items: 
+    - cluster-images
+    - operators
 
 - name: Remove pull oc-mirror-workspace
   ansible.builtin.file:
