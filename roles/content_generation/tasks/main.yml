@@ -22,6 +22,7 @@
   ansible.builtin.stat:
     path: /usr/bin/trident
   register: trident
+  failed_when: false
   changed_when: 'trident.rc != 0'
   notify:
     - Download_trident
