@@ -11,31 +11,6 @@
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
-    backup: true
-  with_items:
-    - cluster-images.yml
-    - operators.yml
-
-- name: Fix space formating of generated imagesetconfigs
-  ansible.builtin.replace:
-    path: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
-    regexp: '^\s*$'
-    replace: ""
-  with_items:
-    - cluster-images.yml
-    - operators.yml
-
-- name: Fix tab formating of generated imagesetconfig
-  ansible.builtin.replace:
-    path: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
-    regexp: '[ \t]+$'
-    replace: ""
-  with_items:
-    - cluster-images.yml
-    - operators.yml
-
-- name: Remove empty lines with sed
-  ansible.builtin.shell: sed -i '/^$/d' {{ common_openshift_oc_mirror_dir }}/{{ item }}
   with_items:
     - cluster-images.yml
     - operators.yml
@@ -48,7 +23,7 @@
 - name: Run oc-mirror to generate image tars
   ansible.builtin.command: 
     cmd: "{{ common_openshift_client_bin }}/oc-mirror --config {{ common_openshift_oc_mirror_dir }}/{{ item }} \
-      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
+      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }} --dest-skip-tls"
   register: mirror_pull
   retries: 5
   delay: 10

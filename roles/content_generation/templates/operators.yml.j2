@@ -10,23 +10,23 @@ storageConfig:
 mirror:
   operators:
 {% for index_dict in content_generation_disconnected_operators %}
-  {% for index, packages in index_dict.items() -%}
-    {% if packages %}
-- catalog: registry.redhat.io/redhat/{{ index }}:v{{ common_openshift_release.split('.')[0] }}.{{ common_openshift_release.split('.')[1] }}
-    packages:
-    {% for package in packages -%}
-    - name: {{ package.name }}
-      {% if 'channel' in package %} 
-      channels: 
+{% for index, packages in index_dict.items() %}
+{% if packages %}
+    - catalog: registry.redhat.io/redhat/{{ index }}:v{{ common_openshift_release.split('.')[0] }}.{{ common_openshift_release.split('.')[1] }}
+      packages:
+{% for package in packages %}
+      - name: {{ package.name }}
+{% if 'channel' in package %} 
+        channels: 
         - name: {{ package.channel }}
-    {% endif %} 
-    {% endfor %}
-    {% endif %}
-  {% endfor %}
+{% endif %} 
+{% endfor %}
+{% endif %}
+{% endfor %}
 {% endfor %}
 {% if content_generation_additionalImages +%}
   additionalImages:
-  {% for image in content_generation_additionalImages %}
-- name: {{ image.name }}
-  {% endfor %}
+{% for image in content_generation_additionalImages %}
+    - name: {{ image.name }}
+{% endfor %}
 {% endif %}
