@@ -8,6 +8,7 @@
 #common_gateway_ip: '{{ ip_space }}.1'
 #common_openshift_interface: eno1
 
+common_openshift_interface: ens1
 common_ip_space: 192.168.169
 common_nodes:
   - name: master-0

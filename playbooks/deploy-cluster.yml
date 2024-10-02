@@ -3,25 +3,23 @@
   gather_facts: true
   roles:
     - role: import_collection
-      tags: import_collection, always
-#    - role: ocp4.disconnected.install_binaries
-#      tags: install_binaries, stage_0
-#    - role: ocp4.disconnected.package_check
-#      tags: packages_check, stage_0
-#    - role: ocp4.disconnected.registry
-#      tags: registry, stage_0
-#    - role: ocp4.disconnected.push_images
-#      tags: push_cluster_images, stage_0
-#      vars:
-#        image_source: cluster-images
+      tags: import_collection
+    - role: ocp4.disconnected.content_generation
+      tags: content_generation
+    - role: ocp4.disconnected.registry
+      tags: registry, stage_0
+    - role: ocp4.disconnected.push_images
+      tags: push_cluster_images, stage_0
+      vars:
+        image_source: cluster-images
     - role: ocp4.disconnected.agent_install
       tags: agent_install, stage_1
-#    - role: ocp4.disconnected.idrac
-#      tags: idrac, stage_1
-#      when: idrac | bool
-#    - role: ocp4.disconnected.git
-#      tags: git, stage_2
-#    - role: ocp4.disconnected.push_images
-#      tags: push_operator_images, stage_2
-#      vars:
-#        image_source: operators
+    - role: ocp4.disconnected.idrac
+      tags: idrac, stage_1
+      when: idrac | bool
+    - role: ocp4.disconnected.git
+      tags: git, stage_2
+    - role: ocp4.disconnected.push_images
+      tags: push_images, stage_2
+      vars:
+        image_source: operators
