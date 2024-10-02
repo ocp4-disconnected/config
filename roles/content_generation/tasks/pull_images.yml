@@ -11,6 +11,7 @@
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
+    backup: yes
   with_items:
     - cluster-images.yml
     - operators.yml  
@@ -65,6 +66,35 @@
   with_items: 
     - cluster-images.yml
     - operators.yml
+
+- name: Compare new files with backups
+  ansible.builtin.command:
+    cmd: "diff -q {{ common_openshift_oc_mirror_dir }}/.{{ item }}.backup {{ common_openshift_oc_mirror_dir }}/{{ item }}"
+  with_items:
+    - cluster-images.yml
+    - operators.yml
+  register: diff_result
+  ignore_errors: true
+  changed_when: false  # Prevents marking the task as changed if files differ
+
+- name: Set fact for files that need oc-mirror run
+  set_fact:
+    files_to_mirror: "{{ files_to_mirror | default([]) + [item] }}"
+  with_items:
+    - cluster-images.yml
+    - operators.yml
+  when: diff_result.results[itemloop.index0].rc == 1  # diff returns 1 if files differ
+
+- name: Run oc-mirror to generate image tars if files differ
+  ansible.builtin.command: 
+    cmd: "{{ common_openshift_client_bin }}/oc-mirror --config {{ common_openshift_oc_mirror_dir }}/{{ item }} \
+      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
+  register: mirror_pull
+  retries: 5
+  delay: 10
+  until: mirror_pull.rc == 0
+  when: item in files_to_mirror
+  with_items: 
 
 - name: Remove pull oc-mirror-workspace
   ansible.builtin.file:
