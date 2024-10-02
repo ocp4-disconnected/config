@@ -13,10 +13,14 @@
 - name: Check if openshift-install is available
   ansible.builtin.shell: "openshift-install version"
   register: install_check
+  failed_when: false
   ignore_errors: true
   changed_when: 'install_check.rc != 0 or "common_openshift_release not in install_check.stdout"'
   notify:
     - Download_oc
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
 
 - name: Check if "trident" binary is present
   ansible.builtin.stat:
