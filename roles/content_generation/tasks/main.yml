@@ -9,6 +9,10 @@
     - "{{ common_openshift_oc_mirror_dir }}"
     - "{{ common_openshift_download_dir }}"
     - "{{ common_openshift_download_dir }}/collections"
+    - "{{ common_openshift_client_bin }}"
+    - "{{ common_openshift_oc_mirror_dir }}"
+    - "{{ common_openshift_download_dir }}"
+    - "{{ common_openshift_download_dir }}/collections"
 
 - name: Check if openshift-install is available
   ansible.builtin.shell: "openshift-install version"
@@ -22,7 +26,8 @@
     msg: incorrect version found
   when: 
     - install_check.rc != 0 or "common_openshift_release not in install_check.stdout"
-  notify: 
+    - install_check.stdout "{{ common }}"
+  notify:
     - Download oc tools
     - Extract oc tools
     - Remove oc tools tar
