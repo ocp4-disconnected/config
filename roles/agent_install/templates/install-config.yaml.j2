@@ -44,7 +44,7 @@ platform:
 {% else %}
   none: {}
 {% endif %}
-fips: true
+fips: {{ common_fips_enabled }}
 pullSecret: '{{ lookup('ansible.builtin.file', ansible_user_dir + '/.docker/config.json' ) }}'
 sshKey: "{{ lookup('ansible.builtin.file', common_ssh_key + '.pub' ) }}"
 {% if not agent_install_connected | bool %}
