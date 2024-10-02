@@ -20,7 +20,7 @@
 - name: Set tools to download if openshift-install is missing or incorrect
   set_fact:
   when: 
-    - install_check.rc != 0 or "'{{ common_openshift_release }}' not in install_check.stdout"
+    - install_check.rc != 0 or "common_openshift_release not in install_check.stdout"
   notify: 
     - Download oc tools
     - Extract oc tools
