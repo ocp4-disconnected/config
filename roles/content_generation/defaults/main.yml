@@ -11,6 +11,6 @@ content_generation_additionalImages:
   - name: registry.redhat.io/ubi9/ubi:latest
   - name: quay.io/noseka1/toolbox-container:full
 
-content_generation_backed:
+content_generation_backend:
   - type: local
     location: "{{ ansible_user_dir }}/oc-mirror-state"
