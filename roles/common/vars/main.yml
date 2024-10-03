@@ -7,3 +7,26 @@ common_openshift_dir: "{{ ansible_user_dir }}/content"
 common_openshift_download_dir: "{{ common_openshift_dir }}/downloads"
 common_openshift_bastion_platform: x86_64
 common_openshift_download_base_url: https://mirror.openshift.com/pub/openshift-v4/{{ common_openshift_bastion_platform }}/clients
+
+
+
+checks:
+  - name: trident
+    path: /usr/bin/tridentctl
+    notify: Download_trident
+
+  - name: butane
+    path: /usr/bin/butane
+    notify: Download_butane
+
+  - name: helm
+    path: /usr/bin/helm
+    notify: Download_helm
+
+  - name: registry
+    path: "{{ common_openshift_oc_mirror_dir }}/registry.tar"
+    notify: Registry_image
+
+  - name: cache_dir
+    path: "{{ ansible_user_dir }}/.cache"
+    notify: rhcos_image
