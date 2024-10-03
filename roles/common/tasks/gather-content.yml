@@ -57,12 +57,22 @@
   notify:
     - Registry_image
 
-- name: Check for pre-staged RHCOS image
+- name: Check if .cache directory exists
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.cache"
+  register: cache_dir
+  failed_when: false
+  changed_when: 'not cache_dir.stat.exists'
+  notify:
+    - rhcos_image
+
+- name: Find pre-staged RHCOS image if .cache directory exists
   ansible.builtin.find:
-    paths: "{{ ansible_user_dir }}/.cache/agent/image_cache"
+    paths: "{{ ansible_user_dir }}/.cache"
     patterns: "*.iso"
   register: rhcos
-  changed_when: 'not rhcos.stat.exists'
+  when: cache_dir.stat.exists
+  changed_when: rhcos.matched == 0
   failed_when: false
   notify:
     - rhcos_image
