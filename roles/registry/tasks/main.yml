@@ -10,6 +10,7 @@
       - "{{ common_registry_volume }}/data"
       - "{{ common_registry_volume }}/auth"
       - "{{ common_registry_volume }}/certs"
+      - "{{ common_registry_volume }}/ca"
       - "{{ ansible_user_dir }}/.config/systemd/user"
   become: true
 
@@ -29,7 +30,30 @@
     dest: '{{ common_registry_volume }}/auth/htpasswd'
     mode: 0760
 
-- name: Generate RSA private key
+- name: Create private key for CA
+  community.crypto.openssl_privatekey:
+    path: "{{ common_registry_volume }}/ca"
+
+- name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
+  community.crypto.openssl_csr:
+    path: "{{ common_registry_volume }}/ca"
+    privatekey_path: "{{ common_registry_volume }}/ca"
+    subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
+    basic_constraints:
+      - 'CA:TRUE'
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+
+- name: Create self-signed certificate
+  community.crypto.x509_certificate:
+    path: "{{ common_registry_volume }}/ca/ca.cer"
+    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
+    csr_path: "{{ common_registry_volume }}/ca/ca.csr"
+    provider: selfsigned
+
+- name: Generate registry private key
   community.crypto.openssl_privatekey:
     path: "{{ common_registry_volume }}/certs/domain.key"
     size: 4096
@@ -40,15 +64,18 @@
 - name: Generate CSR with SANs
   community.crypto.openssl_csr:
     privatekey_path: "{{ common_registry_volume }}/certs/domain.key"
-    path: "{{ common_registry_volume }}/certs/doamin.csr"
+    path: "{{ common_registry_volume }}/certs/domain.csr"
     subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
 
 - name: Generate self-signed certificate
   community.crypto.x509_certificate:
+    ownca_privatekey_path: "{{ common_registry_volume }}/certs/domain.key"
+    ownca_path: "{{ common_registry_volume }}/ca/ca.cer"
     path: "{{ common_registry_volume }}/certs/domain.crt"
-    privatekey_path: "{{ common_registry_volume }}/certs/domain.key"
-    csr_path: "{{ common_registry_volume }}/certs/doamin.csr"
-    provider: selfsigned
+    csr_path: "{{ common_registry_volume }}/certs/domain.csr"
+    ownca_not_after: +365d
+    ownca_not_before: "-1d"
+    provider: ownca
     owner: "{{ ansible_user_id }}"
     group: wheel
 

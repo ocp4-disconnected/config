@@ -17,6 +17,6 @@
 
 - name: Remove pull oc-mirror-workspace
   ansible.builtin.file:
-    path: "{{ common_openshift_oc_mirror_dir }}/{{ item.item.split ('.')[0] }}/oc-mirror-workspace"
+    path: "{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}/oc-mirror-workspace"
     state: absent
   when: template_result.changed | bool
