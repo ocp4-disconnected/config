@@ -8,7 +8,6 @@
     - openshift-client-linux.tar.gz
     - oc-mirror.tar.gz
     - openshift-install-linux.tar.gz
-  listen: download_tools
   listen: "Download_oc"
 
 - name: Extract_oc_tools

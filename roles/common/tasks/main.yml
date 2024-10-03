@@ -11,6 +11,8 @@
     mode: '0555'
   become: true
 
+- ansible.builtin.include_tasks: gather-content.yml
+
 - name: Move binaries to destination directory
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -20,3 +22,6 @@
   become: true
   with_fileglob:
     - "{{ common_openshift_client_bin }}/*"
+
+- include_tasks: pull_images.yml
+  when: content_generation_pull_mirror | bool

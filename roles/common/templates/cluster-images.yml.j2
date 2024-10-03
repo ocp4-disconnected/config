@@ -1,0 +1,16 @@
+kind: ImageSetConfiguration
+apiVersion: mirror.openshift.io/v1alpha2
+{% if content_generation_backend +%}
+{% for config in content_generation_backend %}
+storageConfig:
+  local:
+    path: {{ config.location }}
+{% endfor %}
+{% endif %}
+mirror:
+  platform:
+    channels:
+    - name: stable-{{ common_openshift_release.split('.')[0] }}.{{ common_openshift_release.split('.')[1] }}
+      minVersion: {{ common_previous_openshift_release }}
+      maxVersion: {{ common_openshift_release }}
+      shortestPath: true

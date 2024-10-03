@@ -15,18 +15,18 @@
   register: install_check
   failed_when: false
   ignore_errors: true
-  changed_when: 'install_check.rc != 0 or "common_openshift_release not in install_check.stdout"'
+  changed_when: 
+    - 'install_check.rc != 0'
+    - "'{{ common_openshift_release}}' not in install_check.stdout"
   notify:
     - Download_oc
 
-- meta: flush_handlers
-
 - name: Check if "trident" binary is present
   ansible.builtin.stat:
-    path: /usr/bin/trident
+    path: /usr/bin/tridentctl
   register: trident
   failed_when: false
-  changed_when: 'trident.rc != 0'
+  changed_when: "not trident.stat.exists"
   notify:
     - Download_trident
 
@@ -35,7 +35,7 @@
     path: /usr/bin/butane
   failed_when: false
   register: butane
-  changed_when: 'butane.rc != 0'
+  changed_when: "not butane.stat.exists"
   notify:
     - Download butane
 
@@ -44,7 +44,7 @@
     path: /usr/bin/helm
   failed_when: false
   register: helm
-  changed_when: 'helm.rc != 0'
+  changed_when: 'not helm.stat.exists'
   notify:
     - Download helm
 
@@ -52,7 +52,7 @@
   ansible.builtin.stat:
     path:  "{{ common_openshift_oc_mirror_dir }}/registry.tar"
   register: registry
-  changed_when: 'registry.rc != 0'
+  changed_when: 'not registry.stat.exists'
   failed_when: false
   notify:
     - Registry_image
@@ -62,7 +62,7 @@
     paths: "{{ ansible_user_dir }}/.cache/agent/image_cache"
     patterns: "*.iso"
   register: rhcos
-  changed_when: 'rhcos.rc != 0'
+  changed_when: 'not rhcos.stat.exists'
   failed_when: false
   notify:
     - rhcos_image

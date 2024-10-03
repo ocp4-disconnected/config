@@ -1,0 +1,42 @@
+---
+- name: Create {{ common_openshift_oc_mirror_dir }}
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ common_openshift_oc_mirror_dir }}"
+
+- name: Generete oc-mirror imagesetconfigs
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
+  with_items:
+    - cluster-images.yml
+    - operators.yml
+
+- name: Fix permisison on oc-mirror to make executable
+  ansible.builtin.file:
+    path: "{{ common_openshift_client_bin }}/oc-mirror"
+    mode: '0755'
+
+- name: Run oc-mirror to generate image tars
+  ansible.builtin.command: 
+    cmd: "{{ common_openshift_client_bin }}/oc-mirror --config {{ common_openshift_oc_mirror_dir }}/{{ item }} \
+      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }} --dest-skip-tls"
+  register: mirror_pull
+  retries: 5
+  delay: 10
+  until: mirror_pull.rc == 0
+  with_items: 
+    - cluster-images.yml
+    - operators.yml
+
+- name: Remove pull oc-mirror-workspace
+  ansible.builtin.file:
+    path: "{{ common_openshift_oc_mirror_dir }}/{{ item }}/oc-mirror-workspace"
+    state: absent
+  when: content_generation_pull_mirror | bool
+  with_items:
+    - cluster-images
+    - operators
