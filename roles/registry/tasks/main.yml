@@ -130,7 +130,7 @@
 
 - name: "Login to registry"
   ansible.builtin.command:
-    cmd: podman login https://{{ ipv4_address | first  }}:{{ common_registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
+    cmd: podman login https://{{ ipv4_address | first  }}:{{ common_registry_port }} --username {{ registry_username }} --password {{ registry_password }}
   register: registry_logedin
   retries: 5
   delay: 2
