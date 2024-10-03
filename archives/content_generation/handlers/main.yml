@@ -32,7 +32,7 @@
     - "{{ common_openshift_download_dir }}/*tar.gz"
   listen: "Download_oc"
 
-- name: Download_trident
+- name: Download_trident_tar
   ansible.builtin.get_url:
     url: "https://github.com/NetApp/trident/releases/download/{{ common_trident_version }}/trident-installer-{{ common_trident_version  | replace('v', '') }}.tar.gz"
     dest: "{{ common_openshift_download_dir }}"
@@ -62,14 +62,14 @@
     state: absent
   listen: "Download_tridant"
 
-- name: Download_butane
+- name: Download_butane_bin
   ansible.builtin.get_url:
     url: "{{ common_openshift_download_base_url }}/butane/latest/butane"
     dest: "{{ common_openshift_client_bin }}"
     mode: '0755'
   listen: Download_butane
 
-- name: Download_helm
+- name: Download_helm_bin
   ansible.builtin.get_url:
     url: "{{ common_openshift_download_base_url }}/helm/latest/helm-linux-amd64"
     dest: "{{ common_openshift_client_bin }}/helm"
