@@ -77,7 +77,7 @@
   notify:
     - rhcos_image
 
-- hosts: Download required ansible collections
+- name: Download required ansible collections
   community.general.ansible_galaxy_install:
     type: collection
     dest: "{{ common_openshift_download_dir }}/collections"
