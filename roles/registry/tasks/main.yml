@@ -69,7 +69,7 @@
 
 - name: Generate self-signed certificate
   community.crypto.x509_certificate:
-    ownca_privatekey_path: "{{ common_registry_volume }}/certs/domain.key"
+    ownca_privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
     ownca_path: "{{ common_registry_volume }}/ca/ca.cer"
     path: "{{ common_registry_volume }}/certs/domain.crt"
     csr_path: "{{ common_registry_volume }}/certs/domain.csr"
