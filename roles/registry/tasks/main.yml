@@ -36,8 +36,8 @@
 
 - name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
   community.crypto.openssl_csr:
-    path: "{{ common_registry_volume }}/ca"
-    privatekey_path: "{{ common_registry_volume }}/ca"
+    path: "{{ common_registry_volume }}/ca/ca.csr"
+    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
     subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
     basic_constraints:
       - 'CA:TRUE'
