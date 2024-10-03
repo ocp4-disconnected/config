@@ -19,4 +19,4 @@
   ansible.builtin.file:
     path: "{{ common_openshift_oc_mirror_dir }}/{{ item ('.')[0] }}/oc-mirror-workspace"
     state: absent
-  when: content_generation_pull_mirror | bool
+  when: template_result.changed | bool
