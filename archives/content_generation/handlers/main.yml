@@ -67,14 +67,14 @@
     url: "{{ common_openshift_download_base_url }}/butane/latest/butane"
     dest: "{{ common_openshift_client_bin }}"
     mode: '0755'
-  listen: download_butane
+  listen: Download_butane
 
 - name: Download_helm
   ansible.builtin.get_url:
     url: "{{ common_openshift_download_base_url }}/helm/latest/helm-linux-amd64"
     dest: "{{ common_openshift_client_bin }}/helm"
     mode: '0755'
-  listen: download_helm
+  listen: Download_helm
 
 - name: Pull_registry_image
   containers.podman.podman_image:
