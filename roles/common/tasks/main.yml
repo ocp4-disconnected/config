@@ -23,5 +23,19 @@
   with_fileglob:
     - "{{ common_openshift_client_bin }}/*"
 
-- include_tasks: pull_images.yml
+- name: Create {{ common_openshift_oc_mirror_dir }}
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ common_openshift_oc_mirror_dir }}"
+
+- name: Include tasks to pull images
+  include_tasks: pull_images.yml
+  loop: 
+    - cluster-images.yml
+    - operators.yml
+  loop_control:
+    loop_var: item
   when: content_generation_pull_mirror | bool

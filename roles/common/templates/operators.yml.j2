@@ -1,12 +1,5 @@
 kind: ImageSetConfiguration
 apiVersion: mirror.openshift.io/v1alpha2
-{% if content_generation_backend +%}
-{% for config in content_generation_backend %}
-storageConfig:
-  local:
-    path: {{ config.location }}
-{% endfor %}
-{% endif %}
 mirror:
   operators:
 {% for index_dict in content_generation_disconnected_operators %}

@@ -21,7 +21,7 @@
   notify:
     - Download_oc
 
-- name: Check if "trident" binary is present
+- name: Check if tridentctl binary is present
   ansible.builtin.stat:
     path: /usr/bin/tridentctl
   register: trident

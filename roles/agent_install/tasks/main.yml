@@ -9,18 +9,6 @@
     - "{{ agent_install_openshift_cluster_config_dir }}"
     - "{{ ansible_user_dir }}/.kube"
 
-- name: Create RHCOS iso prestage directory
-  ansible.builtin.file:
-    path: "{{ ansible_user_dir }}/.cache/agent/image_cache"
-    state: directory
-
-- name: Prestage RHCOS iso to {{ ansible_user_dir }}/.cache/agent/image_cache
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "{{ ansible_user_dir }}/.cache/agent/image_cache"
-  with_fileglob:
-    - "{{ common_openshift_download_dir }}/*iso"
-
 - name: Generate RSA ssh keys
   ansible.builtin.command:
     cmd: "ssh-keygen -t rsa -b 2048 -f {{ common_ssh_key }} -N ''"
