@@ -21,27 +21,50 @@
   notify:
     - Download_oc
 
-# Step 1: Check if specified binaries or files are present
-- name: Check if binaries or files are present
+- name: Check if "trident" binary is present
   ansible.builtin.stat:
-    path: "{{ item.path }}"
-  register: check_results
-  loop: "{{ checks }}"
-  loop_control:
-    label: "{{ item.name }}"
+    path: /usr/bin/tridentctl
+  register: trident
   failed_when: false
-  changed_when: false
-  tags: check_files
+  changed_when: "not trident.stat.exists"
+  notify:
+    - Download_trident
 
-# Step 2: Notify handlers for missing items
-- name: Notify handlers for missing items
-  meta: notify
-  notify: "{{ item.item.notify }}"
-  when: not item.stat.exists
-  loop: "{{ check_results.results }}"
-  loop_control:
-    label: "{{ item.item.name }}"
-  tags: notify_missing
+- name: Check if butane binary is present
+  ansible.builtin.stat:
+    path: /usr/bin/butane
+  failed_when: false
+  register: butane
+  changed_when: "not butane.stat.exists"
+  notify:
+    - Download_butane
+
+- name: Check if helm binary is present
+  ansible.builtin.stat:
+    path: /usr/bin/helm
+  failed_when: false
+  register: helm
+  changed_when: 'not helm.stat.exists'
+  notify:
+    - Download_helm
+
+- name: Check for saved registry
+  ansible.builtin.stat:
+    path:  "{{ common_openshift_oc_mirror_dir }}/registry.tar"
+  register: registry
+  changed_when: 'not registry.stat.exists'
+  failed_when: false
+  notify:
+    - Registry_image
+
+- name: Check if .cache directory exists
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.cache"
+  register: cache_dir
+  failed_when: false
+  changed_when: 'not cache_dir.stat.exists'
+  notify:
+    - rhcos_image
 
 - name: Find pre-staged RHCOS image if .cache directory exists
   ansible.builtin.find:
