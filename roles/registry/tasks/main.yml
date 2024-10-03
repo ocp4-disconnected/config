@@ -109,9 +109,36 @@
   delay: 2
   until: registry_logedin.rc == 0
 
-- name: "copy /run/user/1000/containers/auth.json to {{ ansible_user_dir }}/.docker/config.json"
+- name: Read ~/.docker/config.json if it exists
+  ansible.builtin.slurp:
+    path: "{{ ansible_user_dir }}/.docker/config.json"
+  register: docker_config
+  ignore_errors: yes
+
+- name: Read /run/user/1000/containers/auth.json if it exists
+  ansible.builtin.slurp:
+    path: "/run/user/1000/containers/auth.json"
+  register: registry_config
+  ignore_errors: yes
+
+- name: Set fact for docker config content (decode and parse JSON)
+  set_fact:
+    docker_config_content: "{{ docker_config.content | b64decode | from_json }}"
+  when: docker_config is defined and docker_config.content is not none
+
+- name: Set fact for registry config content (decode and parse JSON)
+  set_fact:
+    registry_config_content: "{{ registry_config.content | b64decode | from_json }}"
+  when: registry_config is defined and registry_config.content is not none
+
+- name: Merge Docker and Auth configs
+  set_fact:
+    merged_config: "{{ docker_config_content | combine(registry_config_content, recursive=True) }}"
+  when: docker_config_content is defined and registry_config_content is defined
+
+- name: Write merged config to ~/.docker/config.json
   ansible.builtin.copy:
-    src: /run/user/1000/containers/auth.json
+    content: "{{ merged_config | to_nice_json }}"
     dest: "{{ ansible_user_dir }}/.docker/config.json"
-    backup: true
-    
+    mode: '0644'
+  when: docker_config_content is defined and registry_config_content is defined
