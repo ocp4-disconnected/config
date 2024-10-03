@@ -68,7 +68,7 @@
 
 - name: Find pre-staged RHCOS image if .cache directory exists
   ansible.builtin.find:
-    paths: "{{ ansible_user_dir }}/.cache"
+    paths: "{{ ansible_user_dir }}/.cache/agent/image_cache"
     patterns: "*.iso"
   register: rhcos
   when: cache_dir.stat.exists
