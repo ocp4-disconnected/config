@@ -32,7 +32,7 @@
 
 - name: Create private key for CA
   community.crypto.openssl_privatekey:
-    path: "{{ common_registry_volume }}/ca"
+    path: "{{ common_registry_volume }}/ca/ca.key"
 
 - name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
   community.crypto.openssl_csr:
