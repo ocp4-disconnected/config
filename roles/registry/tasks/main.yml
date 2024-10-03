@@ -74,6 +74,7 @@
       REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/domain.crt"
       REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
       REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: "true"
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
     generate_systemd:
       path: "{{ ansible_user_dir }}/.config/systemd/user/"
       names: true
