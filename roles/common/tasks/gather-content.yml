@@ -21,16 +21,27 @@
   notify:
     - Download_oc
 
+# Step 1: Check if specified binaries or files are present
 - name: Check if binaries or files are present
   ansible.builtin.stat:
     path: "{{ item.path }}"
   register: check_results
-  failed_when: false
-  changed_when: "not item.stat.exists"
-  notify: "{{ item.notify }}"
   loop: "{{ checks }}"
   loop_control:
     label: "{{ item.name }}"
+  failed_when: false
+  changed_when: false
+  tags: check_files
+
+# Step 2: Notify handlers for missing items
+- name: Notify handlers for missing items
+  meta: notify
+  notify: "{{ item.item.notify }}"
+  when: not item.stat.exists
+  loop: "{{ check_results.results }}"
+  loop_control:
+    label: "{{ item.item.name }}"
+  tags: notify_missing
 
 - name: Find pre-staged RHCOS image if .cache directory exists
   ansible.builtin.find:
