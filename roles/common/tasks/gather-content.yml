@@ -37,7 +37,7 @@
   register: butane
   changed_when: "not butane.stat.exists"
   notify:
-    - Download butane
+    - Download_butane
 
 - name: Check if helm binary is present
   ansible.builtin.stat:
@@ -46,7 +46,7 @@
   register: helm
   changed_when: 'not helm.stat.exists'
   notify:
-    - Download helm
+    - Download_helm
 
 - name: Check for saved registry
   ansible.builtin.stat:
