@@ -77,9 +77,11 @@
   notify:
     - rhcos_image
 
-- name: Download required ansible collections
-  ansible.builtin.command: 
-    cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ common_openshift_download_dir }}/collections
+- hosts: Download required ansible collections
+  community.general.ansible_galaxy_install:
+    type: collection
+    dest: "{{ common_openshift_download_dir }}/collections"
+    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
 
 - name: Force all notified handlers to run at this point, not waiting for normal sync points
   ansible.builtin.meta: flush_handlers
