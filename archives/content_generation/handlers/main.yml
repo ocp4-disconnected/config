@@ -91,6 +91,7 @@
   command: 
     cmd: "{{ common_openshift_client_bin }}/openshift-install coreos print-stream-json"
   listen: rhcos_image
+  register: rhcos_image_info
 
 - name: Parse_RHCOS_image_URL
   set_fact:
