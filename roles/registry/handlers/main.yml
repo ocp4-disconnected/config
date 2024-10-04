@@ -1,1 +1,13 @@
-## This file is empty - was not generated from a skeleton config. If you would like to look at an example, please run `ansible-galaxy role init example_skeleton` for more info
+- name: Copy CA certificate to system-wide trusted CA directory
+  ansible.builtin.copy:
+    src: "{{ common_registry_volume }}/ca/ca.cer"
+    dest: "/etc/pki/ca-trust/source/anchors/registry-ca.crt"
+    mode: '0644'
+  become: true
+  listen: update_system_trust
+
+- name: Update CA certificates
+  ansible.builtin.command: "update-ca-trust"
+  become: true
+  listen: update_system_trust
+  

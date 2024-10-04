@@ -52,6 +52,7 @@
     privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
     csr_path: "{{ common_registry_volume }}/ca/ca.csr"
     provider: selfsigned
+  notify: update_system_trust
 
 - name: Generate registry private key
   community.crypto.openssl_privatekey:
@@ -78,6 +79,8 @@
     provider: ownca
     owner: "{{ ansible_user_id }}"
     group: wheel
+
+- ansible.builtin.meta: flush_handlers
 
 - name: Load registry image to podman storage
   containers.podman.podman_load:
