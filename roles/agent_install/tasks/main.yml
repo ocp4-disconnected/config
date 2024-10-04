@@ -29,6 +29,7 @@
   with_items:
    - install-config.yaml
    - agent-config.yaml
+  register: install_templates     
 
 - name: Create copys of configuration files
   ansible.builtin.copy:
@@ -39,13 +40,13 @@
    - install-config.yaml
    - agent-config.yaml
 
-- name: Begin Pulling Disconnected Content
-  include_tasks: agent_install_network_checks.yml
+- include_tasks: agent_install_network_checks.yml
   when: agent_install_network_checks | bool
 
 - name: Generate ISO
   ansible.builtin.command:
     cmd: openshift-install agent create image --dir {{ common_openshift_cluster_install_dir }}
+  when: install_templates | bool
 
 - name: copy new kubeconfig to {{ ansible_user_dir }}/.kube/config, will make backup if something exsists
   ansible.builtin.copy:
@@ -54,3 +55,4 @@
     remote_src: true
     mode: '0644'
     backup: true
+  when: install_templates | bool
