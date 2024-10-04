@@ -135,37 +135,54 @@
   retries: 5
   delay: 2
   until: registry_logedin.rc == 0
-
+  
 - name: Read ~/.docker/config.json if it exists
   ansible.builtin.slurp:
     path: "{{ ansible_user_dir }}/.docker/config.json"
   register: docker_config
+  failed_when: false
   ignore_errors: yes
 
 - name: Read /run/user/1000/containers/auth.json if it exists
   ansible.builtin.slurp:
     path: "/run/user/1000/containers/auth.json"
   register: registry_config
+  failed_when: false
   ignore_errors: yes
 
-- name: Set fact for docker config content (decode and parse JSON)
+- name: Set default docker config content if it doesn't exist
   set_fact:
-    docker_config_content: "{{ docker_config.content | b64decode | from_json }}"
-  when: docker_config is defined and docker_config.content is not none
+    docker_config_content: "{{ (docker_config.content | b64decode | from_json) | default({}) }}"
+  when: docker_config.content is defined and docker_config.content is not none
+  failed_when: false
+  ignore_errors: yes
 
-- name: Set fact for registry config content (decode and parse JSON)
+- name: Set default registry config content if it doesn't exist
   set_fact:
-    registry_config_content: "{{ registry_config.content | b64decode | from_json }}"
-  when: registry_config is defined and registry_config.content is not none
+    registry_config_content: "{{ (registry_config.content | b64decode | from_json) | default({}) }}"
+  when: registry_config.content is defined and registry_config.content is not none
+  failed_when: false
+  ignore_errors: yes
+
+# Ensure both config variables are always set, even if the files don't exist
+- name: Ensure docker_config_content is always set
+  set_fact:
+    docker_config_content: "{{ docker_config_content | default({}) }}"
+  when: docker_config_content is not defined
+
+- name: Ensure registry_config_content is always set
+  set_fact:
+    registry_config_content: "{{ registry_config_content | default({}) }}"
+  when: registry_config_content is not defined
 
 - name: Merge Docker and Auth configs
   set_fact:
     merged_config: "{{ docker_config_content | combine(registry_config_content, recursive=True) }}"
-  when: docker_config_content is defined and registry_config_content is defined
+  when: docker_config_content is defined or registry_config_content is defined
 
 - name: Write merged config to ~/.docker/config.json
   ansible.builtin.copy:
     content: "{{ merged_config | to_nice_json }}"
     dest: "{{ ansible_user_dir }}/.docker/config.json"
     mode: '0644'
-  when: docker_config_content is defined and registry_config_content is defined
+  when: merged_config is defined
