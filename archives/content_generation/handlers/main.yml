@@ -1,0 +1,107 @@
+---
+- name: Download_oc_tools
+  ansible.builtin.get_url:
+    url: "{{ common_openshift_download_base_url }}/ocp/{{ common_openshift_release }}/{{ item }}"
+    dest: "{{ common_openshift_download_dir }}"
+    mode: '0644'
+  with_items:
+    - openshift-client-linux.tar.gz
+    - oc-mirror.tar.gz
+    - openshift-install-linux.tar.gz
+  listen: "Download_oc"
+
+- name: Extract_oc_tools
+  ansible.builtin.unarchive:
+    src: "{{ common_openshift_download_dir }}/{{ item }}"
+    remote_src: true
+    mode: '0755'
+    exclude:
+      - README.md
+    dest: "{{ common_openshift_client_bin }}"
+  with_items:
+    - openshift-client-linux.tar.gz
+    - oc-mirror.tar.gz
+    - openshift-install-linux.tar.gz
+  listen: "Download_oc"
+
+- name: Remove_oc_tools_tar
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "{{ common_openshift_download_dir }}/*tar.gz"
+  listen: "Download_oc"
+
+- name: Download_trident_tar
+  ansible.builtin.get_url:
+    url: "https://github.com/NetApp/trident/releases/download/{{ common_trident_version }}/trident-installer-{{ common_trident_version  | replace('v', '') }}.tar.gz"
+    dest: "{{ common_openshift_download_dir }}"
+    mode: '0755'
+  listen: "Download_tridant"
+
+- name: Extract_trident_binary
+  ansible.builtin.unarchive:
+    src: "{{ common_openshift_download_dir }}/trident-installer-{{ common_trident_version | replace('v', '') }}.tar.gz"
+    remote_src: true
+    include:
+      - trident-installer/tridentctl
+    dest: "{{ common_openshift_client_bin }}"
+  listen: "Download_tridant"
+
+- name: Move_tridentctl_to_proper_location
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ common_openshift_client_bin }}/trident-installer/tridentctl"
+    dest: "{{ common_openshift_client_bin }}/tridentctl"
+    mode: '0755'
+  listen: "Download_tridant"
+
+- name: Remove_trident-installer/tridentctl
+  ansible.builtin.file:
+    path: "{{ common_openshift_client_bin }}/trident-installer"
+    state: absent
+  listen: "Download_tridant"
+
+- name: Download_butane_bin
+  ansible.builtin.get_url:
+    url: "{{ common_openshift_download_base_url }}/butane/latest/butane"
+    dest: "{{ common_openshift_client_bin }}"
+    mode: '0755'
+  listen: Download_butane
+
+- name: Download_helm_bin
+  ansible.builtin.get_url:
+    url: "{{ common_openshift_download_base_url }}/helm/latest/helm-linux-amd64"
+    dest: "{{ common_openshift_client_bin }}/helm"
+    mode: '0755'
+  listen: Download_helm
+
+- name: Pull_registry_image
+  containers.podman.podman_image:
+    name: docker.io/library/registry
+  listen: Registry_image
+
+- name: Save_registry_image
+  containers.podman.podman_save:
+    image: docker.io/library/registry
+    dest: "{{ common_openshift_oc_mirror_dir }}/registry.tar"
+  listen: Registry_image
+
+- name: Detect_RHCOS_image_URL
+  command: 
+    cmd: "{{ common_openshift_client_bin }}/openshift-install coreos print-stream-json"
+  listen: rhcos_image
+  register: rhcos_image_info
+
+- name: Parse_RHCOS_image_URL
+  set_fact:
+    rhcos_image_url: "{{ rhcos_image_info.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
+  listen: rhcos_image
+
+- name: Download_RHCOS_image
+  get_url:
+    url: "{{ rhcos_image_url }}"
+    dest: "{{ common_openshift_download_dir }}/"
+    mode: '0644'
+  listen: rhcos_image
+

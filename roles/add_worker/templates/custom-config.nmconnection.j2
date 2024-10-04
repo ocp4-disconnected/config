@@ -1,0 +1,19 @@
+[connection]
+id=custom-connection
+type=ethernet
+autoconnect-priority=-999
+interface-name={{ common_openshift_interface }}
+
+[ethernet]
+
+[ipv4]
+address1={{ common_ip_space }}.{{ common_nodes | json_query('[?name==`worker-0`].ip') | first }}/{{ common_subnet_mask }},{{ common_gateway_ip }}
+dns={{ common_ip_space }}.{{ common_nodes[0].ip }};
+dns-search={{ common_cluster_domain }}
+method=manual
+
+[ipv6]
+addr-gen-mode=default
+method=disabled
+
+[proxy]

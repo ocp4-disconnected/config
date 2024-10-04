@@ -1,0 +1,66 @@
+apiVersion: v1alpha1
+kind: AgentConfig
+metadata:
+  name: {{ agent_install_cluster_name }}
+rendezvousIP: {{ common_ip_space }}.{{ common_nodes[0].ip }}
+hosts:
+{% for node in common_nodes | selectattr('name', 'search', '^master') | list %}
+  - hostname: {{ node.name }}
+    role: {{ node.name | regex_replace('-.*', '') }}
+    interfaces:
+      - name: "{{ common_openshift_interface }}"
+        macAddress: {{ node.mac }}
+    networkConfig:
+      interfaces:
+        - name: "{{ common_openshift_interface }}"
+          type: ethernet
+          state: up
+          mac-address: {{ node.mac }}
+          ipv4:
+            enabled: true
+            address: 
+              - ip: {{ common_ip_space }}.{{ node.ip }}
+                prefix-length: {{ common_subnet_mask }}
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - {{ agent_install_dns_resolver }}
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: {{ common_gateway_ip }}
+            next-hop-interface: {{ common_openshift_interface }}
+            table-id: {{ agent_install_table_id }}   
+{% endfor %}
+{% if common_nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
+{% for node in common_nodes | selectattr('name', 'search', '^worker') | list %}
+  - hostname: {{ node.name }}
+    role: {{ node.name | regex_replace('-.*', '') }}
+    interfaces:
+      - name: "{{ common_openshift_interface }}"
+        macAddress: {{ node.mac }}
+    networkConfig:
+      interfaces:
+        - name: "{{ common_openshift_interface }}"
+          type: ethernet
+          state: up
+          mac-address: {{ node.mac }}
+          ipv4:
+            enabled: true
+            address: 
+              - ip: {{ common_ip_space }}.{{ node.ip }}
+                prefix-length: {{ common_subnet_mask }}
+            dhcp: false
+      dns-resolver:
+        config:
+          server:
+            - {{ agent_install_dns_resolver }}
+      routes:
+        config:
+          - destination: 0.0.0.0/0
+            next-hop-address: {{ common_gateway_ip }}
+            next-hop-interface: {{ common_openshift_interface }}
+            table-id: {{ agent_install_table_id }}
+{% endfor %}
+{% endif %}

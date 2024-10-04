@@ -1,0 +1,58 @@
+# Defaults main.yml for common role
+
+
+
+## Global variables used by most/all roles
+common_install_dir: "{{ ansible_user_dir }}"
+common_trident_version: v24.06.0
+common_fips_enabled: true
+
+## OpenShift Connected Install Variables
+common_openshift_interface: eno1
+common_cluster_domain: example.com
+
+
+## Openshift Disconnected Install Variables
+common_openshift_release: 4.14.16
+common_previous_openshift_release: 4.14.16
+common_registry_volume: /pods/registry #### NEED TO RE-EVALUATE. FOR SOME REASON AGENT INSTALL USES THIS
+common_ip_space: 192.168.69
+common_subnet_mask: 24
+common_gateway_ip: '{{ common_ip_space }}.1'
+common_ssh_key: "{{ ansible_user_dir + '/.ssh/id_rsa' }}"
+common_registry_port: 5000
+
+content_generation_pull_mirror: false
+
+content_generation_disconnected_operators:
+  - redhat-operator-index:
+  - redhat-marketplace-index:
+  - community-operator-index:
+  - certified-operator-index:
+
+content_generation_additionalImages:
+  - name: registry.redhat.io/ubi8/ubi:latest
+  - name: registry.redhat.io/ubi9/ubi:latest
+  - name: quay.io/noseka1/toolbox-container:full
+
+#content_generation_backend:
+#  - type: local
+#    location: "{{ ansible_user_dir }}/oc-mirror-state"
+
+#common_ip_space: 192.168.169
+#common_nodes:
+#  - name: master-0
+#    ip: '17'
+#    mac: be:47:95:d0:01:51
+#  - name: master-1
+#    ip: '18'
+#    mac: be:47:95:d0:01:52
+#  - name: master-2
+#    ip: '19'
+#    mac: be:47:95:d0:01:53
+#  - name: worker-0
+#    ip: '20'
+#    mac: be:47:95:d0:01:54
+
+### ARCHIVE 
+collection_path: "{{ ansible_user_dir }}/.ansible/collections/ansible_collections/ansible/netcommon"

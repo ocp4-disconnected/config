@@ -1,7 +1,7 @@
 - name: Generate RSA ssh keys
   ansible.builtin.command:
-    cmd: "ssh-keygen -t rsa -b 2048 -f {{ ssh_key }} -N ''"
-    creates: "{{ ssh_key}}"
+    cmd: "ssh-keygen -t rsa -b 2048 -f {{ common_ssh_key }} -N ''"
+    creates: "{{ common_ssh_key }}"
   register: ssh_keygen
   changed_when: ssh_keygen.rc == 0
 

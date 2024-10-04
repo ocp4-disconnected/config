@@ -7,15 +7,16 @@
     group: wheel
   with_items:
       - "{{ ansible_user_dir }}/.docker/"
-      - "{{ registry_volume }}/data"
-      - "{{ registry_volume }}/auth"
-      - "{{ registry_volume }}/certs"
+      - "{{ common_registry_volume }}/data"
+      - "{{ common_registry_volume }}/auth"
+      - "{{ common_registry_volume }}/certs"
+      - "{{ common_registry_volume }}/ca"
       - "{{ ansible_user_dir }}/.config/systemd/user"
   become: true
 
-- name: Set fact for {{ ip_space }} IPv4 address
+- name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
-    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + ip_space + '\\.') | list }}"
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
 - name: "Generate Registry Basic Auth" ## community.general.htpasswd (requires passlib>=1.6)
@@ -26,12 +27,35 @@
 - name: "Write Registry htpasswd credential config"
   ansible.builtin.copy:
     content: '{{ bcrypt_htpasswd.stdout }}'
-    dest: '{{ registry_volume }}/auth/htpasswd'
+    dest: '{{ common_registry_volume }}/auth/htpasswd'
     mode: 0760
 
-- name: Generate RSA private key
+- name: Create private key for CA
   community.crypto.openssl_privatekey:
-    path: "{{ registry_volume }}/certs/domain.key"
+    path: "{{ common_registry_volume }}/ca/ca.key"
+
+- name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
+  community.crypto.openssl_csr:
+    path: "{{ common_registry_volume }}/ca/ca.csr"
+    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
+    subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
+    basic_constraints:
+      - 'CA:TRUE'
+    basic_constraints_critical: true
+    key_usage:
+      - keyCertSign
+    key_usage_critical: true
+
+- name: Create self-signed certificate
+  community.crypto.x509_certificate:
+    path: "{{ common_registry_volume }}/ca/ca.cer"
+    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
+    csr_path: "{{ common_registry_volume }}/ca/ca.csr"
+    provider: selfsigned
+
+- name: Generate registry private key
+  community.crypto.openssl_privatekey:
+    path: "{{ common_registry_volume }}/certs/domain.key"
     size: 4096
     type: RSA
     cipher: null
@@ -39,22 +63,25 @@
 
 - name: Generate CSR with SANs
   community.crypto.openssl_csr:
-    privatekey_path: "{{ registry_volume }}/certs/domain.key"
-    path: "{{ registry_volume }}/certs/doamin.csr"
+    privatekey_path: "{{ common_registry_volume }}/certs/domain.key"
+    path: "{{ common_registry_volume }}/certs/domain.csr"
     subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
 
 - name: Generate self-signed certificate
   community.crypto.x509_certificate:
-    path: "{{ registry_volume }}/certs/domain.crt"
-    privatekey_path: "{{ registry_volume }}/certs/domain.key"
-    csr_path: "{{ registry_volume }}/certs/doamin.csr"
-    provider: selfsigned
+    ownca_privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
+    ownca_path: "{{ common_registry_volume }}/ca/ca.cer"
+    path: "{{ common_registry_volume }}/certs/domain.crt"
+    csr_path: "{{ common_registry_volume }}/certs/domain.csr"
+    ownca_not_after: +365d
+    ownca_not_before: "-1d"
+    provider: ownca
     owner: "{{ ansible_user_id }}"
     group: wheel
 
 - name: Load registry image to podman storage
   containers.podman.podman_load:
-    input: "{{ openshift_oc_mirror_dir }}/registry.tar"
+    input: "{{ common_openshift_oc_mirror_dir }}/registry.tar"
 
 - name: Generate systemd file for {{ registry_pod_name }}
   containers.podman.podman_container:
@@ -62,11 +89,11 @@
     privileged: false
     image: docker.io/library/registry:latest
     state: present
-    ports: "{{ registry_port }}:5000"
+    ports: "{{ common_registry_port }}:5000"
     volume:
-      - "{{ registry_volume }}/data:/var/lib/registry:z"
-      - "{{ registry_volume }}/auth:/auth:z"
-      - "{{ registry_volume }}/certs:/certs:z"
+      - "{{ common_registry_volume }}/data:/var/lib/registry:z"
+      - "{{ common_registry_volume }}/auth:/auth:z"
+      - "{{ common_registry_volume }}/certs:/certs:z"
     env:
       REGISTRY_AUTH: "htpasswd"
       REGISTRY_AUTH_HTPASSWD_REALM: "Registry"
@@ -74,6 +101,7 @@
       REGISTRY_HTTP_TLS_CERTIFICATE: "/certs/domain.crt"
       REGISTRY_HTTP_TLS_KEY: "/certs/domain.key"
       REGISTRY_COMPATIBILITY_SCHEMA1_ENABLED: "true"
+      REGISTRY_STORAGE_DELETE_ENABLED: "true"
     generate_systemd:
       path: "{{ ansible_user_dir }}/.config/systemd/user/"
       names: true
@@ -92,7 +120,7 @@
     daemon_reload: true
     scope: user
 
-- name: Ensure firewalld is configured for port {{ registry_port }}
+- name: Ensure firewalld is configured for port {{ common_registry_port }}
   firewalld:
     port: 5000/tcp
     immediate: true
@@ -102,15 +130,42 @@
 
 - name: "Login to registry"
   ansible.builtin.command:
-    cmd: podman login https://{{ ipv4_address | first  }}:{{ registry_port }} --username {{ registry_username }} --password {{ registry_password }} --tls-verify=false
+    cmd: podman login https://{{ ipv4_address | first  }}:{{ common_registry_port }} --username {{ registry_username }} --password {{ registry_password }}
   register: registry_logedin
   retries: 5
   delay: 2
   until: registry_logedin.rc == 0
 
-- name: "copy /run/user/1000/containers/auth.json to {{ ansible_user_dir }}/.docker/config.json"
+- name: Read ~/.docker/config.json if it exists
+  ansible.builtin.slurp:
+    path: "{{ ansible_user_dir }}/.docker/config.json"
+  register: docker_config
+  ignore_errors: yes
+
+- name: Read /run/user/1000/containers/auth.json if it exists
+  ansible.builtin.slurp:
+    path: "/run/user/1000/containers/auth.json"
+  register: registry_config
+  ignore_errors: yes
+
+- name: Set fact for docker config content (decode and parse JSON)
+  set_fact:
+    docker_config_content: "{{ docker_config.content | b64decode | from_json }}"
+  when: docker_config is defined and docker_config.content is not none
+
+- name: Set fact for registry config content (decode and parse JSON)
+  set_fact:
+    registry_config_content: "{{ registry_config.content | b64decode | from_json }}"
+  when: registry_config is defined and registry_config.content is not none
+
+- name: Merge Docker and Auth configs
+  set_fact:
+    merged_config: "{{ docker_config_content | combine(registry_config_content, recursive=True) }}"
+  when: docker_config_content is defined and registry_config_content is defined
+
+- name: Write merged config to ~/.docker/config.json
   ansible.builtin.copy:
-    src: /run/user/1000/containers/auth.json
+    content: "{{ merged_config | to_nice_json }}"
     dest: "{{ ansible_user_dir }}/.docker/config.json"
-    backup: true
-    
+    mode: '0644'
+  when: docker_config_content is defined and registry_config_content is defined

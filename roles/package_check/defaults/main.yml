@@ -1,1 +1,0 @@
-collection_path: "{{ ansible_user_dir }}/.ansible/collections/ansible_collections/ansible/netcommon"

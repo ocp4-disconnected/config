@@ -1,0 +1,41 @@
+- name: Ensure required packages are installed
+  ansible.builtin.package:
+    name: nmstate,openssl,httpd-tools,podman,git,python3-jmespath,coreos-installer ## Variablize pls common_packages: (Maybe add extra packages var?)
+    state: present
+  become: true
+
+- name: Ensure destination directory exists
+  ansible.builtin.file:
+    path: /usr/bin
+    state: directory
+    mode: '0555'
+  become: true
+
+- ansible.builtin.include_tasks: gather-content.yml
+
+- name: Move binaries to destination directory
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: /usr/bin/
+    mode: '0755'
+    remote_src: yes
+  become: true
+  with_fileglob:
+    - "{{ common_openshift_client_bin }}/*"
+
+- name: Create {{ common_openshift_oc_mirror_dir }}
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ common_openshift_oc_mirror_dir }}"
+
+- name: Include tasks to pull images
+  include_tasks: pull_images.yml
+  loop: 
+    - cluster-images.yml
+    - operators.yml
+  loop_control:
+    loop_var: item
+  when: content_generation_pull_mirror | bool

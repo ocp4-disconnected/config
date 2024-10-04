@@ -1,0 +1,22 @@
+---
+- name: Generete oc-mirror imagesetconfigs for {{ item }}
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ common_openshift_oc_mirror_dir }}/{{ item }}"
+  register: template_result
+
+- name: Run oc-mirror to generate {{ item }} tar
+  ansible.builtin.command: 
+    cmd: "{{ common_openshift_client_bin }}/oc-mirror --config {{ common_openshift_oc_mirror_dir }}/{{ item }} \
+      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }} --dest-skip-tls"
+  register: mirror_pull
+  when: template_result.changed | bool
+  retries: 5
+  delay: 10
+  until: mirror_pull.rc == 0
+
+- name: Remove pull oc-mirror-workspace
+  ansible.builtin.file:
+    path: "{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}/oc-mirror-workspace"
+    state: absent
+  when: template_result.changed | bool
