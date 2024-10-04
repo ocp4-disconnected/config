@@ -5,6 +5,7 @@ add_worker:
     - Generate worker ISO
     - Puts in ~/worker by default
     - Approves worker CSR's on SNO cluster.
+
 agent_install:
     - Create directories
     - Generate SSH keys if needed
@@ -12,6 +13,7 @@ agent_install:
     - Do sanity checks on DNS/Networking before cluster install
     - Generate agent ISO
     - Copy kube-config from newly generated ISO content to ~/.kube/config
+
 common:
     Entrypoints:
         main.yml:
@@ -26,15 +28,19 @@ common:
         pull_images.yml:
             - Generates imageset-config for later pulling with oc-mirror
             - Pulls content per imageset-config and removes "pull" workspace when finished.
+
 git:
     - Generates SSH key for Git
     - Create Git user and any required directories
+
 idrac:
     - Moves generated ISO from agent_install to web root (/var/www/html)
     - Communicates with iDRAC's to load images
     - Sets One time boot for all iDRAC's and resets servers to begin installation
 push_images:
+
     - Pushes images with oc-mirror from output of common/pull_images.yml entrypoint
+
 registry:
     - Ensures all required directories for registry are created
     - Generates HTPASSWD File
@@ -60,6 +66,7 @@ worker-iso:
     - Generate worker ISO
     - Puts in ~/worker by default
     - Approves worker CSR's on SNO cluster.
+
 agent_iso:
     - Create directories
     - Generate SSH keys if needed
@@ -67,6 +74,7 @@ agent_iso:
     - Do sanity checks on DNS/Networking before cluster install
     - Generate agent ISO
     - Copy kube-config from newly generated ISO content to ~/.kube/config
+
 common: <--- Need to add logic for disconnected/connected
     - Ensures required pre-req packages are installed
     - Ensures /usr/bin exists and downladed binaries are installed
@@ -75,11 +83,14 @@ common: <--- Need to add logic for disconnected/connected
     - Creates pre-req directories for oc tools
     - Checks if all required binaries are present and notifies handlers if not for downloading.
     - Ensures correct RHCOS image is available on the system and notifies handler for download if necessary.
+
 pull_images:
     - Generates imageset-config for later pulling with oc-mirror
     - Pulls content per imageset-config and removes "pull" workspace when finished.
+
 push_images:
     - Pushes images with oc-mirror from output of common/pull_images.yml entrypoint
+
 registry:
     - Ensures all required directories for registry are created
     - Generates HTPASSWD File
@@ -90,18 +101,22 @@ registry:
     - Apply firewall rule to allow registry port
     - Verify registry is up and accessible
     - Generate and configure docker pull secret.
+
 idrac:
     - Moves generated ISO from agent_install to web root (/var/www/html)
     - Communicates with iDRAC's to load images
     - Sets One time boot for all iDRAC's and resets servers to begin installation
+
 git:
     - Generates SSH key for Git
     - Create Git user and any required directories
+
 
 connected_samba:
     
 
 disconnected_samba:
+
     connected side:
         - pull_images
 
@@ -131,14 +146,6 @@ disconnected_idrac:
         - git
         - add_worker (once cluster is up)
         - day_2
-
-
-
-
-
-
-
-
 
 
 orchestrate_install:
