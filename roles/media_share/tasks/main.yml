@@ -1,0 +1,3 @@
+---
+- ansible.builtin.include_tasks: idrac.yml
+  when: media_share_idrac | bool

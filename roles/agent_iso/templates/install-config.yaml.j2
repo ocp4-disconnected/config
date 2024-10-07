@@ -24,10 +24,10 @@ controlPlane:
   replicas: 1
 {% endif %}
 metadata:
-  name: {{ agent_install_cluster_name }} 
+  name: {{ agent_iso_cluster_name }} 
 networking:
   machineNetwork:
-  - cidr: {{ agent_install_cluster_cidr }}
+  - cidr: {{ agent_iso_cluster_cidr }}
   clusterNetwork:
   - cidr: 10.128.0.0/14 
     hostPrefix: 23 
@@ -38,16 +38,16 @@ platform:
 {% if common_nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
   baremetal:
     apiVIPs:
-      - {{ agent_install_api_ip }}
+      - {{ agent_iso_api_ip }}
     ingressVIPs:
-      - {{ agent_install_ingress_ip }}
+      - {{ agent_iso_ingress_ip }}
 {% else %}
   none: {}
 {% endif %}
 fips: {{ common_fips_enabled }}
 pullSecret: '{{ lookup('ansible.builtin.file', ansible_user_dir + '/.docker/config.json' ) }}'
 sshKey: "{{ lookup('ansible.builtin.file', common_ssh_key + '.pub' ) }}"
-{% if not agent_install_connected | bool %}
+{% if not agent_iso_connected | bool %}
 additionalTrustBundle: |
 {{ lookup('ansible.builtin.file', common_registry_volume + '/ca/ca.cer') | indent(2, true) }}
 imageDigestSources:
