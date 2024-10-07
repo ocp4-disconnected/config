@@ -9,7 +9,7 @@ add_worker:
 
 agent_install:
 
-    - Create directories
+    - Create necessary OpenShift install directories.
     - Generate SSH keys if needed
     - Generate templates for install-config and agent-config for both 2 node and 3+ node
     - Do sanity checks on DNS/Networking before cluster install
@@ -67,10 +67,6 @@ registry:
 ====== NEW =======
 
 
-
-New-README.md
-
-
 worker-iso:
 
     - Pull config from SNO
@@ -97,14 +93,13 @@ common: <--- Need to add logic for disconnected/connected
     - Checks if all required binaries are present and notifies handlers if not for downloading.
     - Ensures correct RHCOS image is available on the system and notifies handler for download if necessary.
 
-pull_images:
 
-    - Generates imageset-config for later pulling with oc-mirror
-    - Pulls content per imageset-config and removes "pull" workspace when finished.
 
-push_images:
+mirror_content:
 
     - Pushes images with oc-mirror from output of common/pull_images.yml entrypoint
+    - Generates imageset-config for later pulling with oc-mirror
+    - Downloads content per imageset-config and removes "pull" workspace when finished.
 
 registry:
 
@@ -118,16 +113,21 @@ registry:
     - Verify registry is up and accessible
     - Generate and configure docker pull secret.
 
-idrac:
+media_share:
 
+    - Detect or use variable to determine iDRAC vs SAMBA
     - Moves generated ISO from agent_install to web root (/var/www/html)
-    - Communicates with iDRAC's to load images
+    - Communicates with iDRAC or other (if available) to load images otherwise tell where located.
     - Sets One time boot for all iDRAC's and resets servers to begin installation
 
 git:
 
     - Generates SSH key for Git
     - Create Git user and any required directories
+
+
+
+
 
 
 connected_samba:
