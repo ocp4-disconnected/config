@@ -10,6 +10,40 @@
     - "{{ common_openshift_download_dir }}"
     - "{{ common_openshift_download_dir }}/collections"
 
+- name: Check for binaries in {{ common_openshift_client_bin }}
+  ansible.builtin.stat:
+    path: "{{ common_openshift_client_bin }}/{{ item }}"
+  register: move_bin
+  failed_when: false
+  changed_when: "not move_bin.stat.exists"
+  notify:
+    - Download_bin
+  with_items:
+    - butane
+    - helm
+    - kubectl
+    - oc
+    - oc-mirror
+    - openshift-install
+    - tridentctl
+
+- name: Check for binaries in /usr/bin
+  ansible.builtin.stat:
+    path: "/usr/bin/{{ item }}"
+  register: download_bin
+  failed_when: false
+  changed_when: "not download_bin.stat.exists"
+  notify:
+    - Move_binaries
+  with_items:
+    - butane
+    - helm
+    - kubectl
+    - oc
+    - oc-mirror
+    - openshift-install
+    - tridentctl
+
 - name: Check if openshift-install is available
   ansible.builtin.shell: "openshift-install version"
   register: install_check
@@ -19,34 +53,8 @@
     - 'install_check.rc != 0'
     - "'{{ common_openshift_release}}' not in install_check.stdout"
   notify:
-    - Download_oc
-
-- name: Check if tridentctl binary is present
-  ansible.builtin.stat:
-    path: /usr/bin/tridentctl
-  register: trident
-  failed_when: false
-  changed_when: "not trident.stat.exists"
-  notify:
-    - Download_trident
-
-- name: Check if butane binary is present
-  ansible.builtin.stat:
-    path: /usr/bin/butane
-  failed_when: false
-  register: butane
-  changed_when: "not butane.stat.exists"
-  notify:
-    - Download_butane
-
-- name: Check if helm binary is present
-  ansible.builtin.stat:
-    path: /usr/bin/helm
-  failed_when: false
-  register: helm
-  changed_when: 'not helm.stat.exists'
-  notify:
-    - Download_helm
+    - Download_bin
+  when: not download_bin.changed 
 
 - name: Check for saved registry
   ansible.builtin.stat:
@@ -63,8 +71,16 @@
   register: cache_dir
   failed_when: false
   changed_when: 'not cache_dir.stat.exists'
-  notify:
-    - rhcos_image
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
+  notify: Move_binaries
+
+- name: Download required ansible collections
+  community.general.ansible_galaxy_install:
+    type: collection
+    dest: "{{ common_openshift_download_dir }}/collections"
+    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
 
 - name: Find pre-staged RHCOS image if .cache directory exists
   ansible.builtin.find:
@@ -89,11 +105,6 @@
       rhcos_image_url: "{{ rhcos_image_info.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
   when: 'not cache_dir.stat.exists or rhcos.matched == 0'
 
-- name: Download required ansible collections
-  community.general.ansible_galaxy_install:
-    type: collection
-    dest: "{{ common_openshift_download_dir }}/collections"
-    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
-
 - name: Force all notified handlers to run at this point, not waiting for normal sync points
   ansible.builtin.meta: flush_handlers
+
