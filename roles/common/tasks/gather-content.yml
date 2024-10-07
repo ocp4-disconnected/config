@@ -96,6 +96,3 @@
 - name: Force all notified handlers to run at this point, not waiting for normal sync points
   ansible.builtin.meta: flush_handlers
 
-- name: purpose fail playbook
-  ansible.builtin.fail:
-    msg: stop
