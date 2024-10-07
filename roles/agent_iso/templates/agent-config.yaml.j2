@@ -1,7 +1,7 @@
 apiVersion: v1alpha1
 kind: AgentConfig
 metadata:
-  name: {{ agent_install_cluster_name }}
+  name: {{ agent_iso_cluster_name }}
 rendezvousIP: {{ common_ip_space }}.{{ common_nodes[0].ip }}
 hosts:
 {% for node in common_nodes | selectattr('name', 'search', '^master') | list %}
@@ -25,13 +25,13 @@ hosts:
       dns-resolver:
         config:
           server:
-            - {{ agent_install_dns_resolver }}
+            - {{ agent_iso_dns_resolver }}
       routes:
         config:
           - destination: 0.0.0.0/0
             next-hop-address: {{ common_gateway_ip }}
             next-hop-interface: {{ common_openshift_interface }}
-            table-id: {{ agent_install_table_id }}   
+            table-id: {{ agent_iso_table_id }}   
 {% endfor %}
 {% if common_nodes | selectattr('name', 'search', '^master') | list | length == 3 %}
 {% for node in common_nodes | selectattr('name', 'search', '^worker') | list %}
@@ -55,12 +55,12 @@ hosts:
       dns-resolver:
         config:
           server:
-            - {{ agent_install_dns_resolver }}
+            - {{ agent_iso_dns_resolver }}
       routes:
         config:
           - destination: 0.0.0.0/0
             next-hop-address: {{ common_gateway_ip }}
             next-hop-interface: {{ common_openshift_interface }}
-            table-id: {{ agent_install_table_id }}
+            table-id: {{ agent_iso_table_id }}
 {% endfor %}
 {% endif %}

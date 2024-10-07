@@ -4,9 +4,9 @@
     cmd: dig +short {{ item }}
   register: dns_lookup
   with_items:
-    - "api.{{ agent_install_cluster_fqdn }}"
-    - "testurl.apps.{{ agent_install_cluster_fqdn }}"
-    - "{{ agent_install_registry_fqdn }}"
+    - "api.{{ agent_iso_cluster_fqdn }}"
+    - "testurl.apps.{{ agent_iso_cluster_fqdn }}"
+    - "{{ agent_iso_registry_fqdn }}"
   failed_when: dns_lookup.stdout == ''
   changed_when: false
-  when: agent_install_network_checks | bool
+  when: agent_iso_network_checks | bool

@@ -1,0 +1,9 @@
+#agent_iso_registry_fqdn: "{{ ansible_nodename }}"
+agent_iso_cluster_fqdn: "{{ agent_iso_cluster_name }}.{{ common_cluster_domain }}"
+agent_iso_connected: true
+agent_iso_openshift_cluster_config_dir: "{{ common_openshift_cluster_install_dir }}/configs"
+agent_iso_network_checks: false
+agent_iso_cluster_name: ocp-sno
+agent_iso_dns_resolver: '{{ common_ip_space }}.1'
+agent_iso_table_id: 254
+agent_iso_cluster_cidr: '{{ common_ip_space }}.0/{{ common_subnet_mask }}'

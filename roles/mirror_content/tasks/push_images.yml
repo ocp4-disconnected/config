@@ -7,8 +7,8 @@
 - name: push images into registry
   ansible.builtin.command:
     cmd: "oc-mirror --from {{ common_openshift_oc_mirror_dir }}/{{ image_source }} \
-      docker://{{ ipv4_address | first }}:{{ common_registry_port }} --dest-skip-tls"
-  register: cluster_images
+      docker://{{ ipv4_address | first }}:{{ common_registry_port }}"
+  register: push_images
   retries: 5
   delay: 10
-  until: cluster_images.rc == 0
+  until: push_images.rc == 0

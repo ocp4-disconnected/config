@@ -23,7 +23,7 @@
       - insert: true
         image: "http://{{ ipv4_address | first }}/agent.x86_64.iso"
         media_type: "DVD"
-  loop: "{{ idracs }}"
+  loop: "{{ media_share_idracs }}"
 
 - name: Boot Once via CD
   delegate_to: localhost
@@ -35,4 +35,4 @@
     boot_source_override_target: cd
     boot_source_override_enabled: once
     reset_type: force_restart
-  loop: "{{ idracs }}"
+  loop: "{{ media_share_idracs }}"
