@@ -8,6 +8,8 @@
 #common_gateway_ip: '{{ ip_space }}.1'
 #common_openshift_interface: eno1
 
+common_openshift_interface: eno1
+common_cluster_domain: example.com
 common_fips_enabled: false
 content_generation_pull_mirror: false
 agent_install_connected: true
