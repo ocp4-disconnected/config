@@ -48,13 +48,13 @@
     path: "{{ common_openshift_cluster_install_dir }}/agent.x86_64.iso"
   register: agent_iso
   failed_when: false
-  changed_when: 'not agent_iso.stat.exists'
+  changed_when: false
 
 - name: Generate ISO
   ansible.builtin.command:
     cmd: openshift-install agent create image --dir {{ common_openshift_cluster_install_dir }}
   when: 
-    - agent_iso.changed | bool
+    - not agent_iso.stat.exists
     - install_templates.changed | bool
 
 - name: copy new kubeconfig to {{ ansible_user_dir }}/.kube/config, will make backup if something exsists
