@@ -1,4 +1,0 @@
-#!/usr/bin/ansible-playbook
-- hosts: localhost
-  roles:
-    - ocp4.disconnected.content_generation
