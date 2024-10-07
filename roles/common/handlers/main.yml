@@ -8,7 +8,7 @@
     - openshift-client-linux.tar.gz
     - oc-mirror.tar.gz
     - openshift-install-linux.tar.gz
-  listen: "Download_oc"
+  listen: "Download_bin"
 
 - name: Extract oc tools
   ansible.builtin.unarchive:
@@ -22,7 +22,7 @@
     - openshift-client-linux.tar.gz
     - oc-mirror.tar.gz
     - openshift-install-linux.tar.gz
-  listen: "Download_oc"
+  listen: "Download_bin"
 
 - name: Remove oc tools tar
   ansible.builtin.file:
@@ -30,14 +30,14 @@
     state: absent
   with_fileglob:
     - "{{ common_openshift_download_dir }}/*tar.gz"
-  listen: "Download_oc"
+  listen: "Download_bin"
 
 - name: Download trident tar
   ansible.builtin.get_url:
     url: "https://github.com/NetApp/trident/releases/download/{{ common_trident_version }}/trident-installer-{{ common_trident_version  | replace('v', '') }}.tar.gz"
     dest: "{{ common_openshift_download_dir }}"
     mode: '0755'
-  listen: "Download_tridantctl"
+  listen: "Download_bin"
 
 - name: Extract trident binary
   ansible.builtin.unarchive:
@@ -46,7 +46,7 @@
     include:
       - trident-installer/tridentctl
     dest: "{{ common_openshift_client_bin }}"
-  listen: "Download_tridantctl"
+  listen: "Download_bin"
 
 - name: Move tridentctl to proper location
   ansible.builtin.copy:
@@ -54,27 +54,27 @@
     src: "{{ common_openshift_client_bin }}/trident-installer/tridentctl"
     dest: "{{ common_openshift_client_bin }}/tridentctl"
     mode: '0755'
-  listen: "Download_tridantctl"
+  listen: "Download_bin"
 
 - name: Remove trident-installer/tridentctl
   ansible.builtin.file:
     path: "{{ common_openshift_client_bin }}/trident-installer"
     state: absent
-  listen: "Download_tridantctl"
+  listen: "Download_bin"
 
 - name: Download butane binary
   ansible.builtin.get_url:
     url: "{{ common_openshift_download_base_url }}/butane/latest/butane"
     dest: "{{ common_openshift_client_bin }}"
     mode: '0755'
-  listen: Download_butane
+  listen: "Download_bin"
 
 - name: Download helm binary
   ansible.builtin.get_url:
     url: "{{ common_openshift_download_base_url }}/helm/latest/helm-linux-amd64"
     dest: "{{ common_openshift_client_bin }}/helm"
     mode: '0755'
-  listen: Download_helm
+  listen: "Download_bin"
 
 - name: Pull registry image
   containers.podman.podman_image:

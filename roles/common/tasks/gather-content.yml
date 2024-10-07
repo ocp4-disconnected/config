@@ -10,52 +10,38 @@
     - "{{ common_openshift_download_dir }}"
     - "{{ common_openshift_download_dir }}/collections"
 
-- name: Check if openshift-install is available
-  ansible.builtin.shell: "openshift-install version"
-  register: install_check
-  failed_when: false
-  ignore_errors: true
-  changed_when: 
-    - 'install_check.rc != 0'
-    - "'{{ common_openshift_release}}' not in install_check.stdout"
-  notify: Download_oc
-
-- name: Check if tridentctl binary is present
+- name: Check for binaries in {{ common_openshift_client_bin }}
   ansible.builtin.stat:
-    path: /usr/bin/tridentctl
-  register: tridentctl
+    path: "{{ common_openshift_client_bin }}/{{ item }}"
+  register: move_bin
   failed_when: false
-  changed_when: "not tridentctl.stat.exists"
-  notify: "Download_tridantctl"
-
-- name: Check if butane binary is present
-  ansible.builtin.stat:
-    path: /usr/bin/butane
-  failed_when: false
-  register: butane
-  changed_when: "not butane.stat.exists"
-  notify: "Download_butane"
-
-- name: Check if helm binary is present
-  ansible.builtin.stat:
-    path: /usr/bin/helm
-  failed_when: false
-  register: helm
-  changed_when: 'not helm.stat.exists'
-  notify: "Download_helm"
+  changed_when: "not move_bin.stat.exists"
+  notify:
+    - Download_bin
+  with_items:
+    - butane
+    - helm
+    - kubectl
+    - oc
+    - oc-mirror
+    - openshift-install
+    - tridentctl
 
 - name: Check for binaries in /usr/bin
-  ansible.builtin.stat: 
+  ansible.builtin.stat:
     path: "/usr/bin/{{ item }}"
-  register: bin
+  register: download_bin
   failed_when: false
-  changed_when: "not bin.stat.exists"
+  changed_when: "not download_bin.stat.exists"
   notify:
     - Move_binaries
   with_items:
-    - oc
-    - helm
     - butane
+    - helm
+    - kubectl
+    - oc
+    - oc-mirror
+    - openshift-install
     - tridentctl
 
 - name: Check for saved registry
