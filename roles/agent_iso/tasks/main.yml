@@ -45,7 +45,7 @@
 
 - name: check to see if previous iso exists
   ansible.builtin.stat:
-    paths: "{{ common_openshift_cluster_install_dir }}"
+    path: "{{ common_openshift_cluster_install_dir }}"
     patterns: "*.iso"
   register: agent_iso
   failed_when: false
