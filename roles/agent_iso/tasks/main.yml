@@ -50,6 +50,12 @@
   failed_when: false
   changed_when: 'not agent_iso.stat.exists'
 
+- name: Delete .openshift_install_state.json if agent_iso does not exist
+  ansible.builtin.file:
+    path: "{{ common_openshift_cluster_install_dir }}/.openshift_install_state.json"
+    state: absent
+  when: 'agent_iso is changed'
+
 - name: Generate ISO
   ansible.builtin.command:
     cmd: openshift-install agent create image --dir {{ common_openshift_cluster_install_dir }}
