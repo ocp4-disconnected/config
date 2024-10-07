@@ -44,6 +44,18 @@
     - openshift-install
     - tridentctl
 
+- name: Check if openshift-install is available
+  ansible.builtin.shell: "openshift-install version"
+  register: install_check
+  failed_when: false
+  ignore_errors: true
+  changed_when: 
+    - 'install_check.rc != 0'
+    - "'{{ common_openshift_release}}' not in install_check.stdout"
+  notify:
+    - Download_bin
+  when: not download_bin.changed 
+
 - name: Check for saved registry
   ansible.builtin.stat:
     path:  "{{ common_openshift_oc_mirror_dir }}/registry.tar"
