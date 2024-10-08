@@ -1,0 +1,125 @@
+---
+- name: Create cluster directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    mode: '0755'
+    state: directory
+  with_items:
+    - "{{ common_openshift_client_bin }}"
+    - "{{ common_openshift_oc_mirror_dir }}"
+    - "{{ common_git_repos_dir }}"
+    - "{{ common_openshift_download_dir }}"
+    - "{{ common_openshift_download_dir }}/collections"
+
+- name: Check for binaries in {{ common_openshift_client_bin }}
+  ansible.builtin.stat:
+    path: "{{ common_openshift_client_bin }}/{{ item }}"
+  register: move_bin
+  failed_when: false
+  changed_when: "not move_bin.stat.exists"
+  notify:
+    - Download_bin
+  with_items:
+    - butane
+    - helm
+    - kubectl
+    - oc
+    - oc-mirror
+    - openshift-install
+    - tridentctl
+
+- name: Check for binaries in /usr/bin
+  ansible.builtin.stat:
+    path: "/usr/bin/{{ item }}"
+  register: download_bin
+  failed_when: false
+  changed_when: "not download_bin.stat.exists"
+  notify:
+    - Move_binaries
+  with_items:
+    - butane
+    - helm
+    - kubectl
+    - oc
+    - oc-mirror
+    - openshift-install
+    - tridentctl
+
+- name: Check if openshift-install is available
+  ansible.builtin.shell: "openshift-install version"
+  register: install_check
+  failed_when: false
+  ignore_errors: true
+  changed_when: 
+    - 'install_check.rc != 0'
+    - "'{{ common_openshift_release}}' not in install_check.stdout"
+  notify:
+    - Download_bin
+  when: not download_bin.changed 
+
+- name: Check for saved registry
+  ansible.builtin.stat:
+    path:  "{{ common_openshift_oc_mirror_dir }}/registry.tar"
+  register: registry
+  changed_when: 'not registry.stat.exists'
+  failed_when: false
+  notify:
+    - Registry_image
+
+- name: Check if .cache directory exists
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.cache"
+  register: cache_dir
+  failed_when: false
+  changed_when: 'not cache_dir.stat.exists'
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
+  notify: Move_binaries
+
+- name: Download required ansible collections
+  community.general.ansible_galaxy_install:
+    type: collection
+    dest: "{{ common_openshift_download_dir }}/collections"
+    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
+
+- name: Find pre-staged RHCOS image if .cache directory exists
+  ansible.builtin.find:
+    paths: "{{ ansible_user_dir }}/.cache/agent/image_cache"
+    patterns: "*.iso"
+  register: rhcos
+  when: cache_dir.stat.exists
+  changed_when: rhcos.matched == 0
+  failed_when: false
+  notify:
+    - rhcos_image
+
+
+
+- block:
+  - name: Detect_RHCOS_image_URL
+    command: 
+      cmd: "{{ common_openshift_client_bin }}/openshift-install coreos print-stream-json"
+    register: rhcos_image_info
+    no_log: true
+
+  - name: Parse_RHCOS_image_URL
+    set_fact:
+      rhcos_image_url: "{{ rhcos_image_info.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
+  when: 'not cache_dir.stat.exists or rhcos.matched == 0'
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
+
+- name: Clone git repositories if not present
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ common_git_repos_dir }}/{{ item | basename }}"
+    clone: yes
+    update: yes
+    bare: true
+  loop: "{{ common_git_repos }}"
+  loop_control:
+    label: "{{ item }}"
+  when: agent_iso_connected is true
+
