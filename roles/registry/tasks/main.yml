@@ -1,3 +1,42 @@
+---
+- name: Load previous run's variable from facts file (if exists)
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.ansible/facts.d/common_registry_volume.fact"
+  register: fact_file
+  failed_when: false
+
+- name: Set fact for default (initial) common_registry_volume if fact file does not exist
+  ansible.builtin.set_fact:
+    previous_common_registry_volume: "{{ common_registry_volume }}"
+  when: not fact_file.stat.exists
+
+- name: Load previous value if fact file exists
+  ansible.builtin.set_fact:
+    previous_common_registry_volume: "{{ (lookup('ansible.builtin.file', ansible_user_dir + '/.ansible/facts.d/common_registry_volume.fact') | from_json).common_registry_volume }}"
+  when: fact_file.stat.exists  # Fixed the typo here
+
+- name: Compare current and previous values
+  ansible.builtin.debug:
+    msg: "common_registry_volume has changed from {{ previous_common_registry_volume }} to {{ common_registry_volume }}"
+  when: previous_common_registry_volume != common_registry_volume
+
+- include_tasks: moved_volume_mount.yml
+  when: previous_common_registry_volume != common_registry_volume
+
+- name: "Create Directories"
+  ansible.builtin.file:
+    mode: '0774'
+    path: "{{ ansible_user_dir }}/.ansible/facts.d"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: wheel
+
+- name: Store the current common_registry_volume in a persistent fact file
+  ansible.builtin.copy:
+    content: "{{ {'common_registry_volume': common_registry_volume} | to_json }}"
+    dest: "{{ ansible_user_dir }}/.ansible/facts.d/common_registry_volume.fact"
+    mode: '0644'
+
 - name: "Create Directories"
   ansible.builtin.file:
     mode: '0774'
