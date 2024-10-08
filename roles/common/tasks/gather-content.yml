@@ -7,6 +7,7 @@
   with_items:
     - "{{ common_openshift_client_bin }}"
     - "{{ common_openshift_oc_mirror_dir }}"
+    - "{{ common_git_repos_dir }}"
     - "{{ common_openshift_download_dir }}"
     - "{{ common_openshift_download_dir }}/collections"
 
@@ -93,6 +94,8 @@
   notify:
     - rhcos_image
 
+
+
 - block:
   - name: Detect_RHCOS_image_URL
     command: 
@@ -108,3 +111,14 @@
 - name: Force all notified handlers to run at this point, not waiting for normal sync points
   ansible.builtin.meta: flush_handlers
 
+- name: Clone git repositories if not present
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ common_git_repos_dir }}/{{ item | basename }}"
+    clone: yes
+    update: yes
+    bare: true
+  loop: "{{ common_git_repos }}"
+  loop_control:
+    label: "{{ item }}"
+  when: agent_iso_connected is true
