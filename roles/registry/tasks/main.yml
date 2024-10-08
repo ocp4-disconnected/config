@@ -1,4 +1,20 @@
 ---
+- name: "Create Directories"
+  ansible.builtin.file:
+    mode: '0774'
+    path: '{{ item }}'
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: wheel
+  with_items:
+      - "{{ ansible_user_dir }}/.docker/"
+      - "{{ common_registry_volume }}/data"
+      - "{{ common_registry_volume }}/auth"
+      - "{{ common_registry_volume }}/certs"
+      - "{{ common_registry_volume }}/ca"
+      - "{{ ansible_user_dir }}/.config/systemd/user"
+  become: true
+
 - name: Load previous run's variable from facts file (if exists)
   ansible.builtin.stat:
     path: "{{ ansible_user_dir }}/.ansible/facts.d/common_registry_volume.fact"
@@ -36,22 +52,6 @@
     content: "{{ {'common_registry_volume': common_registry_volume} | to_json }}"
     dest: "{{ ansible_user_dir }}/.ansible/facts.d/common_registry_volume.fact"
     mode: '0644'
-
-- name: "Create Directories"
-  ansible.builtin.file:
-    mode: '0774'
-    path: '{{ item }}'
-    state: directory
-    owner: "{{ ansible_user_id }}"
-    group: wheel
-  with_items:
-      - "{{ ansible_user_dir }}/.docker/"
-      - "{{ common_registry_volume }}/data"
-      - "{{ common_registry_volume }}/auth"
-      - "{{ common_registry_volume }}/certs"
-      - "{{ common_registry_volume }}/ca"
-      - "{{ ansible_user_dir }}/.config/systemd/user"
-  become: true
 
 - name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
