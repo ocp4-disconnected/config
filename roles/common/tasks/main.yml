@@ -127,7 +127,7 @@
   loop: "{{ common_git_repos }}"
   loop_control:
     label: "{{ item }}"
-  when: agent_iso_connected is true
+  when: common_connected_cluster is true
 
 - ansible.builtin.meta: flush_handlers
 
