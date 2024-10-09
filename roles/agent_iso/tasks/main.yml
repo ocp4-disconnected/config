@@ -59,7 +59,7 @@
 - name: Generate ISO
   ansible.builtin.command:
     cmd: openshift-install agent create image --dir {{ common_openshift_cluster_install_dir }}
-  when: agent_iso is changed or install_templates.changed | bool
+  when: agent_iso is changed or install_templates is changed
 
 - name: copy new kubeconfig to {{ ansible_user_dir }}/.kube/config, will make backup if something exsists
   ansible.builtin.copy:
@@ -68,4 +68,4 @@
     remote_src: true
     mode: '0644'
     backup: true
-  when: install_templates | bool
+  when: install_templates is changed

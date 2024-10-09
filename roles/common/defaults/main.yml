@@ -13,6 +13,7 @@ common_fips_enabled: true
 ## OpenShift Connected Install Variables
 common_openshift_interface: eno1
 common_cluster_domain: example.com
+commond_connected_cluster: true
 
 
 ## Openshift Disconnected Install Variables

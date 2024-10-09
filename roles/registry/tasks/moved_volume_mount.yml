@@ -1,0 +1,17 @@
+---
+- name: stop registry pod to move data
+  ansible.builtin.systemd_service:
+    name: "container-{{ registry_pod_name }}.service"
+    state: stopped
+    scope: user
+
+- name: Move previous data to new location
+  ansible.builtin.copy:
+    src: "{{ previous_common_registry_volume }}/"
+    dest: "{{ common_registry_volume }}"
+    remote_src: true
+
+- name: delete {{ previous_common_registry_volume }}
+  ansible.builtin.file:
+    path: "{{ previous_common_registry_volume }}"
+    state: absent

@@ -1,3 +1,4 @@
+---
 - name: "Create Directories"
   ansible.builtin.file:
     mode: '0774'
@@ -10,9 +11,46 @@
       - "{{ common_registry_volume }}/data"
       - "{{ common_registry_volume }}/auth"
       - "{{ common_registry_volume }}/certs"
-      - "{{ common_registry_volume }}/ca"
       - "{{ ansible_user_dir }}/.config/systemd/user"
   become: true
+
+- name: Load previous run's variable from facts file (if exists)
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.ansible/facts.d/common_registry_volume.fact"
+  register: fact_file
+  failed_when: false
+
+- name: Set fact for default (initial) common_registry_volume if fact file does not exist
+  ansible.builtin.set_fact:
+    previous_common_registry_volume: "{{ common_registry_volume }}"
+  when: not fact_file.stat.exists
+
+- name: Load previous value if fact file exists
+  ansible.builtin.set_fact:
+    previous_common_registry_volume: "{{ (lookup('ansible.builtin.file', ansible_user_dir + '/.ansible/facts.d/common_registry_volume.fact') | from_json).common_registry_volume }}"
+  when: fact_file.stat.exists  # Fixed the typo here
+
+- name: Compare current and previous values
+  ansible.builtin.debug:
+    msg: "common_registry_volume has changed from {{ previous_common_registry_volume }} to {{ common_registry_volume }}"
+  when: previous_common_registry_volume != common_registry_volume
+
+- include_tasks: moved_volume_mount.yml
+  when: previous_common_registry_volume != common_registry_volume
+
+- name: "Create Directories"
+  ansible.builtin.file:
+    mode: '0774'
+    path: "{{ ansible_user_dir }}/.ansible/facts.d"
+    state: directory
+    owner: "{{ ansible_user_id }}"
+    group: wheel
+
+- name: Store the current common_registry_volume in a persistent fact file
+  ansible.builtin.copy:
+    content: "{{ {'common_registry_volume': common_registry_volume} | to_json }}"
+    dest: "{{ ansible_user_dir }}/.ansible/facts.d/common_registry_volume.fact"
+    mode: '0644'
 
 - name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
@@ -30,30 +68,6 @@
     dest: '{{ common_registry_volume }}/auth/htpasswd'
     mode: 0760
 
-- name: Create private key for CA
-  community.crypto.openssl_privatekey:
-    path: "{{ common_registry_volume }}/ca/ca.key"
-
-- name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
-  community.crypto.openssl_csr:
-    path: "{{ common_registry_volume }}/ca/ca.csr"
-    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
-    subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
-    basic_constraints:
-      - 'CA:TRUE'
-    basic_constraints_critical: true
-    key_usage:
-      - keyCertSign
-    key_usage_critical: true
-
-- name: Create self-signed certificate
-  community.crypto.x509_certificate:
-    path: "{{ common_registry_volume }}/ca/ca.cer"
-    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
-    csr_path: "{{ common_registry_volume }}/ca/ca.csr"
-    provider: selfsigned
-  notify: update_system_trust
-
 - name: Generate registry private key
   community.crypto.openssl_privatekey:
     path: "{{ common_registry_volume }}/certs/domain.key"
@@ -70,8 +84,8 @@
 
 - name: Generate self-signed certificate
   community.crypto.x509_certificate:
-    ownca_privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
-    ownca_path: "{{ common_registry_volume }}/ca/ca.cer"
+    ownca_privatekey_path: /etc/pki/ca-trust/source/anchors/ca.key
+    ownca_path: /etc/pki/ca-trust/source/anchors/ca.cer
     path: "{{ common_registry_volume }}/certs/domain.crt"
     csr_path: "{{ common_registry_volume }}/certs/domain.csr"
     ownca_not_after: +365d
@@ -79,8 +93,7 @@
     provider: ownca
     owner: "{{ ansible_user_id }}"
     group: wheel
-
-- ansible.builtin.meta: flush_handlers
+  become: true
 
 - name: Load registry image to podman storage
   containers.podman.podman_load:

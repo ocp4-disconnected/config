@@ -45,11 +45,15 @@ platform:
   none: {}
 {% endif %}
 fips: {{ common_fips_enabled }}
+{% if not common_connected_cluster | bool %}
+pullSecret: '{{ lookup('ansible.builtin.file', '/run/user/1000/containers/auth.json' ) }}'
+{% else %}
 pullSecret: '{{ lookup('ansible.builtin.file', ansible_user_dir + '/.docker/config.json' ) }}'
+{% endif %}
 sshKey: "{{ lookup('ansible.builtin.file', common_ssh_key + '.pub' ) }}"
-{% if not agent_iso_connected | bool %}
+{% if not common_connected_cluster | bool %}
 additionalTrustBundle: |
-{{ lookup('ansible.builtin.file', common_registry_volume + '/ca/ca.cer') | indent(2, true) }}
+{{ lookup('ansible.builtin.file', '/etc/pki/ca-trust/source/anchors/ca.cer') | indent(2, true) }}
 imageDigestSources:
   - mirrors:
     - {{ ipv4_address | first  }}:{{ common_registry_port }}/openshift/release
