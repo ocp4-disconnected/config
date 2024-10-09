@@ -3,6 +3,8 @@ common_git_repos:
   - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
   - "https://github.com/cjnovak98/ocp4-disconnected-config"
 
+common_connected_cluster: true
+
 mirror_content_pull_mirror: false
 agent_iso_connected: true
 
