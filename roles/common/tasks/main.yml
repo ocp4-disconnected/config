@@ -19,8 +19,8 @@
   with_items:
     - "{{ common_openshift_client_bin }}"
     - "{{ common_openshift_oc_mirror_dir }}"
-    - "{{ common_openshift_download_dir }}"
     - "{{ common_git_repos_dir }}"
+    - "{{ common_openshift_download_dir }}"
     - "{{ common_openshift_download_dir }}/collections"
 
 - name: Check for binaries in {{ common_openshift_client_bin }}
@@ -117,9 +117,6 @@
       rhcos_image_url: "{{ rhcos_image_info.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
   when: 'not cache_dir.stat.exists or rhcos.matched == 0'
 
-- name: Force all notified handlers to run at this point, not waiting for normal sync points
-  ansible.builtin.meta: flush_handlers
-
 - name: Clone git repositories if not present
   ansible.builtin.git:
     repo: "{{ item }}"
@@ -131,6 +128,10 @@
   loop_control:
     label: "{{ item }}"
   when: agent_iso_connected is true
+
+
+- name: Force all notified handlers to run at this point, not waiting for normal sync points
+  ansible.builtin.meta: flush_handlers
 
 - ansible.builtin.include_tasks: generate_ca.yml
   when: not common_connected_cluster 
