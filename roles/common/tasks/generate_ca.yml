@@ -3,17 +3,11 @@
   community.crypto.openssl_privatekey:
     path: /etc/pki/ca-trust/source/anchors/ca.key
   become: true
-
-- name: Set fact for {{ common_ip_space }} IPv4 address
-  set_fact:
-    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
-  when: ipv4_address is undefined
-
-- name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
+ 
+- name: Generate an OpenSSL Certificate Signing Request for the CA
   community.crypto.openssl_csr:
     path: /etc/pki/ca-trust/source/anchors/ca.csr
     privatekey_path: /etc/pki/ca-trust/source/anchors/ca.key
-    subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
     basic_constraints:
       - 'CA:TRUE'
     basic_constraints_critical: true
@@ -22,7 +16,7 @@
     key_usage_critical: true
   become: true
 
-- name: Create self-signed certificate
+- name: Create the CA self-signed certificate
   community.crypto.x509_certificate:
     path: /etc/pki/ca-trust/source/anchors/ca.cer
     privatekey_path: /etc/pki/ca-trust/source/anchors/ca.key
@@ -31,7 +25,7 @@
   become: true
   register: create_ca
 
-- name: Update system trust with created ca
+- name: Update system trust with created CA
   ansible.builtin.command: "update-ca-trust"
   become: true
   when: create_ca is changed

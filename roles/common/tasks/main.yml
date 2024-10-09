@@ -40,7 +40,7 @@
     - openshift-install
     - tridentctl
 
-- name: Check for binaries in /usr/bin
+- name: Check for binaries in /usr/bin/
   ansible.builtin.stat:
     path: "/usr/bin/{{ item }}"
   register: download_bin
@@ -129,9 +129,7 @@
     label: "{{ item }}"
   when: agent_iso_connected is true
 
-
-- name: Force all notified handlers to run at this point, not waiting for normal sync points
-  ansible.builtin.meta: flush_handlers
+- ansible.builtin.meta: flush_handlers
 
 - ansible.builtin.include_tasks: generate_ca.yml
   when: not common_connected_cluster 
