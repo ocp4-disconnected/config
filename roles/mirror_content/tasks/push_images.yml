@@ -4,7 +4,7 @@
     ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
-- name: push images into registry
+- name: push {{ image_source }} images into registry
   ansible.builtin.command:
     cmd: "oc-mirror --from {{ common_openshift_oc_mirror_dir }}/{{ image_source }} \
       docker://{{ ipv4_address | first }}:{{ common_registry_port }}"

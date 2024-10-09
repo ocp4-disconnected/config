@@ -11,7 +11,6 @@
       - "{{ common_registry_volume }}/data"
       - "{{ common_registry_volume }}/auth"
       - "{{ common_registry_volume }}/certs"
-      - "{{ common_registry_volume }}/ca"
       - "{{ ansible_user_dir }}/.config/systemd/user"
   become: true
 
@@ -69,30 +68,6 @@
     dest: '{{ common_registry_volume }}/auth/htpasswd'
     mode: 0760
 
-- name: Create private key for CA
-  community.crypto.openssl_privatekey:
-    path: "{{ common_registry_volume }}/ca/ca.key"
-
-- name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
-  community.crypto.openssl_csr:
-    path: "{{ common_registry_volume }}/ca/ca.csr"
-    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
-    subject_alt_name: DNS:{{ ansible_fqdn }},DNS:{{ ansible_hostname }},DNS:localhost,IP:{{ ipv4_address | first }}
-    basic_constraints:
-      - 'CA:TRUE'
-    basic_constraints_critical: true
-    key_usage:
-      - keyCertSign
-    key_usage_critical: true
-
-- name: Create self-signed certificate
-  community.crypto.x509_certificate:
-    path: "{{ common_registry_volume }}/ca/ca.cer"
-    privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
-    csr_path: "{{ common_registry_volume }}/ca/ca.csr"
-    provider: selfsigned
-  notify: update_system_trust
-
 - name: Generate registry private key
   community.crypto.openssl_privatekey:
     path: "{{ common_registry_volume }}/certs/domain.key"
@@ -109,8 +84,8 @@
 
 - name: Generate self-signed certificate
   community.crypto.x509_certificate:
-    ownca_privatekey_path: "{{ common_registry_volume }}/ca/ca.key"
-    ownca_path: "{{ common_registry_volume }}/ca/ca.cer"
+    ownca_privatekey_path: /etc/pki/ca-trust/source/anchors/ca.key
+    ownca_path: /etc/pki/ca-trust/source/anchors/ca.cer
     path: "{{ common_registry_volume }}/certs/domain.crt"
     csr_path: "{{ common_registry_volume }}/certs/domain.csr"
     ownca_not_after: +365d
@@ -118,8 +93,7 @@
     provider: ownca
     owner: "{{ ansible_user_id }}"
     group: wheel
-
-- ansible.builtin.meta: flush_handlers
+  become: true
 
 - name: Load registry image to podman storage
   containers.podman.podman_load:
