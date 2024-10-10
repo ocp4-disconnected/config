@@ -89,10 +89,14 @@
   notify: Move_binaries
 
 - name: Download required ansible collections
-  community.general.ansible_galaxy_install:
-    type: collection
-    dest: "{{ common_openshift_download_dir }}/collections"
-    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
+  ansible.builtin.command: 
+    cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ common_openshift_download_dir }}/collections
+
+#- name: Download required ansible collections
+#  community.general.ansible_galaxy_install:
+#    type: collection
+#    dest: "{{ common_openshift_download_dir }}/collections"
+#    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
 
 - name: Find pre-staged RHCOS image if .cache directory exists
   ansible.builtin.find:
