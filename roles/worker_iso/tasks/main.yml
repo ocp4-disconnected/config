@@ -31,39 +31,67 @@
   shell: |
      oc extract -n openshift-machine-api secret/worker-user-data --keys=userData --to=-  > {{ worker_iso_openshift_worker_dir }}/worker.ign
 
-- name: Merge pulled ignition with one pulled from master
-  ansible.builtin.shell: |
-    python3 -c "
-    import json
+#- name: Merge pulled ignition with one pulled from master
+#  ansible.builtin.shell: |
+#    python3 -c "
+#    import json
+#
+#    # Load two Ignition files
+#    with open('init-worker.ign') as f1, open('worker.ign') as f2:
+#        ignition1 = json.load(f1)
+#        ignition2 = json.load(f2)
+#
+#    # Merge Ignition JSON objects
+#    def merge_ignition(ign1, ign2):
+#        merged = ign1
+#        for key in ign2:
+#            if key in merged:
+#                # Append lists like files, systemd units
+#                if isinstance(merged[key], list):
+#                    merged[key].extend(ign2[key])
+#                # Recursively merge dictionaries
+#                elif isinstance(merged[key], dict):
+#                    merged[key] = merge_ignition(merged[key], ign2[key])
+#            else:
+#                merged[key] = ign2[key]
+#        return merged
+#
+#    merged_ignition = merge_ignition(ignition1, ignition2)
+#
+#    # Write the merged Ignition file
+#    with open('merged-worker.ign', 'w') as f:
+#        json.dump(merged_ignition, f, indent=4)
+#    "
+#  args:
+#    chdir: "{{ worker_iso_openshift_worker_dir }}"
 
-    # Load two Ignition files
-    with open('init-worker.ign') as f1, open('worker.ign') as f2:
-        ignition1 = json.load(f1)
-        ignition2 = json.load(f2)
+- name: Read init-worker.ign
+  ansible.builtin.slurp:
+    src: "{{ worker_iso_openshift_worker_dir }}/init-worker.ign"
+  register: init_worker
 
-    # Merge Ignition JSON objects
-    def merge_ignition(ign1, ign2):
-        merged = ign1
-        for key in ign2:
-            if key in merged:
-                # Append lists like files, systemd units
-                if isinstance(merged[key], list):
-                    merged[key].extend(ign2[key])
-                # Recursively merge dictionaries
-                elif isinstance(merged[key], dict):
-                    merged[key] = merge_ignition(merged[key], ign2[key])
-            else:
-                merged[key] = ign2[key]
-        return merged
+- name: Read worker.ign
+  ansible.builtin.slurp:
+    src: "{{ worker_iso_openshift_worker_dir }}/worker.ign"
+  register: worker_ign
 
-    merged_ignition = merge_ignition(ignition1, ignition2)
+- name: Parse init-worker.ign content
+  set_fact:
+    init_worker_content: "{{ init_worker.content | b64decode | from_json }}"
 
-    # Write the merged Ignition file
-    with open('merged-worker.ign', 'w') as f:
-        json.dump(merged_ignition, f, indent=4)
-    "
-  args:
-    chdir: "{{ worker_iso_openshift_worker_dir }}"
+- name: Parse worker.ign content
+  set_fact:
+    worker_ign_content: "{{ worker_ign.content | b64decode | from_json }}"
+
+- name: Merge the two Ignition files
+  set_fact:
+    merged_ignition: "{{ init_worker_content | combine(worker_ign_content, recursive=True) }}"
+
+- name: Write merged Ignition file
+  ansible.builtin.copy:
+    content: "{{ merged_ignition | to_nice_json }}"
+    dest: "{{ worker_iso_openshift_worker_dir }}/merged-worker.ign"
+    mode: '0644'
 
 - name: Remove any previous iso generated
   ansible.builtin.file:
@@ -81,6 +109,11 @@
 - name: Pause for 3 minutes to allow time to mount iso
   ansible.builtin.pause:
     minutes: 3
+
+#- include_tasks: approve_csr.yml
+  #until: approved_worker_csrs | length >= 3
+  #retries: 10
+  #delay: 30
 
 - name: Auto approve the worker node certificate signing request (CSR) when its up
   shell: |

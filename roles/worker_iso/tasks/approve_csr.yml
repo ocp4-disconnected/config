@@ -1,0 +1,26 @@
+---
+- block:
+  - name: Fetch the list of CSRs
+    k8s_info:
+      kind: CertificateSigningRequest
+    register: csr_list
+  
+  - name: Filter pending worker node CSRs
+    set_fact:
+      pending_worker_csrs: "{{ csr_list.resources | selectattr('status', 'equalto', None) | selectattr('spec.username', 'search', '^system:node:worker') | list }}"
+  
+  - name: Filter approved worker node CSRs
+    set_fact:
+      approved_worker_csrs: "{{ csr_list.resources | selectattr('status.conditions[0].type', 'equalto', 'Approved') | selectattr('spec.username', 'search', '^system:node:worker') | list }}"
+  
+  - name: Approve pending worker CSRs
+    k8s_csr:
+      name: "{{ item.metadata.name }}"
+      state: present
+      approve: true
+    loop: "{{ pending_worker_csrs }}"
+    when: pending_worker_csrs | length > 0
+
+  until: approved_worker_csrs | length >= 3
+  retries: 10
+  delay: 30
