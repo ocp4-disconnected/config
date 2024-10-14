@@ -110,42 +110,42 @@
   ansible.builtin.pause:
     minutes: 3
 
-- include_tasks: approve_csr.yml
-  until: approved_worker_csrs | length >= 3
-  retries: 10
-  delay: 30
+#- include_tasks: approve_csr.yml
+  #until: approved_worker_csrs | length >= 3
+  #retries: 10
+  #delay: 30
 
-#- name: Auto approve the worker node certificate signing request (CSR) when its up
-#  shell: |
-#      CSR=0
-#      I=0
-#
-#      while [[ $CSR -ne 3 ]]; do
-#        # Fetch the list of CSRs and filter for worker node CSRs
-#        csr_list=$(oc get csr -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.username}{"\t"}{.status.conditions[*].type}{"\n"}{end}')
-#
-#        # Extract pending worker CSRs (worker nodes often have the subject "system:node:<worker-node-name>")
-#        pending_worker_csrs=$(echo "$csr_list" | grep -v 'Approved')
-#
-#        # Extract approved worker CSRs
-#        approved_worker_csrs=$(echo "$csr_list" | grep "system:node:worker" | grep 'Approved')
-#
-#        # Count approved worker CSRs
-#        CSR=$(echo "$approved_worker_csrs" | wc -l)
-#
-#        I=$((I+1))
-#
-#        # Extract the CSR name for pending worker nodes
-#        CERT=$(echo "$pending_worker_csrs" | awk '{print $1}')
-#
-#        if [[ -n $CERT ]]; then
-#          # Approve the CSR
-#          oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' | xargs --no-run-if-empty oc adm certificate approve
-#          #oc adm certificate approve $CERT
-#          echo "Approved CSR for worker node: $CERT"
-#        else
-#          echo "No pending worker CSRs detected on iteration $I"
-#        fi
-#          sleep 30s
-#      done
+- name: Auto approve the worker node certificate signing request (CSR) when its up
+  shell: |
+      CSR=0
+      I=0
+
+      while [[ $CSR -ne 3 ]]; do
+        # Fetch the list of CSRs and filter for worker node CSRs
+        csr_list=$(oc get csr -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.username}{"\t"}{.status.conditions[*].type}{"\n"}{end}')
+
+        # Extract pending worker CSRs (worker nodes often have the subject "system:node:<worker-node-name>")
+        pending_worker_csrs=$(echo "$csr_list" | grep -v 'Approved')
+
+        # Extract approved worker CSRs
+        approved_worker_csrs=$(echo "$csr_list" | grep "system:node:worker" | grep 'Approved')
+
+        # Count approved worker CSRs
+        CSR=$(echo "$approved_worker_csrs" | wc -l)
+
+        I=$((I+1))
+
+        # Extract the CSR name for pending worker nodes
+        CERT=$(echo "$pending_worker_csrs" | awk '{print $1}')
+
+        if [[ -n $CERT ]]; then
+          # Approve the CSR
+          oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' | xargs --no-run-if-empty oc adm certificate approve
+          #oc adm certificate approve $CERT
+          echo "Approved CSR for worker node: $CERT"
+        else
+          echo "No pending worker CSRs detected on iteration $I"
+        fi
+          sleep 30s
+      done
 
