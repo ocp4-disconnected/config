@@ -31,39 +31,67 @@
   shell: |
      oc extract -n openshift-machine-api secret/worker-user-data --keys=userData --to=-  > {{ worker_iso_openshift_worker_dir }}/worker.ign
 
-- name: Merge pulled ignition with one pulled from master
-  ansible.builtin.shell: |
-    python3 -c "
-    import json
+#- name: Merge pulled ignition with one pulled from master
+#  ansible.builtin.shell: |
+#    python3 -c "
+#    import json
+#
+#    # Load two Ignition files
+#    with open('init-worker.ign') as f1, open('worker.ign') as f2:
+#        ignition1 = json.load(f1)
+#        ignition2 = json.load(f2)
+#
+#    # Merge Ignition JSON objects
+#    def merge_ignition(ign1, ign2):
+#        merged = ign1
+#        for key in ign2:
+#            if key in merged:
+#                # Append lists like files, systemd units
+#                if isinstance(merged[key], list):
+#                    merged[key].extend(ign2[key])
+#                # Recursively merge dictionaries
+#                elif isinstance(merged[key], dict):
+#                    merged[key] = merge_ignition(merged[key], ign2[key])
+#            else:
+#                merged[key] = ign2[key]
+#        return merged
+#
+#    merged_ignition = merge_ignition(ignition1, ignition2)
+#
+#    # Write the merged Ignition file
+#    with open('merged-worker.ign', 'w') as f:
+#        json.dump(merged_ignition, f, indent=4)
+#    "
+#  args:
+#    chdir: "{{ worker_iso_openshift_worker_dir }}"
 
-    # Load two Ignition files
-    with open('init-worker.ign') as f1, open('worker.ign') as f2:
-        ignition1 = json.load(f1)
-        ignition2 = json.load(f2)
+- name: Read init-worker.ign
+  ansible.builtin.slurp:
+    src: "{{ worker_iso_openshift_worker_dir }}/init-worker.ign"
+  register: init_worker
 
-    # Merge Ignition JSON objects
-    def merge_ignition(ign1, ign2):
-        merged = ign1
-        for key in ign2:
-            if key in merged:
-                # Append lists like files, systemd units
-                if isinstance(merged[key], list):
-                    merged[key].extend(ign2[key])
-                # Recursively merge dictionaries
-                elif isinstance(merged[key], dict):
-                    merged[key] = merge_ignition(merged[key], ign2[key])
-            else:
-                merged[key] = ign2[key]
-        return merged
+- name: Read worker.ign
+  ansible.builtin.slurp:
+    src: "{{ worker_iso_openshift_worker_dir }}/worker.ign"
+  register: worker_ign
 
-    merged_ignition = merge_ignition(ignition1, ignition2)
+- name: Parse init-worker.ign content
+  set_fact:
+    init_worker_content: "{{ init_worker.content | b64decode | from_json }}"
 
-    # Write the merged Ignition file
-    with open('merged-worker.ign', 'w') as f:
-        json.dump(merged_ignition, f, indent=4)
-    "
-  args:
-    chdir: "{{ worker_iso_openshift_worker_dir }}"
+- name: Parse worker.ign content
+  set_fact:
+    worker_ign_content: "{{ worker_ign.content | b64decode | from_json }}"
+
+- name: Merge the two Ignition files
+  set_fact:
+    merged_ignition: "{{ init_worker_content | combine(worker_ign_content, recursive=True) }}"
+
+- name: Write merged Ignition file
+  ansible.builtin.copy:
+    content: "{{ merged_ignition | to_nice_json }}"
+    dest: "{{ worker_iso_openshift_worker_dir }}/merged-worker.ign"
+    mode: '0644'
 
 - name: Remove any previous iso generated
   ansible.builtin.file:
@@ -82,37 +110,42 @@
   ansible.builtin.pause:
     minutes: 3
 
-- name: Auto approve the worker node certificate signing request (CSR) when its up
-  shell: |
-      CSR=0
-      I=0
+- include_tasks: approve_csr.yml
+  until: approved_worker_csrs | length >= 3
+  retries: 10
+  delay: 30
 
-      while [[ $CSR -ne 3 ]]; do
-        # Fetch the list of CSRs and filter for worker node CSRs
-        csr_list=$(oc get csr -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.username}{"\t"}{.status.conditions[*].type}{"\n"}{end}')
-
-        # Extract pending worker CSRs (worker nodes often have the subject "system:node:<worker-node-name>")
-        pending_worker_csrs=$(echo "$csr_list" | grep -v 'Approved')
-
-        # Extract approved worker CSRs
-        approved_worker_csrs=$(echo "$csr_list" | grep "system:node:worker" | grep 'Approved')
-
-        # Count approved worker CSRs
-        CSR=$(echo "$approved_worker_csrs" | wc -l)
-
-        I=$((I+1))
-
-        # Extract the CSR name for pending worker nodes
-        CERT=$(echo "$pending_worker_csrs" | awk '{print $1}')
-
-        if [[ -n $CERT ]]; then
-          # Approve the CSR
-          oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' | xargs --no-run-if-empty oc adm certificate approve
-          #oc adm certificate approve $CERT
-          echo "Approved CSR for worker node: $CERT"
-        else
-          echo "No pending worker CSRs detected on iteration $I"
-        fi
-          sleep 30s
-      done
+#- name: Auto approve the worker node certificate signing request (CSR) when its up
+#  shell: |
+#      CSR=0
+#      I=0
+#
+#      while [[ $CSR -ne 3 ]]; do
+#        # Fetch the list of CSRs and filter for worker node CSRs
+#        csr_list=$(oc get csr -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.spec.username}{"\t"}{.status.conditions[*].type}{"\n"}{end}')
+#
+#        # Extract pending worker CSRs (worker nodes often have the subject "system:node:<worker-node-name>")
+#        pending_worker_csrs=$(echo "$csr_list" | grep -v 'Approved')
+#
+#        # Extract approved worker CSRs
+#        approved_worker_csrs=$(echo "$csr_list" | grep "system:node:worker" | grep 'Approved')
+#
+#        # Count approved worker CSRs
+#        CSR=$(echo "$approved_worker_csrs" | wc -l)
+#
+#        I=$((I+1))
+#
+#        # Extract the CSR name for pending worker nodes
+#        CERT=$(echo "$pending_worker_csrs" | awk '{print $1}')
+#
+#        if [[ -n $CERT ]]; then
+#          # Approve the CSR
+#          oc get csr -o go-template='{% raw %}{{range .items}}{{if not .status}}{{.metadata.name}}{{"\n"}}{{end}}{{end}}{% endraw %}' | xargs --no-run-if-empty oc adm certificate approve
+#          #oc adm certificate approve $CERT
+#          echo "Approved CSR for worker node: $CERT"
+#        else
+#          echo "No pending worker CSRs detected on iteration $I"
+#        fi
+#          sleep 30s
+#      done
 
