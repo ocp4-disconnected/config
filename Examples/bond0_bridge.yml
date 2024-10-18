@@ -31,3 +31,7 @@ spec:
                   - id: 672 # Storage NW
                   - id: 677 # Private NW
                 enable-native: false
+
+  - name: bond0-br0
+    type: linux-bridge
+    state: absent
