@@ -3,6 +3,7 @@
   community.crypto.openssl_privatekey:
     path: /etc/pki/ca-trust/source/anchors/ca.key
   become: true
+  register: create_key
  
 - name: Generate an OpenSSL Certificate Signing Request for the CA
   community.crypto.openssl_csr:
@@ -15,6 +16,7 @@
       - keyCertSign
     key_usage_critical: true
   become: true
+  register: create_csr
 
 - name: Create the CA self-signed certificate
   community.crypto.x509_certificate:
@@ -22,8 +24,11 @@
     privatekey_path: /etc/pki/ca-trust/source/anchors/ca.key
     csr_path: /etc/pki/ca-trust/source/anchors/ca.csr
     provider: selfsigned
+    group: wheel
+    mode: '0640'
   become: true
   register: create_ca
+  when: create_key is changed and create_csr is changed
 
 - name: Update system trust with created CA
   ansible.builtin.command: "update-ca-trust"

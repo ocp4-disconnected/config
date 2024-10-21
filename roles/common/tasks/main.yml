@@ -19,8 +19,8 @@
   with_items:
     - "{{ common_openshift_client_bin }}"
     - "{{ common_openshift_oc_mirror_dir }}"
-    - "{{ common_git_repos_dir }}"
     - "{{ common_openshift_download_dir }}"
+    - "{{ common_git_repos_dir }}"
     - "{{ common_openshift_download_dir }}/collections"
 
 - name: Check for binaries in {{ common_openshift_client_bin }}
@@ -38,16 +38,15 @@
     - oc
     - oc-mirror
     - openshift-install
+    - openshift-install-fips
     - tridentctl
 
 - name: Check for binaries in /usr/bin/
   ansible.builtin.stat:
     path: "/usr/bin/{{ item }}"
-  register: download_bin
+  register: move_bin
   failed_when: false
-  changed_when: "not download_bin.stat.exists"
-  notify:
-    - Move_binaries
+  changed_when: "not move_bin.stat.exists"
   with_items:
     - butane
     - helm
@@ -55,7 +54,29 @@
     - oc
     - oc-mirror
     - openshift-install
+    - openshift-install-fips
     - tridentctl
+
+- ansible.builtin.meta: flush_handlers
+
+- name: Move binaries to destination directory
+  ansible.builtin.copy:
+    src: "{{ common_openshift_client_bin }}/{{ item }}"
+    dest: /usr/bin/
+    mode: '0755'
+    remote_src: yes
+  become: true
+  with_items:
+    - butane
+    - helm
+    - kubectl
+    - oc
+    - oc-mirror
+    - openshift-install
+    - openshift-install-fips
+    - tridentctl
+  when: move_bin.changed
+
 
 - name: Check if openshift-install is available
   ansible.builtin.shell: "openshift-install version"
@@ -67,7 +88,19 @@
     - "'{{ common_openshift_release}}' not in install_check.stdout"
   notify:
     - Download_bin
-  when: not download_bin.changed 
+  when: not common_fips_enabled 
+
+- name: Check if openshift-install-fips is available
+  ansible.builtin.shell: "openshift-install-fips version"
+  register: install_check
+  failed_when: false
+  ignore_errors: true
+  changed_when: 
+    - 'install_check.rc != 0'
+    - "'{{ common_openshift_release}}' not in install_check.stdout"
+  notify:
+    - Download_bin
+  when: common_fips_enabled 
 
 - name: Check for saved registry
   ansible.builtin.stat:
@@ -78,16 +111,6 @@
   notify:
     - Registry_image
 
-- name: Check if .cache directory exists
-  ansible.builtin.stat:
-    path: "{{ ansible_user_dir }}/.cache"
-  register: cache_dir
-  failed_when: false
-  changed_when: 'not cache_dir.stat.exists'
-
-- ansible.builtin.meta: flush_handlers
-  notify: Move_binaries
-
 - name: Download required ansible collections
   ansible.builtin.command: 
     cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ common_openshift_download_dir }}/collections
@@ -97,6 +120,23 @@
 #    type: collection
 #    dest: "{{ common_openshift_download_dir }}/collections"
 #    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
+
+- name: check from pre-downloaded RHCOS image
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  register: rhcos_downloaded
+  failed_when: false
+  with_fileglob:
+    - "{{ common_openshift_download_dir }}/*iso"
+  changed_when: 'not rhcos_downloaded.stat.exists'
+  notify: download_rhcos
+
+- name: Check if .cache directory exists
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.cache"
+  register: cache_dir
+  failed_when: false
+  changed_when: 'not cache_dir.stat.exists'
 
 - name: Find pre-staged RHCOS image if .cache directory exists
   ansible.builtin.find:
