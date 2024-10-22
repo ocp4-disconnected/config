@@ -1,9 +1,9 @@
 - name: Generate RSA ssh keys
-  ansible.builtin.command:
-    cmd: "ssh-keygen -t rsa -b 2048 -f {{ common_ssh_key }} -N ''"
-    creates: "{{ common_ssh_key }}"
-  register: ssh_keygen
-  changed_when: ssh_keygen.rc == 0
+  community.crypto.openssh_keypair:
+    path: "{{ common_ssh_key }}"
+    size: 2048
+    type: rsa
+    state: present
 
 - name: Create git user
   ansible.builtin.user:
@@ -52,13 +52,13 @@
   become: true
 
 - name: Copy bare git repos to git user directory
-  ansible.builtin.copy:
-    src: "{{ common_git_repos_dir }}/{{ item | basename }}"
+  ansible.builtin.unarchive:
+    src: "{{ common_git_repos_dir }}"
     dest: "{{ git_user_repo_dir }}"
+    remote_src: true
     mode: '0755'
     owner: git
     group: git
-  loop: "{{ common_git_repos }}"
-  loop_control:
-    label: "{{ item | basename }}"
+  with_fileglob::
+  - "{{ common_git_repos_dir }}/*.tar"
   become: true
