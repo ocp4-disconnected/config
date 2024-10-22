@@ -10,11 +10,11 @@
     - "{{ ansible_user_dir }}/.kube"
 
 - name: Generate RSA ssh keys
-  ansible.builtin.command:
-    cmd: "ssh-keygen -t rsa -b 2048 -f {{ common_ssh_key }} -N ''"
-    creates: "{{ common_ssh_key}}"
-  register: ssh_keygen
-  changed_when: ssh_keygen.rc == 0
+  community.crypto.openssh_keypair:
+    path: "{{ common_ssh_key }}"
+    size: 2048
+    type: rsa
+    state: present
 
 - name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
@@ -26,6 +26,9 @@
     src: "{{ item }}.j2"
     dest: "{{ common_openshift_cluster_install_dir }}/{{ item }}"
     mode: '0644'
+    owner: "{{ ansible_user_id }}"
+    group: wheel
+  become: true
   with_items:
    - install-config.yaml
    - agent-config.yaml
@@ -48,7 +51,7 @@
     path: "{{ common_openshift_cluster_install_dir }}/agent.x86_64.iso"
   register: agent_iso
   failed_when: false
-  changed_when: 'not agent_iso.stat.exists'
+  changed_when: 'agent_iso.stat.exists'
 
 - name: Delete .openshift_install_state.json if agent_iso does not exist
   ansible.builtin.file:
@@ -59,7 +62,16 @@
 - name: Generate ISO
   ansible.builtin.command:
     cmd: openshift-install agent create image --dir {{ common_openshift_cluster_install_dir }}
-  when: agent_iso is changed or install_templates is changed
+  when: 
+    - (agent_iso is changed or install_templates is changed)
+    - not common_fips_enabled
+
+- name: Generate FIPS ISO
+  ansible.builtin.command:
+    cmd: openshift-install-fips agent create image --dir {{ common_openshift_cluster_install_dir }}
+  when: 
+    - (agent_iso is changed or install_templates is changed)
+    - common_fips_enabled
 
 - name: copy new kubeconfig to {{ ansible_user_dir }}/.kube/config, will make backup if something exsists
   ansible.builtin.copy:

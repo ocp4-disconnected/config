@@ -1,9 +1,7 @@
-## This file is empty - was not generated from a skeleton config. If you would like to look at an example, please run `ansible-galaxy role init example_skeleton` for more info
-
+# Defaults main.yml for common role
 common_openshift_cluster_install_dir: "{{ common_install_dir }}/install-{{ ansible_date_time.date }}"
 common_openshift_oc_mirror_dir: "{{ common_openshift_dir }}/images"
 common_openshift_client_bin: "{{ common_openshift_dir }}/bin"
-common_openshift_dir: "{{ ansible_user_dir }}/content"
 common_git_repos_dir: "{{ common_openshift_download_dir }}/git"
 common_openshift_download_dir: "{{ common_openshift_dir }}/downloads"
 common_openshift_bastion_platform: x86_64

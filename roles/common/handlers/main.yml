@@ -6,8 +6,9 @@
     mode: '0644'
   with_items:
     - openshift-client-linux.tar.gz
-    - oc-mirror.tar.gz
+    - oc-mirror.rhel9.tar.gz
     - openshift-install-linux.tar.gz
+    - openshift-install-rhel9-amd64.tar.gz
   listen: "Download_bin"
 
 - name: Extract oc tools
@@ -20,8 +21,9 @@
     dest: "{{ common_openshift_client_bin }}"
   with_items:
     - openshift-client-linux.tar.gz
-    - oc-mirror.tar.gz
+    - oc-mirror.rhel9.tar.gz
     - openshift-install-linux.tar.gz
+    - openshift-install-rhel9-amd64.tar.gz
   listen: "Download_bin"
 
 - name: Remove oc tools tar
@@ -56,11 +58,14 @@
     mode: '0755'
   listen: "Download_bin"
 
-- name: Remove trident-installer/tridentctl
+- name: Remove trident-installers
   ansible.builtin.file:
-    path: "{{ common_openshift_client_bin }}/trident-installer"
+    path: "{{ item }}"
     state: absent
   listen: "Download_bin"
+  with_items:
+    - "{{ common_openshift_client_bin }}/trident-installer"
+    - "{{ common_openshift_download_dir }}/trident-installer-{{ common_trident_version  | replace('v', '') }}.tar.gz"
 
 - name: Download butane binary
   ansible.builtin.get_url:
@@ -92,7 +97,7 @@
     url: "{{ rhcos_image_url }}"
     dest: "{{ common_openshift_download_dir }}/"
     mode: '0644'
-  listen: rhcos_image
+  listen: download_rhcos
 
 - name: Create RHCOS iso prestage directory
   ansible.builtin.file:
@@ -107,14 +112,3 @@
   with_fileglob:
     - "{{ common_openshift_download_dir }}/*iso"
   listen: rhcos_image
-
-- name: Move binaries to destination directory
-  ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: /usr/bin/
-    mode: '0755'
-    remote_src: yes
-  become: true
-  with_fileglob:
-    - "{{ common_openshift_client_bin }}/*"
-  listen: Move_binaries

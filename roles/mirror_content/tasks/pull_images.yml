@@ -8,7 +8,7 @@
 - name: Run oc-mirror to generate {{ item }} tar
   ansible.builtin.command: 
     cmd: "{{ common_openshift_client_bin }}/oc-mirror --config {{ common_openshift_oc_mirror_dir }}/{{ item }} \
-      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }} --dest-skip-tls"
+      file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }}"
   register: mirror_pull
   when: template_result.changed | bool
   retries: 5
