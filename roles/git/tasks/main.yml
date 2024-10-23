@@ -51,16 +51,21 @@
     recurse: yes
   become: true
 
+- name: Find directories in the git repos directory
+  ansible.builtin.find:
+    paths: "{{ common_git_repos_dir }}"
+    recurse: no
+    file_type: directory
+  register: git_directories
+
 - name: Copy bare git repos to git user directory
   ansible.builtin.copy:
-    src: "{{ item }}"
-    dest: "{{ git_user_repo_dir }}/{{ item | basename }}"
+    src: "{{ item.path }}"
+    dest: "{{ git_user_repo_dir }}/{{ item.path | basename }}"
     remote_src: true
     mode: '0755'
     owner: git
     group: git
-    directory_mode: '0755'  # Ensure correct permissions for directories
-  with_fileglob:
-    - "{{ common_git_repos_dir }}/*"
-  when: ansible.builtin.stat.path == 'directory'
+    directory_mode: '0755'
+  with_items: "{{ git_directories.files }}"
   become: true
