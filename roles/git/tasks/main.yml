@@ -52,13 +52,15 @@
   become: true
 
 - name: Copy bare git repos to git user directory
-  ansible.builtin.unarchive:
-    src: "{{ common_git_repos_dir }}"
-    dest: "{{ git_user_repo_dir }}"
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ git_user_repo_dir }}/{{ item | basename }}"
     remote_src: true
     mode: '0755'
     owner: git
     group: git
-  with_fileglob::
-  - "{{ common_git_repos_dir }}/*.tar"
+    directory_mode: '0755'  # Ensure correct permissions for directories
+  with_fileglob:
+    - "{{ common_git_repos_dir }}/*"
+  when: ansible.builtin.stat.path == 'directory'
   become: true
