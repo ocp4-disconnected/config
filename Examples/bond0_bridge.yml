@@ -1,0 +1,37 @@
+apiVersion: nmstate.io/v1beta1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: Configure_Bond0_Bridge
+spec:
+  desiredState:
+    interfaces:
+      - name: bond0
+        type: bond
+        link-aggregration:
+          mode:  802.3ad
+          port:
+          - eth0
+          - eth1
+          - eth2
+          - eth3
+      - name: bond0-br0
+        type: linux-bridge
+        state: up
+        bridge:
+          port:
+            - name: bond0
+              stp-hairpin-mode: false
+              vlan:
+                mode: trunk
+                trunk-tags:
+                  - id: 58 # Public (Lab) NW
+                  - id: 59 # Public NW
+                  - id: 668 # vMotion NW
+                  - id: 670 # Management NW
+                  - id: 672 # Storage NW
+                  - id: 677 # Private NW
+                enable-native: false
+
+  - name: bond0-br0
+    type: linux-bridge
+    state: absent
