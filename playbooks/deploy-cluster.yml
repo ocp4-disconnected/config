@@ -6,6 +6,7 @@
       tags: import_collection
     - role: ocp4.disconnected.registry
       tags: registry, stage_0
+      when: not common_connected_cluster | bool
     - role: ocp4.disconnected.mirror_content
       tags: push_cluster_images, stage_0
       vars:
@@ -16,6 +17,7 @@
       vars:
         image_source: cluster-images
         direction: push
+      when: not common_connected_cluster | bool
     - role: ocp4.disconnected.agent_iso
       tags: agent_install, stage_1
     - role: ocp4.disconnected.media_share
@@ -28,3 +30,4 @@
       vars:
         image_source: operators
         direction: push
+      when: not common_connected_cluster | bool
