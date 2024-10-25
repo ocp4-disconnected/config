@@ -1,0 +1,28 @@
+{{- range $i, $value := .Values.roles }}
+---
+apiVersion: machineConfiguration.openshift.io/v1
+kind: MachineConfig
+metadata:
+  labels:
+    machineconfiguration.openshift.io/role: {{ $value.role }}
+  name: 99-{{ $value.role }}-chrony-configuration
+spec:
+  config:
+    ignition:
+      config: {}
+      security:
+        tls: {}
+      timeouts: {}
+      version: 2.2.0
+    networkd: {}
+    passwd: {}
+    storage:
+      files:
+      - contents:
+        source: data:text/plain;charset=utf-8;base64,{{ $.Values.chrony.configContent | b64enc }}
+        verification: {}
+      filesystem: root
+      mode: 420
+      path: /etc/chrony.conf
+  osImageUrl: ""
+{{- end }}

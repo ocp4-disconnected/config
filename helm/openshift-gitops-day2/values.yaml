@@ -1,0 +1,49 @@
+roles:
+  - role: master
+  - role: worker
+
+nncps:
+  - name: master-0
+    vlans:
+      - id: # TODO:: specify, int
+        ip: # TODO:: specify
+  - name: worker-1
+    vlans:
+      - id: # TODO:: specify, int
+        ip: # TODO:: specify
+  # ... TODO:: fill out
+
+
+icsp:
+  operator-0:
+    labels:
+      operators.openshift.org/catelog: "true"
+    mirrors:
+    - mirrors:
+      - fqdn.lab/quay
+      source: registry.redhat.io/quay
+  release-0:
+    mirrors:
+    - mirrors:
+      - fqdn.lab/quay
+      source: registry.redhat.io/quay
+
+ldap:
+  accountName: sAMAccountName
+  bindDN: # like some.svc.ocp
+  bindPW:
+  server:
+    name: # like NAME LDAP
+    urlFull: # like: ldap://fdqn/dn?accountName
+    urlShort: # like: ldap://fdqn
+  groupUIDNameMapping: # Like "cn=foo,ou=bar..."
+  queries:
+    group:
+      baseDN: # Like "cn=foo,ou=bar..."
+    user:
+      baseDN: # Like "cn=foo,ou=bar..."
+      filter: # Like "(cn=foo,ou=bar...)"
+
+chrony:
+  configContent: |-
+    # content of chrony config

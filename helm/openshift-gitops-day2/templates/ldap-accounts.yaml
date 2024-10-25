@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: LDAPSyncConfig
+metadata:
+  name: foo #TODO:: set this
+bindDN: {{ .Values.ldap.bindDN }}
+bindPassword: {{ .Values.ldap.bindPW }}
+insecure: true
+url: {{ .Values.ldap.server.urlShort }}
+groupUIDNameMapping:
+  "{{ .Values.ldap.groupUIDNameMapping }}": Administrators
+augmentedActiveDirectory:
+  groupUIDAttributes: dn
+  groupNameAttributes: [ cn ]
+  groupMembershipAttributes: [ memberOf ]
+  userNameAttributes: [ {{ .Values.ldap.accountName }} ]
+  groupsQuery:
+    baseDN: "{{ .Values.ldap.queries.group.baseDN }}"
+    scope: base
+    derefAliases: never
+    pagesize: 0
+  usersQuery:
+    baseDN: "{{ .Values.ldap.queries.user.baseDN }}"
+    scope: sub
+    derefAliases: never
+    filter: {{ .Values.ldap.queries.user.filter }}
+    pageSize: 0

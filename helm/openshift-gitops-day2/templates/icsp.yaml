@@ -1,0 +1,12 @@
+{{- range $policyName, $v := .Values.icsp }}
+---
+apiVersion: operator.openshift.io/v1alpha1
+kind: ImageContentSourcePolicy
+metadata:
+  labels:
+    operators.openshift.org/catelog: "true"
+  name: {{ $policyName }}
+spec:
+  repositoryDigestMirrors: # TODO:: this next bit breaks in the indent department
+#    {{ toYaml $v.mirrors | indent 4 }}
+{{- end}}

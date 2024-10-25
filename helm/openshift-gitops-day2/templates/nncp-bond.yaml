@@ -1,0 +1,16 @@
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: bond0
+spec:
+  desiredState:
+    interfaces:
+      - name: bond0
+        type: bond
+        link-aggregation:
+          mode: 802.3ad
+          port: # TODO:: templatize
+            - ens2f0
+            - ens2f1
+            - ens3f0
+            - ens3f1
