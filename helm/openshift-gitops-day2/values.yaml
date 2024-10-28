@@ -1,3 +1,7 @@
+cluster:
+  ca: |- # The cluster's CA
+    ----- CA Content ------
+
 roles:
   - role: master
   - role: worker
@@ -5,14 +9,13 @@ roles:
 nncps:
   - name: master-0
     vlans:
-      - id: # TODO:: specify, int
-        ip: # TODO:: specify
+      - id: 1 # TODO:: specify, int
+        ip: 192.168.1.1 # TODO:: specify
   - name: worker-1
     vlans:
-      - id: # TODO:: specify, int
-        ip: # TODO:: specify
+      - id: 2 # TODO:: specify, int
+        ip: 192.168.1.2 # TODO:: specify
   # ... TODO:: fill out
-
 
 icsp:
   operator-0:
@@ -29,9 +32,10 @@ icsp:
       source: registry.redhat.io/quay
 
 ldap:
+  syncConfigName: foo
   accountName: sAMAccountName
   bindDN: # like some.svc.ocp
-  bindPW:
+  bindPW: foo # plaintext
   server:
     name: # like NAME LDAP
     urlFull: # like: ldap://fdqn/dn?accountName
@@ -47,3 +51,6 @@ ldap:
 chrony:
   configContent: |-
     # content of chrony config
+
+storage:
+  provisioner: #IP/hostname

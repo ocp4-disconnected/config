@@ -3,7 +3,7 @@
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
-  name: bond-ips
+  name: {{ .name }}
 spec:
   nodeSelecotor:
     kubernetes.io/hostname: {{ .name }}

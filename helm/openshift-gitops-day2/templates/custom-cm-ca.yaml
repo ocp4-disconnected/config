@@ -5,4 +5,4 @@ metadata:
   namespase: openshift-config
 data:
   ca-bundle.crt: |
-    # TODO:: Certificate data. make value
+    {{ .Values.cluster.ca }}

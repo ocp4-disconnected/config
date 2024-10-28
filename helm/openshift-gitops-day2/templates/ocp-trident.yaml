@@ -7,5 +7,5 @@ metadata:
 parameters:
   backendType: ontap-nas
   fsType: nfs
-provisioner: # TODO:: parameterize, hostname/IP
+provisioner: {{ .Values.storage.provisioner }}
 volumeBindingMode: WaitForFirstCustomer

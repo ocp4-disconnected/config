@@ -8,7 +8,7 @@ metadata:
     include.release.openshift.io/single-node-developer: 'true'
     release.openshift.io/create-only: 'true'
 spec:
-  identityProviders: # TODO:: review spacing/indenting
+  identityProviders:
     - ldap:
       attributes:
         email:

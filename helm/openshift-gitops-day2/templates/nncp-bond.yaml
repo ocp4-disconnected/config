@@ -9,7 +9,7 @@ spec:
         type: bond
         link-aggregation:
           mode: 802.3ad
-          port: # TODO:: templatize
+          port: # TODO:: templatize?
             - ens2f0
             - ens2f1
             - ens3f0

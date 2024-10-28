@@ -7,6 +7,5 @@ metadata:
     operators.openshift.org/catelog: "true"
   name: {{ $policyName }}
 spec:
-  repositoryDigestMirrors: # TODO:: this next bit breaks in the indent department
-#    {{ toYaml $v.mirrors | indent 4 }}
-{{- end}}
+  repositoryDigestMirrors: # TODO:: this next bit breaks in the indent department: {{/* toYaml $v.mirrors | indent 4 */}}
+{{- end }}
