@@ -26,11 +26,9 @@
 - name: Check for binaries in {{ common_openshift_client_bin }}
   ansible.builtin.stat:
     path: "{{ common_openshift_client_bin }}/{{ item }}"
-  register: move_bin
+  register: download_bin
   failed_when: false
-  changed_when: "not move_bin.stat.exists"
-  notify:
-    - Download_bin
+  changed_when: "not download_bin.stat.exists"
   with_items:
     - butane
     - helm
@@ -40,6 +38,88 @@
     - openshift-install
     - openshift-install-fips
     - tridentctl
+
+- name: Download oc tools
+  ansible.builtin.get_url:
+    url: "{{ common_openshift_download_base_url }}/ocp/{{ common_openshift_release }}/{{ item }}"
+    dest: "{{ common_openshift_download_dir }}"
+    mode: '0644'
+  with_items:
+    - openshift-client-linux.tar.gz
+    - oc-mirror.rhel9.tar.gz
+    - openshift-install-linux.tar.gz
+    - openshift-install-rhel9-amd64.tar.gz
+  when: download_bin is changed
+
+- name: Extract oc tools
+  ansible.builtin.unarchive:
+    src: "{{ common_openshift_download_dir }}/{{ item }}"
+    remote_src: true
+    mode: '0755'
+    exclude:
+      - README.md
+    dest: "{{ common_openshift_client_bin }}"
+  with_items:
+    - openshift-client-linux.tar.gz
+    - oc-mirror.rhel9.tar.gz
+    - openshift-install-linux.tar.gz
+    - openshift-install-rhel9-amd64.tar.gz
+  when: download_bin is changed
+
+- name: Remove oc tools tar
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_fileglob:
+    - "{{ common_openshift_download_dir }}/*tar.gz"
+  when: download_bin is changed
+
+- name: Download trident tar
+  ansible.builtin.get_url:
+    url: "https://github.com/NetApp/trident/releases/download/{{ common_trident_version }}/trident-installer-{{ common_trident_version  | replace('v', '') }}.tar.gz"
+    dest: "{{ common_openshift_download_dir }}"
+    mode: '0755'
+  when: download_bin is changed
+
+- name: Extract trident binary
+  ansible.builtin.unarchive:
+    src: "{{ common_openshift_download_dir }}/trident-installer-{{ common_trident_version | replace('v', '') }}.tar.gz"
+    remote_src: true
+    include:
+      - trident-installer/tridentctl
+    dest: "{{ common_openshift_client_bin }}"
+  when: download_bin is changed
+
+- name: Move tridentctl to proper location
+  ansible.builtin.copy:
+    remote_src: true
+    src: "{{ common_openshift_client_bin }}/trident-installer/tridentctl"
+    dest: "{{ common_openshift_client_bin }}/tridentctl"
+    mode: '0755'
+  when: download_bin is changed
+
+- name: Remove trident-installers
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  with_items:
+    - "{{ common_openshift_client_bin }}/trident-installer"
+    - "{{ common_openshift_download_dir }}/trident-installer-{{ common_trident_version  | replace('v', '') }}.tar.gz"
+  when: download_bin is changed
+
+- name: Download butane binary
+  ansible.builtin.get_url:
+    url: "{{ common_openshift_download_base_url }}/butane/latest/butane"
+    dest: "{{ common_openshift_client_bin }}"
+    mode: '0755'
+  when: download_bin is changed
+
+- name: Download helm binary
+  ansible.builtin.get_url:
+    url: "{{ common_openshift_download_base_url }}/helm/latest/helm-linux-amd64"
+    dest: "{{ common_openshift_client_bin }}/helm"
+    mode: '0755'
+  when: download_bin is changed
 
 - name: Check for binaries in /usr/bin/
   ansible.builtin.stat:
@@ -57,8 +137,6 @@
     - openshift-install-fips
     - tridentctl
 
-- ansible.builtin.meta: flush_handlers
-
 - name: Move binaries to destination directory
   ansible.builtin.copy:
     src: "{{ common_openshift_client_bin }}/{{ item }}"
@@ -75,31 +153,27 @@
     - openshift-install
     - openshift-install-fips
     - tridentctl
-  when: move_bin.changed
+  when: move_bin is changed
 
 
 - name: Check if openshift-install is available
   ansible.builtin.shell: "openshift-install version"
   register: install_check
-  failed_when: false
   ignore_errors: true
-  changed_when: 
+  failed_when: 
     - 'install_check.rc != 0'
     - "'{{ common_openshift_release}}' not in install_check.stdout"
-  notify:
-    - Download_bin
+  changed_when: false
   when: not common_fips_enabled 
 
 - name: Check if openshift-install-fips is available
   ansible.builtin.shell: "openshift-install-fips version"
   register: install_check
-  failed_when: false
   ignore_errors: true
-  changed_when: 
+  failed_when: 
     - 'install_check.rc != 0'
     - "'{{ common_openshift_release}}' not in install_check.stdout"
-  notify:
-    - Download_bin
+  changed_when: false
   when: common_fips_enabled 
 
 - name: Check for saved registry
@@ -110,6 +184,17 @@
   failed_when: false
   notify:
     - Registry_image
+
+- name: Pull registry image
+  containers.podman.podman_image:
+    name: docker.io/library/registry
+  when: registry is changed
+
+- name: Save registry image
+  containers.podman.podman_save:
+    image: docker.io/library/registry
+    dest: "{{ common_openshift_oc_mirror_dir }}/registry.tar"
+  when: registry is changed
 
 - name: Download required ansible collections
   ansible.builtin.command: 
@@ -129,7 +214,13 @@
   with_fileglob:
     - "{{ common_openshift_download_dir }}/*iso"
   changed_when: 'not rhcos_downloaded.stat.exists'
-  notify: download_rhcos
+
+- name: Download RHCOS image
+  get_url:
+    url: "{{ rhcos_image_url }}"
+    dest: "{{ common_openshift_download_dir }}/"
+    mode: '0644'
+  when: rhcos_downloaded is changed
 
 - name: Check if .cache directory exists
   ansible.builtin.stat:
@@ -146,8 +237,20 @@
   when: cache_dir.stat.exists
   changed_when: rhcos.matched == 0
   failed_when: false
-  notify:
-    - rhcos_image
+
+- name: Create RHCOS iso prestage directory
+  ansible.builtin.file:
+    path: "{{ ansible_user_dir }}/.cache/agent/image_cache"
+    state: directory
+  when: rhcos is changed
+
+- name: Prestage RHCOS iso to {{ ansible_user_dir }}/.cache/agent/image_cache
+  ansible.builtin.copy:
+    src: "{{ item }}"
+    dest: "{{ ansible_user_dir }}/.cache/agent/image_cache"
+  with_fileglob:
+    - "{{ common_openshift_download_dir }}/*iso"
+  when: rhcos is changed
 
 - block:
   - name: Detect_RHCOS_image_URL
@@ -173,7 +276,7 @@
     label: "{{ item }}"
   when: common_connected_cluster is true
 
-- ansible.builtin.meta: flush_handlers
+- ansible.builtin.fail:
 
 - ansible.builtin.include_tasks: generate_ca.yml
   when: not common_connected_cluster 
