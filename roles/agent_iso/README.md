@@ -1,5 +1,6 @@
 # WORK IN PROGRESS!
 ## Folder Structure
+```
 agent_iso/
 ├── defaults/
 │   └── main.yml                  # Default variables for agent ISO creation
@@ -17,7 +18,7 @@ agent_iso/
 │   └── main.yml                  # Test playbook for validating role functionality
 └── vars/
     └── main.yml                  # Variables specific to agent ISO creation
-
+```
 ---
 
 ## Variables that are required

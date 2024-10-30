@@ -1,6 +1,7 @@
 # WORK IN PROGRESS!
 
 ## Folder Structure
+```
 registry/
 ├── defaults/
 │   └── main.yml                  # Default variables for registry configuration
@@ -17,7 +18,7 @@ registry/
 │   └── main.yml                  # Test playbook for validating registry role functionality
 └── vars/
     └── main.yml                  # Variables specific to registry configuration
-
+```
 ---
 
 ## Variables that are required

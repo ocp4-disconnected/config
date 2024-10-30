@@ -1,6 +1,7 @@
 # WORK IN PROGRESS!
 
 ## Folder Structure
+```
 mirror_content/
 ├── defaults/
 │   └── main.yml                  # Default variables for content mirroring
@@ -17,7 +18,7 @@ mirror_content/
 │   └── main.yml                  # Test playbook for validating role functionality
 └── vars/
     └── main.yml                  # Variables specific to content mirroring
-
+```
 ---
 
 ## Variables that are required
