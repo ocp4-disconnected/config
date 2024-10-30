@@ -8,6 +8,5 @@ metadata:
 stringData:
   type: git
   url: {{ .Values.gitRepoTemplate.url }}
-  sshPrivateKey: |
 data:
   sshPrivateKey: {{ .Values.gitRepoTemplate.sshPrivateKey | b64enc}}

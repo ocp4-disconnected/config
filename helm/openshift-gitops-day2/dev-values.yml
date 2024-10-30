@@ -9,7 +9,7 @@ nncps:
   - name: master-0
     vlans:
       - id: 1 # TODO:: specify, int
-        ip: 192.168.1.1 # TODO:: specify
+        ip: 192.168.1.42 # TODO:: specify
 #  - name: worker-1
 #    vlans:
 #      - id: 2 # TODO:: specify, int
