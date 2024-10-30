@@ -276,8 +276,6 @@
     label: "{{ item }}"
   when: common_connected_cluster is true
 
-- ansible.builtin.fail:
-
 - ansible.builtin.include_tasks: generate_ca.yml
   when: not common_connected_cluster 
   
