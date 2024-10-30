@@ -1,7 +1,7 @@
 # WORK IN PROGRESS!
 
 ## Folder Structure
-
+```
 worker_iso/
 ├── defaults/
 │   └── main.yml                  # Default variables for worker ISO configuration
@@ -19,7 +19,7 @@ worker_iso/
 │   └── main.yml                  # Test playbook for validating worker ISO role functionality
 └── vars/
     └── main.yml                  # Variables specific to worker ISO configuration
-
+```
 ---
 
 ## Variables that are required
