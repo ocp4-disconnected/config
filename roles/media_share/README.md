@@ -19,9 +19,10 @@ media_share/
 
 Required variables should be specified in `defaults/main.yml` or `vars/main.yml`. Key variables include:
 
-- **`media_share_idrac`**: 
-- **`media_share_idrac_user`**: 
-- **`media_share_idrac_password`**: 
+- **`media_share_idrac`**: Boolean flag indicating if iDRAC (Integrated Dell Remote Access Controller) is enabled for media sharing.
+- **`media_share_idrac_user`**: Username for accessing iDRAC.
+- **`media_share_idrac_password`**: Password for accessing iDRAC.
+
 
 ---
 

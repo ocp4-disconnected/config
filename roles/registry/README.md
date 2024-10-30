@@ -22,9 +22,10 @@ registry/
 
 ## Variables that are required
 
-- **`registry_pod_name`**:
-- **`registry_username`**: 
-- **`registry_password`**: 
+- **`registry_pod_name`**: Name of the pod running the container registry.
+- **`registry_username`**: Username for authenticating to the container registry.
+- **`registry_password`**: Password for authenticating to the container registry.
+
 
 ---
 

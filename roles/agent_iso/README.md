@@ -24,9 +24,14 @@ agent_iso/
 
 Required variables should be specified in `defaults/main.yml` or `vars/main.yml`. Key variables include:
 
-- **`agent_iso_base_url`**: Base URL for downloading agent ISO components.
-- **`agent_network_config`**: Configuration details for network settings applied to the ISO.
-- **`agent_installation_vars`**: Key variables required for configuring installation parameters for agents.
+- **`agent_iso_cluster_fqdn`**: Fully Qualified Domain Name for the cluster. Constructed by combining `agent_iso_cluster_name` and `common_cluster_domain`, it represents the main domain path for accessing the cluster.
+- **`agent_iso_connected`**: Boolean flag indicating if the installation is connected to the internet (true) or disconnected (false).
+- **`agent_iso_openshift_cluster_config_dir`**: Directory path where OpenShift cluster configuration files are stored. This path is derived by appending `/configs` to `common_openshift_cluster_install_dir`.
+- **`agent_iso_network_checks`**: Boolean that controls whether network checks are performed during the ISO configuration or installation. Set to false to bypass these checks.
+- **`agent_iso_cluster_name`**: Name identifier for the OpenShift cluster, used in naming conventions and as part of the FQDN.
+- **`agent_iso_dns_resolver`**: IP address of the DNS resolver for the agent ISO installation, typically set to the gateway or primary DNS within the IP space.
+- **`agent_iso_table_id`**: Routing table ID used in network configuration, often employed in environments with multiple network interfaces to manage specific routing requirements.
+- **`agent_iso_cluster_cidr`**: CIDR notation for the cluster network range, constructed using `common_ip_space` and `common_subnet_mask`, defining the subnet used by the cluster's services and nodes.
 
 ---
 
