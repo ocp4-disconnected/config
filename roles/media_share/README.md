@@ -1,5 +1,6 @@
 # WORK IN PROGRESS!
 ## Folder Structure
+```
 media_share/
 ├── defaults/
 │   └── main.yml                  # Default variables for media share configuration
@@ -12,7 +13,7 @@ media_share/
 │   └── main.yml                  # Test playbook for validating role functionality
 └── vars/
     └── main.yml                  # Variables specific to media share configuration
-
+```
 ---
 
 ## Variables that are required
