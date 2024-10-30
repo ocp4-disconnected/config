@@ -1,7 +1,7 @@
 # WORK IN PROGRESS!
 
 ## Folder Structure
-
+```
 git/
 ├── defaults/
 │   └── main.yml                  # Default variables for Git configuration
@@ -13,7 +13,7 @@ git/
 │   └── main.yml                  # Main entry for tasks in Git configuration
 ├── tests/
 │   └── main.yml                  # Test playbook for validating role functionality
-
+```
 ---
 ## Variables that are required
 
