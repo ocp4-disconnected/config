@@ -121,14 +121,12 @@
 #    dest: "{{ common_openshift_download_dir }}/collections"
 #    requirements_file: "{{ playbook_dir }}/../collections/requirements.yml"
 
-- name: check from pre-downloaded RHCOS image
-  ansible.builtin.stat:
-    path: "{{ item }}"
+- name: check for pre-downloaded RHCOS image
+  ansible.builtin.find:
+    paths: "{{ common_openshift_download_dir }}"
+    patterns: "*.iso"
   register: rhcos_downloaded
-  failed_when: false
-  with_fileglob:
-    - "{{ common_openshift_download_dir }}/*iso"
-  changed_when: 'not rhcos_downloaded.stat.exists'
+  changed_when: rhcos_downloaded.matched == 0
   notify: download_rhcos
 
 - name: Check if .cache directory exists
@@ -151,10 +149,18 @@
 
 - block:
   - name: Detect_RHCOS_image_URL
-    command: 
+    ansible.builtin.command: 
       cmd: "{{ common_openshift_client_bin }}/openshift-install coreos print-stream-json"
     register: rhcos_image_info
     no_log: true
+    when: not common_fips_enabled 
+
+  - name: Detect_RHCOS_image_URL FIPS
+    ansible.builtin.command: 
+      cmd: "{{ common_openshift_client_bin }}/openshift-install-fips coreos print-stream-json"
+    register: rhcos_image_info
+    no_log: true
+    when: common_fips_enabled 
 
   - name: Parse_RHCOS_image_URL
     set_fact:
