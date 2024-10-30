@@ -1,9 +1,9 @@
 - name: Generate RSA ssh keys
-  ansible.builtin.command:
-    cmd: "ssh-keygen -t rsa -b 2048 -f {{ common_ssh_key }} -N ''"
-    creates: "{{ common_ssh_key }}"
-  register: ssh_keygen
-  changed_when: ssh_keygen.rc == 0
+  community.crypto.openssh_keypair:
+    path: "{{ common_ssh_key }}"
+    size: 2048
+    type: rsa
+    state: present
 
 - name: Create git user
   ansible.builtin.user:
@@ -51,14 +51,21 @@
     recurse: yes
   become: true
 
+- name: Find directories in the git repos directory
+  ansible.builtin.find:
+    paths: "{{ common_git_repos_dir }}"
+    recurse: no
+    file_type: directory
+  register: git_directories
+
 - name: Copy bare git repos to git user directory
   ansible.builtin.copy:
-    src: "{{ common_git_repos_dir }}/{{ item | basename }}"
-    dest: "{{ git_user_repo_dir }}"
+    src: "{{ item.path }}"
+    dest: "{{ git_user_repo_dir }}/{{ item.path | basename }}"
+    remote_src: true
     mode: '0755'
     owner: git
     group: git
-  loop: "{{ common_git_repos }}"
-  loop_control:
-    label: "{{ item | basename }}"
+    directory_mode: '0755'
+  with_items: "{{ git_directories.files }}"
   become: true
