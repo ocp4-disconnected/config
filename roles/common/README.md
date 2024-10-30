@@ -1,6 +1,7 @@
 # WORK IN PROGRESS!
 
 ## Folder Structure
+```
 common/
 ├── defaults/
 │   └── main.yml                  # Default variables for the common configurations
@@ -15,6 +16,8 @@ common/
 │   └── main.yml                  # Test playbook for validating role functionality
 └── vars/
     └── main.yml                  # Variables specific to common configurations
+```
+
 
 ---
 
