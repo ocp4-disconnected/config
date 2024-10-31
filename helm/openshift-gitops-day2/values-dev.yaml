@@ -16,20 +16,6 @@ nncps:
 #        ip: 192.168.1.2 # TODO:: specify
   # ... TODO:: fill out
 
-icsp:
-  operator-0:
-    labels:
-      operators.openshift.org/catelog: "true"
-    mirrors:
-    - mirrors:
-      - fqdn.lab/quay
-      source: registry.redhat.io/quay
-  release-0:
-    mirrors:
-    - mirrors:
-      - fqdn.lab/quay
-      source: registry.redhat.io/quay
-
 ldap:
   syncConfigName: foo
   accountName: sAMAccountName

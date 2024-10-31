@@ -1,4 +1,3 @@
-
 gitOps:
   namespace: openshift-gitops
 
@@ -32,3 +31,16 @@ gitRepoTemplate:
     FkcrzHc/nVg3ET0+4Glnn4KroLtAd4G6CemiLKYkyR9BDiSV8cgIz9xenfqDnsSQPBpR1h
     qKOENJs3pSf3Dv6HAAAAAAEC
     -----END OPENSSH PRIVATE KEY-----
+icsp:
+  operator-0:
+    labels:
+      operators.openshift.org/catelog: "true"
+    mirrors:
+    - mirrors:
+      - fqdn.lab/quay
+      source: registry.redhat.io/quay
+  release-0:
+    mirrors:
+    - mirrors:
+      - fqdn.lab/quay
+      source: registry.redhat.io/quay
