@@ -1,6 +1,6 @@
 cluster:
   ca:
-    specify: true
+    specify: false
     content: |- # The cluster's CA
       ----- CA Content ------
       ......
