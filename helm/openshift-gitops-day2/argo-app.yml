@@ -1,16 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: day2-ops
+  name: day2-dev
 spec:
   destination:
     name: ''
     namespace: ''
     server: https://kubernetes.default.svc
   source:
-    path: /helm/openshift-gitops-day2/
-    repoURL: git@192.168.122.239:repo/ocp4-disconnected-config
-    targetRevision: HEAD
+    path: helm/openshift-gitops-day2
+    repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
+    targetRevision: greg-helm
+    helm:
+      valueFiles:
+        - values-dev.yaml
   sources: []
   project: default
 
