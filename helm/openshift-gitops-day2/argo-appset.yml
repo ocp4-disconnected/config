@@ -22,7 +22,7 @@ spec:
       wave: 2
   template:
     metadata:
-      name: '{{.cluster}}-guestbook'
+      name: 'day2-ops-wave-{{.values.wave}}'
       annotations:
         argocd.argoproj.io/sync-wave: '{{.values.wave}}'
     spec:
