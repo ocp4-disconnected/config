@@ -253,22 +253,16 @@
         cmd: "{{ common_openshift_client_bin }}/openshift-install-fips coreos print-stream-json"
       register: rhcos_image_info_fips
       no_log: true
-      when: 
-        - rhcos_downloaded is changed
 
     - name: Parse RHCOS image URL
       set_fact:
         rhcos_image_url: "{{ rhcos_image_info_fips.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
-      when: 
-        - rhcos_downloaded is changed
 
     - name: Download RHCOS image
       get_url:
         url: "{{ rhcos_image_url }}"
         dest: "{{ common_openshift_download_dir }}/"
         mode: '0644'
-      when: 
-        - rhcos_downloaded is changed
 
     when: not common_fips_enabled 
 
@@ -278,24 +272,20 @@
         cmd: "{{ common_openshift_client_bin }}/openshift-install-fips coreos print-stream-json"
       register: rhcos_image_info_fips
       no_log: true
-      when: 
-        - rhcos_downloaded is changed
 
     - name: Parse RHCOS image URL FIPS
       set_fact:
         rhcos_image_url: "{{ rhcos_image_info_fips.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
-      when: 
-        - rhcos_downloaded is changed
 
     - name: Download RHCOS image FIPS
       get_url:
         url: "{{ rhcos_image_url }}"
         dest: "{{ common_openshift_download_dir }}/"
         mode: '0644'
-      when: 
-        - rhcos_downloaded is changed
 
     when: common_fips_enabled 
+
+  when: rhcos_downloaded is changed
 
 - name: Prestage RHCOS iso to {{ ansible_user_dir }}/.cache/agent/image_cache
   ansible.builtin.copy:
@@ -304,8 +294,6 @@
   with_fileglob:
     - "{{ common_openshift_download_dir }}/*iso"
   when: rhcos is changed
-
-- ansible.builtin.file:
 
 - name: Clone git repositories if not present
   ansible.builtin.git:
