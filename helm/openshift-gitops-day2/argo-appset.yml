@@ -7,19 +7,19 @@ spec:
   goTemplateOptions: ["missingkey=error"]
   generators:
   - git:
-    repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
-    revision: greg-helm
-    directories:
-    - path: helm/openshift-gitops-day2/wave1
-    values:
-      wave: 1
+      repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
+      revision: greg-helm
+      directories:
+      - path: helm/openshift-gitops-day2/wave1
+      values:
+        wave: "1"
   - git:
-    repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
-    revision: greg-helm
-    directories:
-    - path: helm/openshift-gitops-day2/wave2
-    values:
-      wave: 2
+      repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
+      revision: greg-helm
+      directories:
+      - path: helm/openshift-gitops-day2/wave2
+      values:
+        wave: "2"
   template:
     metadata:
       name: 'day2-ops-wave-{{.values.wave}}'
@@ -29,21 +29,15 @@ spec:
       project: default
       source:
         repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
-        targetRevision: HEAD
+        targetRevision: greg-helm
         path: '{{.path.path}}'
         helm:
           valueFiles:
             - values-dev.yaml
       destination:
-        destination:
         name: ''
         namespace: ''
         server: https://kubernetes.default.svc
-
-
-
-
-
 
 #apiVersion: argoproj.io/v1alpha1
 #kind: Application
