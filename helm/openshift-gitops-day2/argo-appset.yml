@@ -1,0 +1,63 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: day2-ops
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - git:
+    repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
+    revision: greg-helm
+    directories:
+    - path: helm/openshift-gitops-day2/wave1
+    values:
+      wave: 1
+  - git:
+    repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
+    revision: greg-helm
+    directories:
+    - path: helm/openshift-gitops-day2/wave2
+    values:
+      wave: 2
+  template:
+    metadata:
+      name: '{{.cluster}}-guestbook'
+      annotations:
+        argocd.argoproj.io/sync-wave: '{{.values.wave}}'
+    spec:
+      project: default
+      source:
+        repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
+        targetRevision: HEAD
+        path: '{{.path.path}}'
+      destination:
+        destination:
+        name: ''
+        namespace: ''
+        server: https://kubernetes.default.svc
+
+
+
+
+
+
+#apiVersion: argoproj.io/v1alpha1
+#kind: Application
+#metadata:
+#  name: day2-dev
+#spec:
+#  destination:
+#    name: ''
+#    namespace: ''
+#    server: https://kubernetes.default.svc
+#  source:
+#    path: helm/openshift-gitops-day2
+#    repoURL: git@192.168.122.239:repos/ocp4-disconnected-config
+#    targetRevision: greg-helm
+#    helm:
+#      valueFiles:
+#        - values-dev.yaml
+#  sources: []
+#  project: default
+

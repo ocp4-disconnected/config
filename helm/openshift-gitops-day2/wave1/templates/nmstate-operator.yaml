@@ -5,8 +5,6 @@ metadata:
     operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ''
   name: kubernetes-nmstate-operator
   namespace: openshift-nmstate
-  annotations:
-    argocd.argoproj.io/sync-wave: -1
 spec:
   channel: stable
   installPlanApproval: Automatic
