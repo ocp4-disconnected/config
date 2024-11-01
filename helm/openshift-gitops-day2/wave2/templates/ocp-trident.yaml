@@ -8,4 +8,4 @@ parameters:
   backendType: ontap-nas
   fsType: nfs
 provisioner: {{ .Values.storage.provisioner }}
-volumeBindingMode: WaitForFirstCustomer
+volumeBindingMode: WaitForFirstConsumer
