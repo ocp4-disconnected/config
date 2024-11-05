@@ -4,6 +4,8 @@ kind: ConfigMap
 metadata:
   name: custom-ca
   namespace: openshift-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 data:
   ca-bundle.crt: |
 {{ .Values.cluster.ca.content | indent 4 }}

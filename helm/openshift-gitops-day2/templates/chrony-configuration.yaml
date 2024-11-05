@@ -6,6 +6,8 @@ metadata:
   labels:
     machineconfiguration.openshift.io/role: {{ $value.role }}
   name: 99-{{ $value.role }}-chrony-configuration
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   config:
     ignition:
