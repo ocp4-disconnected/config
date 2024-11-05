@@ -9,7 +9,7 @@ bindPassword: {{ .Values.ldap.bindPW }}
 insecure: true
 url: {{ .Values.ldap.server.urlShort }}
 groupUIDNameMapping:
-  "{{ .Values.ldap.groupUIDNameMapping }}": Administrators
+{{ .Values.ldap.groupUIDNameMapping | indent 2 }}
 augmentedActiveDirectory:
   groupUIDAttributes: dn
   groupNameAttributes: [ cn ]

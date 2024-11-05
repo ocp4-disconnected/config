@@ -1,4 +1,4 @@
-{{- range $i, $value := .Values.roles }}
+{{- range $i, $value := .Values.chrony.roles }}
 ---
 apiVersion: machineConfiguration.openshift.io/v1
 kind: MachineConfig

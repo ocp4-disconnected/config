@@ -5,6 +5,16 @@ cluster:
       ----- CA Content ------
       ......
       ----- end content ----
+  ingress:
+    secretName: ingress-cert
+    cert: |-
+      ---- cert content ----
+      ....
+      ---- content ------
+    key:
+      ----- cert content ----
+      .....
+      ----- cert content ----
 nncps:
   - name: master-0
     vlans:
@@ -34,6 +44,9 @@ ldap:
       filter: # Like "(cn=foo,ou=bar...)"
 
 chrony:
+  roles:
+    - role: master
+    - role: worker
   configContent: |-
     # content of chrony config
 

@@ -7,4 +7,4 @@ metadata:
     argocd.argoproj.io/sync-wave: "5"
 spec:
   defaultCertificate:
-    name: ingress-certs
+    name: {{ .Values.cluster.ingress.secretName }}
