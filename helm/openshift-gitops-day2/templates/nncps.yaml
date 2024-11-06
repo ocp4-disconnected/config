@@ -1,4 +1,4 @@
-{{ range .Values.nncps }}
+{{ range .Values.nncps.nodes }}
 ---
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
@@ -12,11 +12,11 @@ spec:
   desiredState:
     interfaces:
   {{ range .vlans }}
-    - name: bond0.{{ .id }}
+    - name: {{ $.Values.nncps.bond.name }}.{{ .id }}
       type: vlan
       state: up
       vlan:
-        base-iface: bond0
+        base-iface: {{ $.Values.nncps.bond.name }}
         id: {{ .id }}
       ipv4:
         enabled: true

@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: custom-ca
+  name: {{ .Values.cluster.ca.configMapName  }}
   namespace: openshift-config
   annotations:
     argocd.argoproj.io/sync-wave: "5"
