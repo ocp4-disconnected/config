@@ -35,7 +35,7 @@ ldap:
     name: # like NAME LDAP
     urlFull: # like: ldap://fdqn/dn?accountName
     urlShort: # like: ldap://fdqn
-  groupUIDNameMapping: # Like "cn=foo,ou=bar..."
+  groupUIDNameMappingKey: # Like "cn=foo,ou=bar..."
   queries:
     group:
       baseDN: # Like "cn=foo,ou=bar..."
