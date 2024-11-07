@@ -8,6 +8,8 @@
     - "{{ common_openshift_cluster_install_dir }}"
     - "{{ agent_iso_openshift_cluster_config_dir }}"
     - "{{ ansible_user_dir }}/.kube"
+    - "{{ ansible_user_dir }}/.ssh"
+    - "{{ ansible_user_dir }}/.docker"
 
 - name: Generate RSA ssh keys
   community.crypto.openssh_keypair:
@@ -15,6 +17,23 @@
     size: 2048
     type: rsa
     state: present
+
+- name: Check if {{ ansible_user_dir }}/.docker/config.json exists
+  ansible.builtin.stat:
+    path: "{{ ansible_user_dir }}/.docker/config.json"
+  register: docker_config_json
+  failed_when: not docker_config_json.stat.exists
+
+- name: Load and validate JSON file
+  ansible.builtin.slurp:
+    path: "{{ ansible_user_dir }}/.docker/config.json"
+  register: docker_config_json_content
+  when: docker_config_json.stat.exists
+
+- name: Parse and validate JSON
+  set_fact:
+    config_json: "{{ docker_config_json_content.content | b64decode | from_json }}"
+  when: docker_config_json.stat.exists
 
 - name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
