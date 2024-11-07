@@ -24,7 +24,7 @@
     cmd: "ansible-galaxy collection install -r requirements.yml"
   args:
     chdir: "{{ common_openshift_download_dir }}/collections"
-  when: collection_install is changed and internet is not changed
+  when: collection_install is changed and internet is not changed or install_collection | bool"
   register: collection_installed
 
 - name: Install ansible collection from the internet
