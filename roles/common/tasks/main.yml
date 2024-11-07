@@ -155,8 +155,7 @@
     - tridentctl
   when: move_bin is changed
 
-
-- name: Check if openshift-install is available
+- name: Validate openshift-install version
   ansible.builtin.shell: "openshift-install version"
   register: install_check
   ignore_errors: true
@@ -166,7 +165,7 @@
   changed_when: false
   when: not common_fips_enabled 
 
-- name: Check if openshift-install-fips is available
+- name: Validate openshift-install-fips version
   ansible.builtin.shell: "openshift-install-fips version"
   register: install_check
   ignore_errors: true
@@ -196,9 +195,20 @@
     dest: "{{ common_openshift_oc_mirror_dir }}/registry.tar"
   when: registry is changed
 
+- name: Get file metadata for requirements.yml
+  ansible.builtin.stat:
+    path: "{{ common_openshift_download_dir }}/collections/requirements.yml"
+  register: collection_age
+
+- name: Calculate file age in days if file exists
+  set_fact:
+    file_age_days: "{{ (ansible_date_time.epoch | int - collection_age.stat.atime) // 86400 }}"
+  when: collection_age.stat.exists
+
 - name: Download required ansible collections
   ansible.builtin.command: 
     cmd: ansible-galaxy collection download --requirements-file ../collections/requirements.yml --download-path {{ common_openshift_download_dir }}/collections
+  when: ( file_age_days | default(4) | int ) > 3 or not collection_age.stat.exists
 
 #- name: Download required ansible collections
 #  community.general.ansible_galaxy_install:
@@ -212,16 +222,7 @@
     patterns: "*.iso"
   register: rhcos_downloaded
   failed_when: false
-  with_fileglob:
-    - "{{ common_openshift_download_dir }}/*iso"
-  changed_when: 'not rhcos_downloaded.stat.exists'
-
-- name: Download RHCOS image
-  get_url:
-    url: "{{ rhcos_image_url }}"
-    dest: "{{ common_openshift_download_dir }}/"
-    mode: '0644'
-  when: rhcos_downloaded is changed
+  changed_when: rhcos_downloaded.matched == 0
 
 - name: Check if .cache directory exists
   ansible.builtin.stat:
@@ -245,6 +246,47 @@
     state: directory
   when: rhcos is changed
 
+- block:
+  - block:
+    - name: Detect RHCOS image URL
+      ansible.builtin.command: 
+        cmd: "{{ common_openshift_client_bin }}/openshift-install-fips coreos print-stream-json"
+      register: rhcos_image_info_fips
+      no_log: true
+
+    - name: Parse RHCOS image URL
+      set_fact:
+        rhcos_image_url: "{{ rhcos_image_info_fips.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
+
+    - name: Download RHCOS image
+      get_url:
+        url: "{{ rhcos_image_url }}"
+        dest: "{{ common_openshift_download_dir }}/"
+        mode: '0644'
+
+    when: not common_fips_enabled 
+
+  - block:
+    - name: Detect RHCOS image URL FIPS
+      ansible.builtin.command: 
+        cmd: "{{ common_openshift_client_bin }}/openshift-install-fips coreos print-stream-json"
+      register: rhcos_image_info_fips
+      no_log: true
+
+    - name: Parse RHCOS image URL FIPS
+      set_fact:
+        rhcos_image_url: "{{ rhcos_image_info_fips.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
+
+    - name: Download RHCOS image FIPS
+      get_url:
+        url: "{{ rhcos_image_url }}"
+        dest: "{{ common_openshift_download_dir }}/"
+        mode: '0644'
+
+    when: common_fips_enabled 
+
+  when: rhcos_downloaded is changed
+
 - name: Prestage RHCOS iso to {{ ansible_user_dir }}/.cache/agent/image_cache
   ansible.builtin.copy:
     src: "{{ item }}"
@@ -252,26 +294,6 @@
   with_fileglob:
     - "{{ common_openshift_download_dir }}/*iso"
   when: rhcos is changed
-
-- block:
-  - name: Detect_RHCOS_image_URL
-    ansible.builtin.command: 
-      cmd: "{{ common_openshift_client_bin }}/openshift-install coreos print-stream-json"
-    register: rhcos_image_info
-    no_log: true
-    when: not common_fips_enabled 
-
-  - name: Detect_RHCOS_image_URL FIPS
-    ansible.builtin.command: 
-      cmd: "{{ common_openshift_client_bin }}/openshift-install-fips coreos print-stream-json"
-    register: rhcos_image_info
-    no_log: true
-    when: common_fips_enabled 
-
-  - name: Parse_RHCOS_image_URL
-    set_fact:
-      rhcos_image_url: "{{ rhcos_image_info.stdout | from_json | json_query('architectures.x86_64.artifacts.metal.formats.iso.disk.location') }}"
-  when: 'not cache_dir.stat.exists or rhcos.matched == 0'
 
 - name: Clone git repositories if not present
   ansible.builtin.git:
