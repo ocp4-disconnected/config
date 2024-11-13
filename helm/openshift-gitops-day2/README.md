@@ -21,13 +21,15 @@ To use, you will simply add an application in Argo, and supply this repo/directo
 * Values:
   * Override the values as needed. If Argo was able to successfully connect to the source repo configuration, then you should see a list of optional values to override. You can also upload your own `values.yaml` file.
 
-You can use the following command to see what will be applied before actually applying:
+To get to Argo, simply select it from the top right dropdown on the OpenShift web ui.
+
+You can also use the following command to see what will be applied before actually applying:
 
 ```bash
 helm template test . --debug | less
 ```
 
-The default `values.yaml` is designed to be give you the basic layout, as well as provide a template for your own custom values file.
+The default [values.yaml](values.yaml) is designed to be give you the basic layout, as well as provide a template for your own custom values file. Simply make a copy of this default, and start filling in your real-world data. You can even run the above template command, adding `--values=/path/to/yourValues.yaml` before the `|` to tell Helm to use your new file, in order to check your work.
 
 ## Components overview
 
