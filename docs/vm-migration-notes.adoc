@@ -138,6 +138,8 @@ For Windows-based VMs (e.g., Windows Server 2012), special steps are needed:
 ### **More information**:
 * More detailed information can be found in the migration toolkit user guide: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7
 
+* More detailed information about OpenShift Virtualization in general can be found here: https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/openshift_virtualization/index
+
 
 ## Automation Notes
 ---
