@@ -1,5 +1,7 @@
 #### AGENT INSTALL
 
+install_collection: false
+
 #openshift_cluster_install_dir: "{{ install_dir }}/install-{{ ansible_date_time.date }}"
 #openshift_cluster_config_dir: "{{ install_dir }}/configs"
 #cluster_fqdn: "{{ cluster_name }}.{{ cluster_domain }}"
