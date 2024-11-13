@@ -1,3 +1,4 @@
+# This optionally specifies a CA to use in a cluster-wide CA.
 {{ if .Values.cluster.ca.specify }}
 apiVersion: v1
 kind: ConfigMap

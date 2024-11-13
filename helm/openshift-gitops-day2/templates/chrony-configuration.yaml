@@ -1,3 +1,5 @@
+# This sets the chrony configuraiton for specified node roles
+# This is referenced in proxy.yaml
 {{- range $i, $value := .Values.chrony.roles }}
 ---
 apiVersion: machineConfiguration.openshift.io/v1

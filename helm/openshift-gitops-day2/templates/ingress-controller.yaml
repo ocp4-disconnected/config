@@ -1,3 +1,5 @@
+# Configures the ingress controller with the provided cert
+# Cert specified in ingress-certs-secret.yaml
 apiVersion: operator.openshift.io/v1
 kind: IngressController
 metadata:

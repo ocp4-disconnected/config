@@ -1,10 +1,16 @@
+# General cluster-level information
 cluster:
+  # Used in custom-ca.yaml
   ca:
+    # true if you have a cert and want to set it, false to skip setting a cluster ca.
     specify: true
     content: |- # The cluster's CA
       ----- CA Content ------
       ......
       ----- end content ----
+  # Used in:
+  #  - ingress-certs-secret.yaml
+  #  - ingress-controller.yaml
   ingress:
     secretName: ingress-cert
     cert: |-
@@ -15,6 +21,11 @@ cluster:
       ----- cert content ----
       .....
       ----- cert content ----
+# TODO:: doublecheck updated from site
+# Configuration for NodeNetworkConfigurationPolicy
+# Used in:
+#  - nncps.yaml
+#  - nncp-bond.yaml ?
 nncps:
   - name: master-0
     vlans:
@@ -26,7 +37,13 @@ nncps:
 #        ip: 192.168.1.2 # TODO:: specify
   # ... TODO:: fill out
 
+# LDAP configuration.
+# Used in:
+#  - ldap-accounts.yaml
+#  - ldap-bind-secret.yaml
+#  - ocp-oauth-sec.yaml
 ldap:
+  # The name of the LDAPSyncConfig (ldap-accounts.yaml)
   syncConfigName: foo
   accountName: sAMAccountName
   bindDN: # like some.svc.ocp
@@ -43,6 +60,9 @@ ldap:
       baseDN: # Like "cn=foo,ou=bar..."
       filter: # Like "(cn=foo,ou=bar...)"
 
+# Chrony configuration.
+# Used in:
+#  - chrony-configuration.yaml
 chrony:
   roles:
     - role: master
@@ -50,5 +70,7 @@ chrony:
   configContent: |-
     # content of chrony config
 
+# Storage settings for the cluster.
+# Used in ocp-trident.yaml
 storage:
   provisioner: #IP/hostname

@@ -1,3 +1,4 @@
+# Sets up syncing auth information with an LDAP server
 apiVersion: v1
 kind: LDAPSyncConfig
 metadata:

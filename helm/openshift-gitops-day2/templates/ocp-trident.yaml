@@ -1,3 +1,4 @@
+# Sets up a storage class to interact with a provisioner, marking it as default.
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
