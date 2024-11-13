@@ -1,0 +1,7 @@
+#!/usr/bin/ansible-playbook -K
+- hosts: localhost
+  gather_facts: true
+  roles:
+    - role: ocp4.disconnected.media_share
+      tags: idrac, stage_1
+      when: media_share_stop_web_server | bool
