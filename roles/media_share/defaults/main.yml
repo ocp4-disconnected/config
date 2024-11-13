@@ -1,3 +1,4 @@
 media_share_idrac: false
 media_share_idrac_user: test
 media_share_idrac_password: tester
+media_share_webserver_port: 8000

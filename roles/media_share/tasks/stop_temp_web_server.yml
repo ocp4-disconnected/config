@@ -1,0 +1,11 @@
+---
+- name: Kill the temporary webserver session in tmux
+  shell: tmux kill-session -t temp-webserver
+  ignore_errors: true  # Prevent failure if the session is already stopped
+
+- name: Close port {{ media_share_webserver_port }} on the firewall
+  firewalld:
+    port: "{{ media_share_webserver_port }}/tcp"
+    permanent: no
+    immediate: yes
+    state: disabled

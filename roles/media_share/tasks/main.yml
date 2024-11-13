@@ -1,3 +1,5 @@
 ---
 - ansible.builtin.include_tasks: idrac.yml
   when: media_share_idrac | bool
+- ansible.builtin.include_tasks: stop_temp_web_server.yml
+  when: media_share_stop_web_server | bool
