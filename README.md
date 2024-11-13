@@ -37,6 +37,9 @@ Post-Install Configuration
 - Ansible-collections
   - dellemc.openmanage
 
+## Additional Info:
+[View notes on recommended procedures for vm migrations](/docs/vm-migration-notes.adoc)
+
 ## Thanks:
 This started as as a fork from [hyperkinetierdcn/ansible-ocp4-agent](https://github.com/hyperkinetierdcn/ansible-ocp4-agent), but we have since diverged quite a bit away, but still would like to give credit.
 
