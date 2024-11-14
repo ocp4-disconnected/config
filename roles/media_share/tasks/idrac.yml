@@ -1,11 +1,18 @@
 ---
-- name: Move generated ISO to webroot
-  ansible.builtin.copy:
-    src: "{{ common_openshift_cluster_install_dir}}/agent.x86_64.iso"
-    dest: /var/www/html/
-    remote_src: true
+- name:  Open port {{ media_share_webserver_port }} on the firewall
+  firewalld: 
+    port: "{{ media_share_webserver_port }}/tcp"
+    permanent: no
+    immediate: yes
+    state: enabled
   become: true
   
+- name: Create the temporary webserver | runs in background via tmux
+  shell:
+    cmd: 'tmux new-session -d -s temp-webserver python3 -m http.server'
+  args:
+    chdir: "{{ common_openshift_cluster_install_dir }}"
+
 - name: Set fact for {{ common_ip_space }} IPv4 address
   set_fact:
     ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
@@ -21,9 +28,8 @@
     force: true
     virtual_media:
       - insert: true
-        image: "http://{{ ipv4_address | first }}/agent.x86_64.iso"
+        image: "http://{{ ipv4_address | first }}:{{ media_share_webserver_port }}/agent.x86_64.iso"
         media_type: "DVD"
-  loop: "{{ media_share_idracs }}"
 
 - name: Boot Once via CD
   delegate_to: localhost
@@ -35,4 +41,3 @@
     boot_source_override_target: cd
     boot_source_override_enabled: once
     reset_type: force_restart
-  loop: "{{ media_share_idracs }}"
