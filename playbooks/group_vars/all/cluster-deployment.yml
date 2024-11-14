@@ -32,15 +32,11 @@ common_nodes:
 #idrac_user: test
 #idrac_password: tester
 
-#idracs:
-#  - name: master-0
-#    ip: '{{ ip_space }}.5'
-#  - name: master-1
-#    ip: '{{ ip_space }}.6'
-#  - name: master-2
-#    ip: '{{ ip_space }}.7'
-#  - name: worker-0
-#    ip: '{{ ip_space }}.8'
+media_share_idracs:
+  - name: master-0
+    ip: '{{ ip_space }}.5'
+  - name: worker-0
+    ip: '{{ ip_space }}.8'
 
 # Single Node Worker
 
