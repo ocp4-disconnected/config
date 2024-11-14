@@ -1,5 +1,31 @@
 ---
+- name: Filter nodes based on the selected role
+  set_fact:
+    filtered_idracs: >-
+      {{ media_share_idracs | selectattr('name', 'search', '^' + role) | list }}
+
+- name:  Open port {{ media_share_webserver_port }} on the firewall
+  firewalld: 
+    port: "{{ media_share_webserver_port }}/tcp"
+    permanent: no
+    immediate: yes
+    state: enabled
+  become: true
+  when: media_share_idrac | bool and  filtered_idracs | length > 0
+  
+- name: Create the temporary webserver | runs in background via tmux
+  shell:
+    cmd: 'tmux new-session -d -s temp-webserver python3 -m http.server'
+  args:
+    chdir: "{{ common_openshift_cluster_install_dir }}"
+  failed_when: false
+  when: media_share_idrac | bool and  filtered_idracs | length > 0
+
 - ansible.builtin.include_tasks: idrac.yml
-  when: media_share_idrac | bool
+  loop: "{{ filtered_idracs }}"
+  loop_control:
+    loop_var: idrac_node
+  when: media_share_idrac | bool and  filtered_idracs | length > 0
+
 - ansible.builtin.include_tasks: stop_temp_web_server.yml
   when: media_share_stop_web_server | bool
