@@ -9,7 +9,7 @@ This guide outlines the steps to migrate virtual machines (VMs) from VMware vCen
 
 * Ensure you have the necessary access permissions to both VMware vCenter and OpenShift Virtualization clusters.
 * Create source provider(s) for vmware and/or vcenter:
-	** Steps for creating a provider can be found here: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.0/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#adding-source-provider_mtv
+	** Steps for creating a provider can be found here: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#mtv-overview-page_mtv
 * Verify the following operators are properly configured in OpenShift:
 	** Virtualization Operator
 		*** for hosting the migrated virtual machines
@@ -52,10 +52,42 @@ desiredState:
 
 * Create VLANs: Create VLANs to map network traffic between VMware and OpenShift Virtualization. 
     ** Example VLAN IDs: `677` (primary), `58` (for public networks), 59 (for public networks).
-// TODO: provide example nncp for the vlans
-* Network Attachment: Apply network attachment definitions (NAD) that point to the appropriate VLAN. For instance, the primary network for TB7 machines will map to VLAN 677, while public-facing VMs might use VLAN 58.
-	** Unless communication is needed with the containers then it is recommended to set the container network as disabled 
-// TODO: provide example nad
+https://github.com/cjnovak98/ocp4-disconnected-config/blob/main/Examples/node_network_config_policy.yaml[Example NodeNetworkConfigurationPolicy]
+* Network Attachment: Apply network attachment definitions (NAD) that point to the appropriate VLAN. For instance, the primary network for the migrated VMs will map to VLAN 677, while public-facing VMs might use VLAN 58.
+	** Unless communication is needed with the containers then it is recommended to set the container network as disabled in the network attachment definition.
+```yaml
+---
+#Example Network Attachment Definitions
+
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: bond0-bridge-vlan677 
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "name": "bond0-bridge-vlan677", 
+    "type": "bridge", 
+    "bridge": "bond0-br0", 
+    "macspoofchk": false, 
+    "vlan": 677
+  }'
+
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: bond0-bridge-vlan58 
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "name": "bond0-bridge-vlan58", 
+    "type": "bridge", 
+    "bridge": "bond0-br0", 
+    "macspoofchk": false, 
+    "vlan": 58
+  }'
+```
 
 
 
@@ -78,7 +110,7 @@ Migration plans are created in OpenShift using the Migration Toolkit. This plan 
 		*** only lowercase alphanumeric characters or '-'
 		*** start with alphanumeric
 		*** end with alphanumeric
-		*** (e.g., `tb7-core-test-24oct-1449`).
+		*** (e.g., `core-test-24oct-1449`).
 	. Choose target provider: OpenShift Virtualization.
 	. Set up network mapping:
         *** Map VMware networks to OpenShift VLANs (e.g., map vlan-677 to vlan-677 in OCP).
@@ -91,7 +123,7 @@ Migration plans are created in OpenShift using the Migration Toolkit. This plan 
 
 ### **VM Post-Migration Configuration**
 
-The virtio drivers that OpenShift Virtualization uses are not supported by default for the older versions of RHEL and Windows Server. Since OpenShift Virtualization defaults to virtio for the network and disk interfaces you will need to update that setting post migration. Once the migration process is complete, and the VM is created in OpenShift (e.g., web-tb7), follow these steps:
+The virtio drivers that OpenShift Virtualization uses are not supported by default for the older versions of RHEL and Windows Server. Since OpenShift Virtualization defaults to virtio for the network and disk interfaces you will need to update that setting post migration. Once the migration process is complete, and the VM is created in OpenShift (e.g., web-qa), follow these steps:
 
 . Modify Network Interfaces:
     ** Ensure the network interfaces are set to e1000e.
@@ -104,25 +136,34 @@ The virtio drivers that OpenShift Virtualization uses are not supported by defau
 
 ### **Dealing with Windows-Specific Issues**
 
-For Windows-based VMs (e.g., Windows Server 2012), special steps are needed:
+For any Windows based VMs (e.g., Windows Server 2012), special steps are needed:
 
 * Shutdown Windows Properly in vCenter:
-    ** Shut down the Windows VM gracefully (`shutdown /s`), as Windows VMs can have issues with hibernation or fast boot that may cause the file system to be mounted as read-only.
-    ** Disable hibernation and fast boot if necessary.
+    ** Always shut down the Windows VM gracefully: `shutdown /s`.
+    ** Windows VMs can experience issues migrating due to hibernation or fast boot settings. When these are enabled it may cause the file system to be mounted as read-only which prevents the migration from taking place. NOTE: it appears fast boot is enabled by default for Windows Server 2012
 
 
-
-## **Migration Best Practices and Considerations**
+## **Recommended Practices and Considerations**
 ---
 
 ### **VMs Not Starting After Migration**
 
+Any VMs running an OS which is not in the list of supported guest operating systems, or operating systems that have difficulty with the virtio drivers may need to use these other drivers for their disk and network interfaces:
+
 * Disk Configuration: Ensure all disks are configured to SATA after migration.
-* Network Configuration: Double-check that the VM is connected to the correct VLAN and that e1000e is used for network interfaces.
+* Network Configuration: Double-check that the VM is connected to the correct VLAN and that e1000e is used for network interfaces. Additionally, if e1000e is the interface used in the VMware environment, then using this setting may help to ensure previous network configurations remain on the migrated VM.
 
 ### **Migration Plan Recommended Practices**
 
-* Avoid migrating multiple VMs simultaneously from vCenter as this may overwhelm the system. Always perform migration of one VM at a time when migrating from vCenter.
+* Avoid migrating multiple VMs simultaneously from vCenter as this may overwhelm the system. Always perform migration of one VM at a time when migrating from vCenter as the source provider.
+
+* It is also possible to throttle the number of simultaneous migrations in the MTV configurations. This will allow you to put more than one machine in a single migration plan (regardless of if it's from vCenter vs ESXi host) and not to overwhelm the source system. This can be done by modifying the `controller_max_vm_inflight` setting which is found in the forklift-controller CR created by the MTV operator. https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#configuring-mtv-operator_mtv[More info for additional configuration options]
+
+```yaml
+spec:
+  controller_max_vm_inflight: <number> #defaults to 20
+```
+
 
 ### **Saving and Re-Importing VMs**
 
@@ -138,7 +179,7 @@ For Windows-based VMs (e.g., Windows Server 2012), special steps are needed:
 ### **More information**:
 * More detailed information can be found in the migration toolkit user guide: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7
 
-* More detailed information about OpenShift Virtualization in general can be found here: https://docs.redhat.com/en/documentation/openshift_container_platform/4.8/html/openshift_virtualization/index
+* More detailed information about OpenShift Virtualization in general can be found here: https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/virtualization/index
 
 
 ## Automation Notes
@@ -146,8 +187,13 @@ For Windows-based VMs (e.g., Windows Server 2012), special steps are needed:
 
 // TODO: update example with JT's script for this step
 
-*  Automatically update the disk and network interfaces for all virtual machines with a script:
-```
+*  Automatically update the disk and network interfaces for all virtual machines with a script. This script:
+  ** gets the current configurations for all vms on openshift and then loops through each to
+    *** modify the storage and network interfaces to use SATA/e1000e to prevent any potential virtio/storage issues for unsupported guest operating systems
+    *** apply the updated config
+    *** start or restart the VM
+
+```shell
 !#/bin/bash
 
 # Set namespace and project
