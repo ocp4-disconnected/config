@@ -3,7 +3,9 @@ gitOps:
   source: redhat-operators
 
 gitRepoTemplate:
-  url: git@192.168.122.42:repos
+  # The URL of the repository setup in the Ansible step.
+  url: git@<ip of host>:repos
+  # The SSH key of the user that ran the Ansible step, used to connect to the git repo
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
     -----END OPENSSH PRIVATE KEY-----
@@ -11,11 +13,6 @@ icsp:
   operator-0:
     labels:
       operators.openshift.org/catelog: "true"
-    mirrors:
-    - mirrors:
-      - fqdn.lab/quay
-      source: registry.redhat.io/quay
-  release-0:
     mirrors:
     - mirrors:
       - fqdn.lab/quay
