@@ -35,14 +35,51 @@ The default [values.yaml](values.yaml) is designed to be give you the basic layo
 
 ### nmstate operator
 
+Relevant templates:
+
+ - [nmstate-instance.yaml](templates/nmstate-instance.yml)
+ - [nmstate-namespace.yaml](templates/nmstate-namespace.yaml)
+ - [nmstate-operator.yaml](templates/nmstate-operator.yaml)
+ - [nmstate-operatorgroup.yaml](templates/nmstate-operatorgroup.yaml)
+ - [nncp-bond.yaml](templates/nncp-bond.yaml)
+ - [nncps.yaml](templates/nncps.yaml)
+
 The nmstate operator is what brings in the NodeNetworkConfigurationPolicy CRD's , allowing us to further tweak the network setup of the cluster.
 
 ### Chrony
 
+Relevant templates:
+
+ - [chrony-configuration.yaml](templates/chrony-configuration.yaml)
+
 ### LDAP
+
+Relevant templates:
+
+ - [ldap-accounts](templates/ldap-accounts.yaml)
+ - [ldap-bind-secret.yaml](templates/ldap-bind-secret.yaml)
+ - [ocp-oauth-sec.yaml](templates/ocp-oauth-sec.yaml)
+
+### Storage
+
+Relevant templates:
+
+ - [ocp-trident.yaml](templates/ocp-trident.yaml)
+ - [trident-machineconfig-master.yaml](templates/trident-machineconfig-master.yaml)
+ - [trident-machineconfig-worker.yaml](templates/tri)
 
 ### Other
 
 #### Proxy
 
+Relevant templates:
 
+ - [custom-ca.yaml](templates/custom-ca.yaml)
+ - [proxy.yaml](templates/proxy.yaml)
+
+#### Ingress
+
+Relevant templates:
+
+ - [ingress-certs-secret.yaml](templates/ingress-certs-secret.yaml)
+ - [ingress-controller.yaml](templates/ingress-controller.yaml)
