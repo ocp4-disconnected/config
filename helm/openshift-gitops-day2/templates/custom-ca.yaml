@@ -1,0 +1,15 @@
+# This optionally specifies a CA to use in a cluster-wide CA.
+{{ if .Values.cluster.ca.specify }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: custom-ca
+  namespace: openshift-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+data:
+  ca-bundle.crt: |
+{{ .Values.cluster.ca.content | indent 4 }}
+{{ else }}
+# Did not specify cluster ca
+{{ end }}

@@ -4,5 +4,10 @@
   roles:
     - role: import_collection
       tags: import_collection, always
-    - role: ocp4.disconnected.add_worker
+    - role: ocp4.disconnected.worker_iso
       tags: always
+    - role: ocp4.disconnected.media_share
+      tags: idrac, stage_1
+      when: media_share_idrac | bool
+      vars:
+        role: worker

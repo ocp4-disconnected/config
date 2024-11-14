@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: private-repo
+  namespace: {{ .Values.gitOps.namespace }}
+  labels:
+    argocd.argoproj.io/secret-type: repo-creds
+stringData:
+  type: git
+  url: {{ .Values.gitRepoTemplate.url }}
+data:
+  sshPrivateKey: {{ .Values.gitRepoTemplate.sshPrivateKey | b64enc}}
