@@ -20,7 +20,6 @@ common_nodes:
     ip: '43'
     mac: 52:54:00:8d:13:78
 
-
 # Registry
 #common_registry_volume: /pods/registry
 #registry_username: openshift

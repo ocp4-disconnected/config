@@ -1,13 +1,16 @@
+# Sets up syncing auth information with an LDAP server
 apiVersion: v1
 kind: LDAPSyncConfig
 metadata:
   name: {{ .Values.ldap.syncConfigName }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 bindDN: {{ .Values.ldap.bindDN }}
 bindPassword: {{ .Values.ldap.bindPW }}
 insecure: true
 url: {{ .Values.ldap.server.urlShort }}
 groupUIDNameMapping:
-  "{{ .Values.ldap.groupUIDNameMapping }}": Administrators
+{{ .Values.ldap.groupUIDNameMapping | indent 2 }}
 augmentedActiveDirectory:
   groupUIDAttributes: dn
   groupNameAttributes: [ cn ]

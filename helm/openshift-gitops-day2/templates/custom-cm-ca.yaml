@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: custom-ca
-  namespase: openshift-config
-data:
-  ca-bundle.crt: |
-    {{ .Values.cluster.ca }}
