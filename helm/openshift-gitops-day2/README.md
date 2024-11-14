@@ -67,6 +67,21 @@ Relevant templates:
  - [ocp-trident.yaml](templates/ocp-trident.yaml)
  - [trident-machineconfig-master.yaml](templates/trident-machineconfig-master.yaml)
  - [trident-machineconfig-worker.yaml](templates/tri)
+### Trident Machine Config
+
+Most Kubernetes distributions come with the packages and utilities to mount NFS backends installed by default, including Red Hat OpenShift.
+
+However, for NFSv3, there is no mechanism to negotiate concurrency between the client and the server. Hence the maximum number of client-side sunrpc slot table entries must be manually synced with supported value on the server to ensure the best performance for the NFS connection without the server having to decrease the window size of the connection.
+
+For ONTAP, the supported maximum number of sunrpc slot table entries is 128 i.e. ONTAP can serve 128 concurrent NFS requests at a time. However, by default, Red Hat CoreOS/Red Hat Enterprise Linux has maximum of 65,536 sunrpc slot table entries per connection. We need to set this value to 128 and this can be done using Machine Config Operator (MCO) in OpenShift.
+
+For more information see https://docs.netapp.com/us-en/netapp-solutions/containers/rh-os-n_overview_trident.html#nfs
+
+Machine config for the Masters:
+ - [trident-machineconfig-master.yaml](templates/trident-machineconfig-master.yaml)
+
+Machine config for the Workers:
+ - [trident-machineconfig-worker.yaml](templates/trident-machineconfig-worker.yaml)
 
 ### Other
 
