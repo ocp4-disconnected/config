@@ -1,114 +1,159 @@
-Here are the install instructions I follow when testing out the automation, same set of instructions for both STIG/Non-stig systems.
+# Red Hat OpenShift Installation Guide
 
-# Engineering level install docs
+This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat Enterprise Linux 9 with options for FIPS and STIG configurations. The instructions support deployment on both connected and disconnected environments.
 
-## RHEL9 With FIPS/Stig configurations
-Install Red Hat Enterprise linux 9 and register with your account
+## Prerequisites
 
-<ol>
+- **RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
+- **Environment Configurations**:
 
-<li> Openshift 4.15+ on RHEL 9 Stigged + fips enabled 
+  > **NOTE:** These configurations can be done post install. Changes to usbguard/sysctl.conf will require a reboot, while fapolicyd will only require restart on the service.
 
-(either durring [install](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/switching-rhel-to-fips-mode_security-hardening#proc_installing-the-system-with-fips-mode-enabled_switching-rhel-to-fips-mode) or [enabled](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/switching-rhel-to-fips-mode_security-hardening#switching-the-system-to-fips-mode_using-the-system-wide-cryptographic-policies) post install)
+  1. Ensure **FIPS** mode is enabled for RHEL 9.
+      - [Enable FIPS during installation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/switching-rhel-to-fips-mode_security-hardening#proc_installing-the-system-with-fips-mode-enabled_switching-rhel-to-fips-mode); or
+     - [Enable FIPS post-installation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/switching-rhel-to-fips-mode_security-hardening#switching-the-system-to-fips-mode_using-the-system-wide-cryptographic-policies)
+  2. Configure **STIG** compliance as needed
+  3. Configure **fapolicyd** for Ansible Playbooks:
+      - Allow regular users to run Ansible playbooks by creating a new file at `/etc/fapolicyd/rules.d/22-ansible.rules` with the following contents:
+        ```plaintext
+        allow perm=any uid=1000 : dir=/home/user/.ansible
+        allow perm=any uid=1000 : dir=/home/user/.cache/agent
+        allow perm=any uid=1000 : dir=/usr/share/git-core/templates/hooks
+        allow perm=any uid=1000 : dir=/pods
+        allow perm=any uid=1000 : dir=/usr/bin
+        allow perm=any uid=0,1000 : dir=/tmp
+        ```
 
-<li> Allow regular user to run ansbile-playbooks, create a new file /etc/fapolicyd/rules.d/22-ansible.rules:
+  4. Adjust User Namespace Limits for Registry Pod:
+     - Increase the `user.max_user_namespaces` setting to enable the registry pod to run as a non-root user. Update `/etc/sysctl.conf` as follows:
+        ```plaintext
+        # Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
+        user.max_user_namespaces = 5
+        ```
+
+  5. Enable Access to External USB Devices (for Disconnected Environments):
+     - Add the following commands to the `%post` section in your kickstart file:
+       ```plaintext
+       systemctl disable usbguard
+       sed -i 's/black/\#black/g' /etc/modprobe.d/usb-storage.conf
+       sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
+       ```
+
+  6. Install Ansible/Podman:
+      ```shell
+      sudo dnf install ansible-core
+      sudo dnf install container-tools
+      ```
+
+      to verify they are installed correctly you can run:
+      ```shell
+      ansible --version
+      podman -v
+      ```
+  
+  7. Clone the Repository:
+      ```shell
+      git clone https://github.com/cjnovak98/ocp4-disconnected-config
+      ```
+
+  8. Navigate to the Playbooks Directory:
+      ```shell
+      cd ocp4-disconnected-config/playbooks
+      ```
+
+  9. Install Required Ansible Collections: 
+      ```shell
+      ansible-playbook ansible-galaxy.yml
+      ```
+---
+
+## Running the Automation
+
+### Directory Structure Assumptions
+
+- **Content Path**: Ensure that the content resides in `/pods/content` (definable in `playbooks/group_vars/all/cluster-deployment.yml`). It is assumed this is the transferable media when running connected side for a disconnected cluster and disconnected config is /pods/content/ansible
+
+### Update Environment Variables
+
+- Modify `group_vars/all/cluster-deployment.yml` to customize it for your environment. Key variables include:
+   - `common_openshift_dir`: Directory for pulled content to live.
+   - `common_connected_cluster`: Set to `true` if the cluster itself is connected.
+   - `mirror_content_pull_mirror`: Set to `true` to pull content (set to `false` for disconnected environments).
+   - `common_fips_enabled`: `true` if the host is stigged and FIPS is enabled.
+   - `common_cluster_domain`: Top-Level Domain (TLD) for the cluster.
+   - `common_ip_space`: First three octets of the IP address range for both the bastion and cluster.
+   - `common_nodes`: Details of nodes, including name, last octet of the node IP, and MAC addresses.
+   - `idracs_user` and `idracs_password`: iDRAC credentials.
+   - `idracs`: Node name and IP of the node’s iDRAC.
+
+```yaml
+# Example playbooks/group_vars/all/cluster-deployment.yml
+
+common_git_repos:
+  - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
+  - "https://github.com/cjnovak98/ocp4-disconnected-config"
+
+common_openshift_dir: /pods/content
+common_connected_cluster: false
+mirror_content_pull_mirror: false
+
+common_openshift_interface: ens1
+common_fips_enabled: true
+common_cluster_domain: example.com
+
+common_ip_space: 192.168.122
+common_nodes:
+  - name: master-0
+    ip: '42'
+    mac: 52:54:00:8d:13:77
+  - name: worker-0
+    ip: '43'
+    mac: 52:54:00:8d:13:78
+
+# iDRAC
+#idrac_user: test
+#idrac_password: tester
+
+#media_share_idracs:
+#  - name: master-0
+#    ip: '{{ ip_space }}.5'
+#  - name: master-1
+#    ip: '{{ ip_space }}.6'
+#  - name: master-2
+#    ip: '{{ ip_space }}.7'
+#  - name: worker-0
+#    ip: '{{ ip_space }}.8'
 
 ```
-allow perm=any uid=1000 : dir=/home/user/.ansible
-allow perm=any uid=1000 : dir=/home/user/.cache/agent
-allow perm=any uid=1000 : dir=/usr/share/git-core/templates/hooks
-allow perm=any uid=1000 : dir=/pods
-allow perm=any uid=1000 : dir=/usr/bin
-allow perm=any uid=0,1000 : dir=/tmp
+
+### Run Content Gathering Playbook to Prepare Disconnected Environments:
+If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run whcih will gather the appropriate content: 
+
+```shell
+ansible-playbook -K gather-content.yml
+```
+or 
+```shell
+./gather-content.yml
 ```
 
-<li>Increase the number of namespaces, to allow registry pod to run as user. Modify /etc/sysctl.conf
+Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content)
 
-Need to test smaller number than 5
+### Ensure A Valid Pull-Secret Exists: 
+
+You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
+
+> NOTE: If the pull-secret is absent, it will cause the automation to fail but you can simply add it and rerun the playbook.
+
+### Run the Deployment Playbook:
+
+For both connected and disconnected clusters, deploy the cluster by running:
+
+```shell
+ansible-playbook -K deploy-cluster.yml
 ```
-# Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
-user.max_user_namespaces = 0
+or
+
+```shell
+./deploy-cluster.yml
 ```
-to
-```
-# Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
-user.max_user_namespaces = 5
-```
-
-<li>Need to figure out how to get content to Disconnected machine. I was testing with mass storage device and had the following on my test kickstart in `%post` portion:
-
-```
-systemctl disable usbguard
-sed -i 's/black/\#black/g' /etc/modprobe.d/usb-storage.conf
-sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
-```
-
-This allowed me to access the USB device after 1st boot. 
-
-These configurations can be done post install, changes to usbguard/sysctl.conf will require a reboot, while fapolicyd will only require restart on the service
-</ol>
-
-## Running the automation
-
-Note: content is assumed to be in /pods/content (definable in group_vars/all/cluster-deployment.yml)
-
-Note: It is assumed this is the transferable media when running connected side for a disconnected cluster and disconnected config is /pods/content/ansible
-<ol>
-
-<li>pull this repo, 
-
-`git pull https://github.com/cjnovak98/ocp4-disconnected-config`
-
-<li>move into that directory /playbooks
-
-`cd ocp4-disconnected-config/playbooks`
-
-<li> install ansible
-
-`sudo dnf install ansible-core`
-
-<li>run the collection
-
-`ansible-playbook ansible-galaxy.yml` or `./ansible-galaxy.yml`
-
-<li>This play will install the disconnected collection
-
-<li>modify group_vars/all/cluster-deployment.yml for your environment
-<ol> 
-<li>most likely the following items:
-<ol>
-<li>common_openshift_dir (where to pulled content will live)
-
-<li>common_connected_cluster ( is the cluster itself connected)
-
-<li>mirror_content_pull_mirror (youll want to set this to true, to pull. And false on disconnected side
-
-<li>common_fips_enabled ( true if stiged/fips )
-
-<li>common_cluster_domain ( Top Level Domain of where cluster will live )
-
-<li>common_ip_space (1st 3 octects of ip space both bastion/cluster will be on)
-
-<li>common_nodes (name, last octect of the nodes ips, and mac of IP )
-
-<li>idracs_user/password
-
-<li>idrac (node name and ip of idrac of the node)
-</ol>
-</ol>
-<li>run the next step (connected or disconnected) either will prompt for Become Password
-
-<ol>
-<li>for connected run:
-
-`ansbile-playbook -K gather-content.yml ` or `./gather-content.yml` (connected side of disconnected only)
-
-* make sure you have a valid pull-secret in ~/.docker/config (we have fast fail if this doesn’t exist, can add post-install, just re-run automation)
-</ol>
-
-<li>for disconnected/connected clusters run: 
-
-`ansible-playbook -K deploy-cluster` or .`/deploy-cluster`
-
-</ol>
-
