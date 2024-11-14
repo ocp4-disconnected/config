@@ -4,6 +4,7 @@ metadata:
   name: 98-master-nfs-rpc-slot-tables
   labels:
     machineconfiguration.openshift.io/role: master
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   config:
     ignition:
