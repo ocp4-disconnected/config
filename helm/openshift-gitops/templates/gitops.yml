@@ -8,7 +8,7 @@ spec:
   channel: latest
   installPlanApproval: Automatic
   name: openshift-gitops-operator
-  source: redhat-operators
+  source: {{ .Values.gitOps.source }}
   sourceNamespace: openshift-marketplace
   config:
     env:

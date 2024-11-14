@@ -27,8 +27,6 @@ Post-Install Configuration
 #### Status
 - This is a work in progress, and we will continue to make enhancements over time.
 
-#### Requirements (connected system)
-- TODO
 #### Requirements (disconnected system)
 - Packages:
   - nmstate
