@@ -31,7 +31,7 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
         user.max_user_namespaces = 5
         ```
 
-  4. Enable Access to External USB Devices (for Disconnected Environments):
+  5. Enable Access to External USB Devices (for Disconnected Environments):
      - Add the following commands to the `%post` section in your kickstart file:
        ```plaintext
        systemctl disable usbguard
@@ -39,62 +39,115 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
        sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
        ```
 
+  6. Install Ansible/Podman:
+      ```shell
+      sudo dnf install ansible-core
+      sudo dnf install container-tools
+      ```
 
+      to verify they are installed correctly you can run:
+      ```shell
+      ansible --version
+      podman -v
+      ```
+  
+  7. Clone the Repository:
+      ```shell
+      git clone https://github.com/cjnovak98/ocp4-disconnected-config
+      ```
+
+  8. Navigate to the Playbooks Directory:
+      ```shell
+      cd ocp4-disconnected-config/playbooks
+      ```
+
+  9. Install Required Ansible Collections: 
+      ```shell
+      ansible-playbook ansible-galaxy.yml
+      ```
 ---
 
 ## Running the Automation
 
 ### Directory Structure Assumptions
 
-- **Content Path**: Ensure that the content resides in `/pods/content` (definable in `group_vars/all/cluster-deployment.yml`). It is assumed this is the transferable media when running connected side for a disconnected cluster and disconnected config is /pods/content/ansible
+- **Content Path**: Ensure that the content resides in `/pods/content` (definable in `playbooks/group_vars/all/cluster-deployment.yml`). It is assumed this is the transferable media when running connected side for a disconnected cluster and disconnected config is /pods/content/ansible
 
-### Step-by-Step Automation Execution
+### Update Environment Variables
 
-1. **Clone the Repository**:
-   ```shell
-   git clone https://github.com/cjnovak98/ocp4-disconnected-config
-   ```
+- Modify `group_vars/all/cluster-deployment.yml` to customize it for your environment. Key variables include:
+   - `common_openshift_dir`: Directory for pulled content to live.
+   - `common_connected_cluster`: Set to `true` if the cluster itself is connected.
+   - `mirror_content_pull_mirror`: Set to `true` to pull content (set to `false` for disconnected environments).
+   - `common_fips_enabled`: `true` if the host is stigged and FIPS is enabled.
+   - `common_cluster_domain`: Top-Level Domain (TLD) for the cluster.
+   - `common_ip_space`: First three octets of the IP address range for both the bastion and cluster.
+   - `common_nodes`: Details of nodes, including name, last octet of the node IP, and MAC addresses.
+   - `idracs_user` and `idracs_password`: iDRAC credentials.
+   - `idracs`: Node name and IP of the node’s iDRAC.
 
-2. **Navigate to the Playbooks Directory**:
-   ```shell
-   cd ocp4-disconnected-config/playbooks
-   ```
+```yaml
+# Example playbooks/group_vars/all/cluster-deployment.yml
 
-3. **Install Ansible Core**:
-   ```shell
-   sudo dnf install ansible-core
-   ```
+common_git_repos:
+  - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
+  - "https://github.com/cjnovak98/ocp4-disconnected-config"
 
-4. **Install Required Ansible Collections**: 
-    ```shell
-    ansible-playbook ansible-galaxy.yml
-    ```
+common_openshift_dir: /pods/content
+common_connected_cluster: false
+mirror_content_pull_mirror: false
 
-5. **Update Environment Variables**:
-   - Modify `group_vars/all/cluster-deployment.yml` to customize it for your environment. Key variables include:
-     - `common_openshift_dir`: Directory for pulled content to live.
-     - `common_connected_cluster`: Set to `true` if the cluster itself is connected.
-     - `mirror_content_pull_mirror`: Set to `true` to pull content (set to `false` for disconnected environments).
-     - `common_fips_enabled`: `true` if the host is stigged and FIPS is enabled.
-     - `common_cluster_domain`: Top-Level Domain (TLD) for the cluster.
-     - `common_ip_space`: First three octets of the IP address range for both the bastion and cluster.
-     - `common_nodes`: Details of nodes, including name, last octet of the node IP, and MAC addresses.
-     - `idracs_user` and `idracs_password`: iDRAC credentials.
-     - `idrac`: Node name and IP of the node’s iDRAC.
+common_openshift_interface: ens1
+common_fips_enabled: true
+common_cluster_domain: example.com
 
-6. **Run Content Gathering Playbook**:
-   - On connected environments or the connected side of disconnected environments (i.e. bastion/syscon host), gather the required content by running:
-     ```shell
-     ansible-playbook -K gather-content.yml
-     ```
-7. **Ensure A Valid Pull-Secret Exists**: get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. If the pull-secret is absent, it will cause the automation to fail but you can simply add it and rerun the playbook.
+common_ip_space: 192.168.122
+common_nodes:
+  - name: master-0
+    ip: '42'
+    mac: 52:54:00:8d:13:77
+  - name: worker-0
+    ip: '43'
+    mac: 52:54:00:8d:13:78
 
-7. **Run the Deployment Playbook**:
-   - For both connected and disconnected clusters, deploy the cluster by running:
-     ```shell
-     ansible-playbook -K deploy-cluster.yml
-     ```
-     or
-     ```shell
-     ./deploy-cluster.yml
-     ```
+# iDRAC
+#idrac_user: test
+#idrac_password: tester
+
+#idracs:
+#  - name: master-0
+#    ip: '{{ ip_space }}.5'
+#  - name: master-1
+#    ip: '{{ ip_space }}.6'
+#  - name: master-2
+#    ip: '{{ ip_space }}.7'
+#  - name: worker-0
+#    ip: '{{ ip_space }}.8'
+
+```
+
+### Run Content Gathering Playbook:
+On connected environments or the connected side of disconnected environments (i.e. bastion/syscon host), gather the required content by running:
+
+```shell
+ansible-playbook -K gather-content.yml
+```
+
+### Ensure A Valid Pull-Secret Exists: 
+
+You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
+
+> NOTE: If the pull-secret is absent, it will cause the automation to fail but you can simply add it and rerun the playbook.
+
+### Run the Deployment Playbook:
+
+For both connected and disconnected clusters, deploy the cluster by running:
+
+```shell
+ansible-playbook -K deploy-cluster.yml
+```
+or
+
+```shell
+./deploy-cluster.yml
+```
