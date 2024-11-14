@@ -126,12 +126,14 @@ common_nodes:
 
 ```
 
-### Run Content Gathering Playbook:
-On connected environments or the connected side of disconnected environments (i.e. bastion/syscon host), gather the required content by running:
+### Run Content Gathering Playbook to Prepare Disconnected Environments:
+If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run whcih will gather the appropriate content: 
 
 ```shell
 ansible-playbook -K gather-content.yml
 ```
+
+Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content)
 
 ### Ensure A Valid Pull-Secret Exists: 
 
