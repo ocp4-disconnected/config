@@ -1,5 +1,6 @@
 gitOps:
   namespace: openshift-gitops
+  source: redhat-operators
 
 gitRepoTemplate:
   url: git@192.168.122.42:repos
