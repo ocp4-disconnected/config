@@ -15,56 +15,63 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
   2. Configure **STIG** compliance as needed
   3. Configure **fapolicyd** for Ansible Playbooks:
       - Allow regular users to run Ansible playbooks by creating a new file at `/etc/fapolicyd/rules.d/22-ansible.rules` with the following contents:
-        ```plaintext
-        allow perm=any uid=1000 : dir=/home/user/.ansible
-        allow perm=any uid=1000 : dir=/home/user/.cache/agent
-        allow perm=any uid=1000 : dir=/usr/share/git-core/templates/hooks
-        allow perm=any uid=1000 : dir=/pods
-        allow perm=any uid=1000 : dir=/usr/bin
-        allow perm=any uid=0,1000 : dir=/tmp
-        ```
+```plaintext
+
+allow perm=any uid=1000 : dir=/home/user/.ansible
+allow perm=any uid=1000 : dir=/home/user/.cache/agent
+allow perm=any uid=1000 : dir=/usr/share/git-core/templates/hooks
+allow perm=any uid=1000 : dir=/pods
+allow perm=any uid=1000 : dir=/usr/bin
+allow perm=any uid=0,1000 : dir=/tmp
+```
 
   4. Adjust User Namespace Limits for Registry Pod:
      - Increase the `user.max_user_namespaces` setting to enable the registry pod to run as a non-root user. Update `/etc/sysctl.conf` as follows:
-        ```plaintext
-        # Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
-        user.max_user_namespaces = 5
-        ```
+```plaintext
+# Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
+user.max_user_namespaces = 5
+```
 
   5. Enable Access to External USB Devices (for Disconnected Environments):
      - Add the following commands to the `%post` section in your kickstart file:
-       ```plaintext
-       systemctl disable usbguard
-       sed -i 's/black/\#black/g' /etc/modprobe.d/usb-storage.conf
-       sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
-       ```
+```plaintext
+systemctl disable usbguard
+sed -i 's/black/\#black/g' /etc/modprobe.d/usb-storage.conf
+sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
+```
 
   6. Install Ansible/Podman:
-      ```shell
-      sudo dnf install ansible-core
-      sudo dnf install container-tools
-      ```
+```shell
+sudo dnf install ansible-core
+sudo dnf install container-tools
+```
 
       to verify they are installed correctly you can run:
-      ```shell
-      ansible --version
-      podman -v
-      ```
+```shell
+ansible --version
+podman -v
+```
   
   7. Clone the Repository:
-      ```shell
-      git clone https://github.com/cjnovak98/ocp4-disconnected-config
-      ```
+```shell
+
+git clone https://github.com/cjnovak98/ocp4-disconnected-config
+
+```
 
   8. Navigate to the Playbooks Directory:
-      ```shell
-      cd ocp4-disconnected-config/playbooks
-      ```
+```shell
+
+cd ocp4-disconnected-config/playbooks
+
+```
 
   9. Install Required Ansible Collections: 
-      ```shell
-      ansible-playbook ansible-galaxy.yml
-      ```
+```shell
+
+ansible-playbook ansible-galaxy.yml
+
+```
 ---
 
 ## Running the Automation

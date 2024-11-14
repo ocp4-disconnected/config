@@ -1,15 +1,15 @@
-# **VM Migration from VMware vCenter to OpenShift Virtualization**
+# VM Migration from VMware vCenter to OpenShift Virtualization
 
 This guide outlines the steps to migrate virtual machines (VMs) from VMware vCenter to OpenShift Virtualization. It includes setting up networking, managing VM configurations, executing the migration, and troubleshooting common issues.
 
-## **Pre-Migration Preparation**
+## Pre-Migration Preparation
 ---
 
-### **1. Access and Permissions**
+### 1. Access and Permissions
 
 * Ensure you have the necessary access permissions to both VMware vCenter and OpenShift Virtualization clusters.
 * Create source provider(s) for vmware and/or vcenter:
-	** Steps for creating a provider can be found here: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#mtv-overview-page_mtv
+	* Steps for creating a provider can be found here: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#mtv-overview-page_mtv
 * Verify the following operators are properly configured in OpenShift:
 	* Virtualization Operator
 		* for hosting the migrated virtual machines
@@ -18,81 +18,81 @@ This guide outlines the steps to migrate virtual machines (VMs) from VMware vCen
 	* Kubernetes NMState Operator
 		* to manage the required networking configurations for the machines
 
-### **2. Identify/Prepare Target VMs**
+### 2. Identify/Prepare Target VMs
 
 Ensure the VM(s) you wish to migrate are properly identified in VMware. 
 
 > WARNING: These VMs will need to be powered down for the migration and remain down for testing to avoid IP conflicts.
 
-### **3. Networking Setup**
+### 3. Networking Setup
 
 * Create Bond: Create the Bond network using a Node Network Configuration Policy (NNCP). Example:
 
-  ```
-  apiVersion: nmstate.io/v1
-  kind: NodeNetworkConfigurationPolicy
-  metadata:
-  name: bond0
-  spec:
-  desiredState:
-      interfaces:
-      - name: bond0
-          type: bond
-          link-aggregation:
-          mode: 802.3ad
-          port:
-              - ens2f0
-              - ens2f1
-              - ens3f0
-              - ens3f1
-  ```
+```yaml
+apiVersion: nmstate.io/v1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+name: bond0
+spec:
+desiredState:
+    interfaces:
+    - name: bond0
+        type: bond
+        link-aggregation:
+        mode: 802.3ad
+        port:
+            - ens2f0
+            - ens2f1
+            - ens3f0
+            - ens3f1
+```
 
 * Create VLANs: Create VLANs to map network traffic between VMware and OpenShift Virtualization. 
-    - Example VLAN IDs: `677` (primary), `58` (for public networks), 59 (for public networks).
+    * Example VLAN IDs: `677` (primary), `58` (for public networks), 59 (for public networks).
 [Example NodeNetworkConfigurationPolicy](https://github.com/cjnovak98/ocp4-disconnected-config/blob/main/Examples/node_network_config_policy.yaml)
 
 * Network Attachment: Apply network attachment definitions (NAD) that point to the appropriate VLAN. For instance, the primary network for the migrated VMs will map to VLAN 677, while public-facing VMs might use VLAN 58.
   > NOTE: Unless communication is needed with the containers then it is recommended to set the container network as disabled in the network attachment definition.
-  ```yaml
-  ---
-  #Example Network Attachment Definitions
+```yaml
+---
+#Example Network Attachment Definitions
 
-  apiVersion: "k8s.cni.cncf.io/v1"
-  kind: NetworkAttachmentDefinition
-  metadata:
-    name: bond0-bridge-vlan677 
-  spec:
-    config: '{
-      "cniVersion": "0.3.1",
-      "name": "bond0-bridge-vlan677", 
-      "type": "bridge", 
-      "bridge": "bond0-br0", 
-      "macspoofchk": false, 
-      "vlan": 677
-    }'
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: bond0-bridge-vlan677 
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "name": "bond0-bridge-vlan677", 
+    "type": "bridge", 
+    "bridge": "bond0-br0", 
+    "macspoofchk": false, 
+    "vlan": 677
+  }'
 
-  ---
-  apiVersion: "k8s.cni.cncf.io/v1"
-  kind: NetworkAttachmentDefinition
-  metadata:
-    name: bond0-bridge-vlan58 
-  spec:
-    config: '{
-      "cniVersion": "0.3.1",
-      "name": "bond0-bridge-vlan58", 
-      "type": "bridge", 
-      "bridge": "bond0-br0", 
-      "macspoofchk": false, 
-      "vlan": 58
-    }'
-  ```
+---
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: bond0-bridge-vlan58 
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "name": "bond0-bridge-vlan58", 
+    "type": "bridge", 
+    "bridge": "bond0-br0", 
+    "macspoofchk": false, 
+    "vlan": 58
+  }'
+```
 
 
 
-## **Migration Process**
+## Migration Process
 ---
 
-### **Plan Setup**
+### Plan Setup
 
 Migration plans are created in OpenShift using the Migration Toolkit. This plan selects the targeted virtual machines and specifies the source and destination environments.
 
@@ -119,7 +119,7 @@ Migration plans are created in OpenShift using the Migration Toolkit. This plan 
 
 * Start Migration: Click Start Migration to initiate the migration of selected VMs.
 
-### **VM Post-Migration Configuration**
+### VM Post-Migration Configuration
 
 The virtio drivers that OpenShift Virtualization uses are not supported by default for the older versions of RHEL and Windows Server. Since OpenShift Virtualization defaults to virtio for the network and disk interfaces you will need to update that setting post migration. Once the migration process is complete, and the VM is created in OpenShift (e.g., web-qa), follow these steps:
 
@@ -132,7 +132,7 @@ The virtio drivers that OpenShift Virtualization uses are not supported by defau
     * Once all configurations are verified, go to Actions → Start to power on the VM in OpenShift Virtualization.
     * If the VM is already running you must stop it and restart it in order for the changes to be applied.
 
-### **Dealing with Windows-Specific Issues**
+### Dealing with Windows-Specific Issues
 
 For any Windows based VMs (e.g., Windows Server 2012), special steps are needed:
 
@@ -142,10 +142,10 @@ For any Windows based VMs (e.g., Windows Server 2012), special steps are needed:
     > NOTE: it appears fast boot is enabled by default for Windows Server 2012
 
 
-## **Recommended Practices and Considerations**
+## Recommended Practices and Considerations
 ---
 
-### **VMs Not Starting After Migration**
+### VMs Not Starting After Migration
 
 Any VMs running an OS which is not in the list of supported guest operating systems, or operating systems that have difficulty with the virtio drivers may need to use these other drivers for their disk and network interfaces:
 
@@ -153,7 +153,7 @@ Any VMs running an OS which is not in the list of supported guest operating syst
 
 * Network Configuration: Double-check that the VM is connected to the correct VLAN and that e1000e is used for network interfaces. Additionally, if e1000e is the interface used in the VMware environment, then using this setting may help to ensure previous network configurations remain on the migrated VM.
 
-### **Migration Plan Recommended Practices**
+### Migration Plan Recommended Practices
 
 * Avoid migrating multiple VMs simultaneously from vCenter as this may overwhelm the system. Always perform migration of one VM at a time when migrating from vCenter as the source provider.
 
@@ -165,18 +165,18 @@ spec:
 ```
 
 
-### **Saving and Re-Importing VMs**
+### Saving and Re-Importing VMs
 
 * Consider creating backups of VM data and configurations before migration, especially when dealing with production VMs.
 * Use tools like `virtctl` to upload images or configure persistent volumes. In case of failure, ensure you have a repeatable process for re-importing the VM images.
 
-### **Migration Plan Failures**
+### Migration Plan Failures
 
 * API Gateway Errors: If the migration fails due to a bad API gateway, verify network connectivity and access permissions for the gateway. Restarting the gateway or re-initiating the plan may resolve the issue.
 
 * High RAM Usage: Monitor node resource usage during the migration process. Nodes with high memory consumption may affect the migration speed or cause failures.
 
-### **More information**:
+### More information:
 * More detailed information can be found in the migration toolkit user guide: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7
 
 * More detailed information about OpenShift Virtualization in general can be found here: https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/virtualization/index
