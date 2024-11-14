@@ -15,8 +15,7 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
   2. Configure **STIG** compliance as needed
   3. Configure **fapolicyd** for Ansible Playbooks:
       - Allow regular users to run Ansible playbooks by creating a new file at `/etc/fapolicyd/rules.d/22-ansible.rules` with the following contents:
-```plaintext
-
+```shell
 allow perm=any uid=1000 : dir=/home/user/.ansible
 allow perm=any uid=1000 : dir=/home/user/.cache/agent
 allow perm=any uid=1000 : dir=/usr/share/git-core/templates/hooks
@@ -27,14 +26,14 @@ allow perm=any uid=0,1000 : dir=/tmp
 
   4. Adjust User Namespace Limits for Registry Pod:
      - Increase the `user.max_user_namespaces` setting to enable the registry pod to run as a non-root user. Update `/etc/sysctl.conf` as follows:
-```plaintext
+```shell
 # Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
 user.max_user_namespaces = 5
 ```
 
   5. Enable Access to External USB Devices (for Disconnected Environments):
      - Add the following commands to the `%post` section in your kickstart file:
-```plaintext
+```shell
 systemctl disable usbguard
 sed -i 's/black/\#black/g' /etc/modprobe.d/usb-storage.conf
 sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
