@@ -1,35 +1,11 @@
 gitOps:
   namespace: openshift-gitops
+  source: redhat-operators
 
 gitRepoTemplate:
   url: git@192.168.122.42:repos
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
-    b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
-    NhAAAAAwEAAQAAAQEAxGK9tDfL4LGjeZfKSwbg9qrORx5W94QHl6bUaRnb4ObYlpIz8sOZ
-    P295c5z0ndJB1DNBP1npVzVjvxrl6ArXF5QlmgP+NWPraKqhXINIib1FsL0fX3PsQyqqXs
-    dQEnJBVuX/Nbimx44KveEkmhOzjCDCRDZtUWTjlo5DDjZe4j2MyopUQ+GwkxeZu+ak8jnC
-    xHQy4o313dU35FqzOjle4ocW4m167Akkt8/oILlEZbWpuHDVjGUiGtwSfKO1LjtI14V1Ro
-    PV9BQxpuk7xkegq52aOvMVZYgI39o5ZGqYv6zLwDEVjdumJ2GaVZ+mNbGPYQZ9103zJx0q
-    ecziotWsqQAAA7gbLhSEGy4UhAAAAAdzc2gtcnNhAAABAQDEYr20N8vgsaN5l8pLBuD2qs
-    5HHlb3hAeXptRpGdvg5tiWkjPyw5k/b3lznPSd0kHUM0E/WelXNWO/GuXoCtcXlCWaA/41
-    Y+toqqFcg0iJvUWwvR9fc+xDKqpex1ASckFW5f81uKbHjgq94SSaE7OMIMJENm1RZOOWjk
-    MONl7iPYzKilRD4bCTF5m75qTyOcLEdDLijfXd1TfkWrM6OV7ihxbibXrsCSS3z+gguURl
-    tam4cNWMZSIa3BJ8o7UuO0jXhXVGg9X0FDGm6TvGR6CrnZo68xVliAjf2jlkapi/rMvAMR
-    WN26YnYZpVn6Y1sY9hBn3XTfMnHSp5zOKi1aypAAAAAwEAAQAAAQA5eiDFlzL/f142Hzvg
-    u5GqABHBdNrFNIo4U2aFoEDfUREA+KdlnOPEUi78rGpXqosDvUCSdxE5KfIYo5m4UTvktc
-    JPkm2bWLQ0fQQfHHllftTfxmphOH9kpR8aAEGqNHB1K3mHUpTVgPgZ3MQmqC97irbw2fEi
-    ymFl1htAFJ+unQtv6F7W/NXFhKFe6c5GfjQnMgAnsjx9lve19ZfoZ5sAlFM5dcifIhayAe
-    DHyEsLWHGUC5lhZehxYkrkq/iVtX6iPDelrV1UbrNBiUioBPqY3ZXGg/JRAsSnnmGbTLSU
-    Z1GdkReiWjSm+YI8iLE101tsms3UO9gtVQ1b3QIbUOpFAAAAgQCrWBU3yO3m1uyadvLSbN
-    qdKMGvpl88O+JaHKkaKMbSm+p9icJHh7GQU7pQ5Pmp7MAW96Tn/0k6VU3JOJqHTOFlIDHp
-    hgWsPautky1FBGhPS5AZ9ofoPJJdBVv9FnZEl//EZaz6HufCV8wSHwNK8wxC5ZiZTW5bXL
-    fwZUjq/li98gAAAIEA8e8aJVVbLzXAttVinA6trmHQb6Pq2HMiAoA8ZirvrOvPLRV1kCe7
-    ba6yP8STu5TySq8m4t8pLRJuiX49YqgBZ2V5mO7keFtRiKmoikjfY4KH/qdDGcQx4xrI/n
-    0eoMERmrQDpPCGGcz+jsKd25cJooMtFEpTxYYkwbI1NaexF08AAACBAM/NtQqf1qr5ctJ2
-    rsf7C0biH7GocX1vI2iuzTIjyAPGi99QKjFAQbtpeGB+TKfMMTAF8ym+m4irIDAvtCEXzy
-    FkcrzHc/nVg3ET0+4Glnn4KroLtAd4G6CemiLKYkyR9BDiSV8cgIz9xenfqDnsSQPBpR1h
-    qKOENJs3pSf3Dv6HAAAAAAEC
     -----END OPENSSH PRIVATE KEY-----
 icsp:
   operator-0:
