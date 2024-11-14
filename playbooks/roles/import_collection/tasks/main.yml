@@ -2,7 +2,7 @@
 - name: Check if ocp4.disconnected collection is installed
   ansible.builtin.command: ansible-galaxy collection list ocp4.disconnected
   register: collection_install
-  changed_when: collection_install.rc == 5
+  changed_when:  "'unable to find ocp4.disconnected in collection paths' in collection_install.stderr"
   failed_when: false
 
 - name: Test if connected to the internet
@@ -25,7 +25,6 @@
   args:
     chdir: "{{ common_openshift_download_dir }}/collections"
   when: collection_install is changed and internet is not changed
-  register: collection_installed
 
 - name: Install ansible collection from the internet
   ansible.builtin.command:
