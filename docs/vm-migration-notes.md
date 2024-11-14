@@ -90,7 +90,7 @@ spec:
 
 
 ## Migration Process
----
+
 
 ### Plan Setup
 
@@ -143,7 +143,7 @@ For any Windows based VMs (e.g., Windows Server 2012), special steps are needed:
 
 
 ## Recommended Practices and Considerations
----
+
 
 ### VMs Not Starting After Migration
 
@@ -183,7 +183,7 @@ spec:
 
 
 ## Automation Notes
----
+
 
 <!-- TODO: update example with JT's script for this step -->
 
