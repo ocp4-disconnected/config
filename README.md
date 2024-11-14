@@ -1,4 +1,4 @@
-# Openshift 4 Disconnected collection
+# Openshift 4 Disconnected Collection
 
 ## Overview
 
@@ -12,7 +12,7 @@
 - cluster_version: This variable controls the version of the cluster and allows for the pulling of operators and additional images (for the cluster) via oc-mirror. This requires an active subscription with a pull secret in ~/.docker/config.json. It will pull all the required binaries along with some additional nice-to-haves (such as Butane).
 
 - cluster_deployment: This variable controls how the cluster is deployed. It will generate the install-config and agent-config based on configured variables. 
-- static this is used to set things that vary rarly change or set varaibles definded in other vars, that are built ontop of other varables
+- static this is used to set things that very rarely change or set variables defined in other vars, that are built ontop of other variables
 
 #### Some assumptions include:
 - SSH keys will not exist.
