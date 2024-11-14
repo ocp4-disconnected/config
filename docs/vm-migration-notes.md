@@ -3,7 +3,7 @@
 This guide outlines the steps to migrate virtual machines (VMs) from VMware vCenter to OpenShift Virtualization. It includes setting up networking, managing VM configurations, executing the migration, and troubleshooting common issues.
 
 ## Pre-Migration Preparation
----
+
 
 ### 1. Access and Permissions
 

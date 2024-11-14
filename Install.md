@@ -46,6 +46,7 @@ sudo dnf install container-tools
 ```
 
       to verify they are installed correctly you can run:
+
 ```shell
 ansible --version
 podman -v
@@ -53,25 +54,20 @@ podman -v
   
   7. Clone the Repository:
 ```shell
-
 git clone https://github.com/cjnovak98/ocp4-disconnected-config
-
 ```
 
   8. Navigate to the Playbooks Directory:
+
 ```shell
-
 cd ocp4-disconnected-config/playbooks
-
 ```
 
   9. Install Required Ansible Collections: 
 ```shell
-
 ansible-playbook ansible-galaxy.yml
-
 ```
----
+
 
 ## Running the Automation
 
