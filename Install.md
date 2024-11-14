@@ -114,7 +114,7 @@ common_nodes:
 #idrac_user: test
 #idrac_password: tester
 
-#idracs:
+#media_share_idracs:
 #  - name: master-0
 #    ip: '{{ ip_space }}.5'
 #  - name: master-1
@@ -131,6 +131,10 @@ If you are deploying on a disconnected system then you will first need to gather
 
 ```shell
 ansible-playbook -K gather-content.yml
+```
+or 
+```shell
+./gather-content.yml
 ```
 
 Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content)
