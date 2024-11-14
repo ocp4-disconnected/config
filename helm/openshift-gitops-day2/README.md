@@ -35,7 +35,7 @@ The default [values.yaml](values.yaml) is designed to be give you the basic layo
 
 ### nmstate operator
 
-TODO: are NodeNetworkConfigurationPolicy part of this operator?
+The nmstate operator is what brings in the NodeNetworkConfigurationPolicy CRD's , allowing us to further tweak the network setup of the cluster.
 
 ### Chrony
 
