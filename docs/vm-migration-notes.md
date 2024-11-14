@@ -52,7 +52,8 @@ desiredState:
 [Example NodeNetworkConfigurationPolicy](https://github.com/cjnovak98/ocp4-disconnected-config/blob/main/Examples/node_network_config_policy.yaml)
 
 * Network Attachment: Apply network attachment definitions (NAD) that point to the appropriate VLAN. For instance, the primary network for the migrated VMs will map to VLAN 677, while public-facing VMs might use VLAN 58.
-  > NOTE: Unless communication is needed with the containers then it is recommended to set the container network as disabled in the network attachment definition.
+  
+> NOTE: Unless communication is needed with the containers then it is recommended to set the container network as disabled in the network attachment definition.
 ```yaml
 ---
 #Example Network Attachment Definitions
@@ -106,7 +107,7 @@ Migration plans are created in OpenShift using the Migration Toolkit. This plan 
 		* name must be unique among other migration plans
 		* at most 63 characters
 		* only lowercase alphanumeric characters or '-'
-		* start with alphanumeric
+		* start with alpha
 		* end with alphanumeric
 		* (e.g., `core-test-24oct-1449`).
 	* Choose target provider: OpenShift Virtualization.
