@@ -66,7 +66,7 @@ Relevant templates:
 
  - [ocp-trident.yaml](templates/ocp-trident.yaml)
  - [trident-machineconfig-master.yaml](templates/trident-machineconfig-master.yaml)
- - [trident-machineconfig-worker.yaml](templates/tri)
+ - [trident-machineconfig-worker.yaml](templates/trident-machineconfig-worker.yaml)
 
 Most Kubernetes distributions come with the packages and utilities to mount NFS backends installed by default, including Red Hat OpenShift.
 
