@@ -138,7 +138,7 @@ You can get your pull secret from [https://console.redhat.com/openshift/create/l
 
 #### Run the Gather Content Playbook:
 
-If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run whcih will gather the appropriate content: 
+If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run which will gather the appropriate content: 
 
 
 ```shell
