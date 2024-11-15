@@ -129,7 +129,17 @@ common_nodes:
 ```
 
 ### Run Content Gathering Playbook to Prepare Disconnected Environments:
+
+#### Ensure A Valid Pull-Secret Exists: 
+
+You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
+
+> NOTE: If the pull-secret is absent, it will cause the automation to fail but you can simply add it and rerun the playbook.
+
+#### Run the Gather Content Playbook:
+
 If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run whcih will gather the appropriate content: 
+
 
 ```shell
 ansible-playbook -K gather-content.yml
@@ -143,11 +153,6 @@ Once you have the content downloaded, transfer it to your disconnected machine a
 
 It is recommended to use the target directory (`common_openshift_dir`) on a mounted hard drive. This approach allows all downloaded content to be stored directly on the drive, which can then be unmounted and physically transferred to the disconnected system. If this isn't feasible, you would need to transfer the content manually using tools like `cp` or `rsync`.
 
-### Ensure A Valid Pull-Secret Exists: 
-
-You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
-
-> NOTE: If the pull-secret is absent, it will cause the automation to fail but you can simply add it and rerun the playbook.
 
 ### Run the Deployment Playbook:
 
