@@ -141,7 +141,7 @@ or
 
 Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content)
 
-It is recommend to have the target directory (`common_openshift_dir`) the mounted hard drive, as it would download everthing onto it, and would just need to be unmounted and moved over to the disconnected system. If you dont then you would need to transfer it over, with either `cp` or `rsync`.
+It is recommended to use the target directory (`common_openshift_dir`) on a mounted hard drive. This approach allows all downloaded content to be stored directly on the drive, which can then be unmounted and physically transferred to the disconnected system. If this isn't feasible, you would need to transfer the content manually using tools like `cp` or `rsync`.
 
 ### Ensure A Valid Pull-Secret Exists: 
 
@@ -162,4 +162,4 @@ or
 ./deploy-cluster.yml
 ```
 
->**NOTE:** For disconnected clusters, ensure you have the drive mounted from the internet connected machine, and update `group_vars/all/cluster-deployment.yml` with its mount point. It is paramount, and will fail. You don't need to worry about the pull-secret, one will be genereated for you based on `group_vars/all/cluster-deployment.yml`
+>**NOTE:** For disconnected clusters, ensure the drive is mounted from the internet-connected machine and update `group_vars/all/cluster-deployment.yml` with its mount point. This configuration is critical for success, as the process will fail without it. You don't need to worry about manually handling the pull-secret; one will be generated automatically based on the settings in `group_vars/all/cluster-deployment.yml`.
