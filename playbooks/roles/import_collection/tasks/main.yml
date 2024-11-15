@@ -17,7 +17,7 @@
   delay: 1
   failed_when: false
   changed_when: internet.status == 200
-  when: collection_install.rc == 5 and update_collection | bool
+  when: collection_install is changed and update_collection | bool
 
 - name: Install ansible collections from local media
   ansible.builtin.command:
@@ -29,4 +29,4 @@
 - name: Install ansible collection from the internet
   ansible.builtin.command:
     cmd: ansible-galaxy collection install git+https://github.com/cjnovak98/ocp4-disconnected-collection.git -U
-  when: collection_install.rc == 5 and update_collection | bool and collection_installed is not changed
+  when: collection_install is changed and update_collection | bool and internet is changed
