@@ -1,4 +1,9 @@
+\pagebreak
+
+![](docs/images/ocplogo.jpg "OCP Logo")
+
 # Red Hat OpenShift Installation Guide
+
 
 This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat Enterprise Linux 9 with options for FIPS and STIG configurations. The instructions support deployment on both connected and disconnected environments.
 
@@ -12,63 +17,74 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
   1. Ensure **FIPS** mode is enabled for RHEL 9.
       - [Enable FIPS during installation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/switching-rhel-to-fips-mode_security-hardening#proc_installing-the-system-with-fips-mode-enabled_switching-rhel-to-fips-mode); or
      - [Enable FIPS post-installation](https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/9/html/security_hardening/switching-rhel-to-fips-mode_security-hardening#switching-the-system-to-fips-mode_using-the-system-wide-cryptographic-policies)
+  
+  
   2. Configure **STIG** compliance as needed
+  
+  
   3. Configure **fapolicyd** for Ansible Playbooks:
+  
       - Allow regular users to run Ansible playbooks by creating a new file at `/etc/fapolicyd/rules.d/22-ansible.rules` with the following contents:
-```shell
-allow perm=any uid=1000 : dir=/home/user/.ansible
-allow perm=any uid=1000 : dir=/home/user/.cache/agent
-allow perm=any uid=1000 : dir=/usr/share/git-core/templates/hooks
-allow perm=any uid=1000 : dir=/pods
-allow perm=any uid=1000 : dir=/usr/bin
-allow perm=any uid=0,1000 : dir=/tmp
-```
+
+      ```bash
+      allow perm=any uid=1000 : dir=/home/user/.ansible
+      allow perm=any uid=1000 : dir=/home/user/.cache/agent
+      allow perm=any uid=1000 : dir=/usr/share/git-core/templates/hooks
+      allow perm=any uid=1000 : dir=/pods
+      allow perm=any uid=1000 : dir=/usr/bin
+      allow perm=any uid=0,1000 : dir=/tmp
+      ```
 
   4. Adjust User Namespace Limits for Registry Pod:
-     - Increase the `user.max_user_namespaces` setting to enable the registry pod to run as a non-root user. Update `/etc/sysctl.conf` as follows:
-```shell
-# Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
-user.max_user_namespaces = 5
-```
+     
+     
+      - Increase the `user.max_user_namespaces` setting to enable the registry pod to run as a non-root user. Update `/etc/sysctl.conf` as follows:
+
+      ```bash
+      # Per CCE-83956-3: Set user.max_user_namespaces = 0 in /etc/sysctl.conf
+      user.max_user_namespaces = 5
+      ```
 
   5. Enable Access to External USB Devices (for Disconnected Environments):
-     - Add the following commands to the `%post` section in your kickstart file:
-```shell
-systemctl disable usbguard
-sed -i 's/black/\#black/g' /etc/modprobe.d/usb-storage.conf
-sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
-```
+      
+      - Add the following commands to the `%post` section in your kickstart file:
+
+      ```bash
+      systemctl disable usbguard
+      sed -i 's/black/\#black/g' /etc/modprobe.d/usb-storage.conf
+      sed -i 's/install/\#install/g' /etc/modprobe.d/usb-storage.conf
+      ```
 
   6. Install Ansible/Podman:
-```shell
-sudo dnf install -y ansible-core container-tools
 
-#to verify you can run the following
-ansible --version
-podman -v
-```
+      ```bash
+      sudo dnf install -y ansible-core container-tools
+      ```
   
   7. Clone the Repository:
-```shell
-git clone https://github.com/cjnovak98/ocp4-disconnected-config
-```
+
+      ```bash
+      git clone https://github.com/cjnovak98/ocp4-disconnected-config
+      ```
 
   8. Navigate to the Project Directory:
-```shell
-cd ocp4-disconnected-config
-```
+
+      ```bash
+      cd ocp4-disconnected-config
+      ```
 
   9. Install the Necessary Collection:
-```shell
-ansible-playbook ./playbooks/ansible-galaxy.yml -e update_collection=true
-```
+
+      ```bash
+      ansible-playbook ./playbooks/ansible-galaxy.yml -e update_collection=true
+      ```
 
 
 ## Running the Automation
 
 ### Directory Structure Assumptions
 
-- **Content Path**: Ensure that the content resides in `/pods/content` (definable in `playbooks/group_vars/all/cluster-deployment.yml`). It is assumed this is the transferable media when running connected side for a disconnected cluster and disconnected config is /pods/content/ansible
+Ensure that the content resides in `/pods/content` (definable in `playbooks/group_vars/all/cluster-deployment.yml`). It is assumed this is the transferable media when running connected side for a disconnected cluster and disconnected config is /pods/content/ansible
 
 ### Update Environment Variables
 
@@ -85,8 +101,6 @@ ansible-playbook ./playbooks/ansible-galaxy.yml -e update_collection=true
 
 ```yaml
 # Example playbooks/group_vars/all/cluster-deployment.yml
-
-
 
 common_git_repos:
   - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
@@ -126,13 +140,15 @@ common_nodes:
 ```
 
 ### Run Content Gathering Playbook to Prepare Disconnected Environments:
+
 If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run which will gather the appropriate content: 
 
-```shell
+```bash
 ansible-playbook -K gather-content.yml
 ```
 or 
-```shell
+
+```bash
 ./gather-content.yml
 ```
 
@@ -148,12 +164,12 @@ You can get your pull secret from [https://console.redhat.com/openshift/create/l
 
 For both connected and disconnected clusters, deploy the cluster by running:
 
-```shell
+```bash
 ansible-playbook -K deploy-cluster.yml
 ```
 or
 
-```shell
+```bash
 ./deploy-cluster.yml
 ```
 > NOTE: if the playbook fails with an error stating that requirements.yml cannot be found, then it's likely the collection did not install properly. Try rerunning the playbook with the additional variable `-e update_collection=true`

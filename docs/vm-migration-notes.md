@@ -1,3 +1,5 @@
+\pagebreak
+
 # VM Migration from VMware vCenter to OpenShift Virtualization
 
 This guide outlines the steps to migrate virtual machines (VMs) from VMware vCenter to OpenShift Virtualization. It includes setting up networking, managing VM configurations, executing the migration, and troubleshooting common issues.
@@ -140,11 +142,10 @@ For any Windows based VMs (e.g., Windows Server 2012), special steps are needed:
 * Shutdown Windows Properly in vCenter:
   * Always shut down the Windows VM gracefully: `shutdown /s`.
   * Windows VMs can experience issues migrating due to hibernation or fast boot settings. When these are enabled it may cause the file system to be mounted as read-only which prevents the migration from taking place. 
-    > NOTE: it appears fast boot is enabled by default for Windows Server 2012
-
+  
+  > NOTE: it appears fast boot is enabled by default for Windows Server 2012
 
 ## Recommended Practices and Considerations
-
 
 ### VMs Not Starting After Migration
 
@@ -165,10 +166,10 @@ spec:
   controller_max_vm_inflight: <number> #defaults to 20
 ```
 
-
 ### Saving and Re-Importing VMs
 
 * Consider creating backups of VM data and configurations before migration, especially when dealing with production VMs.
+
 * Use tools like `virtctl` to upload images or configure persistent volumes. In case of failure, ensure you have a repeatable process for re-importing the VM images.
 
 ### Migration Plan Failures
@@ -185,10 +186,10 @@ spec:
 
 ## Automation Notes
 
-
 <!-- TODO: update example with JT's script for this step -->
 
 Automatically update the disk and network interfaces for all virtual machines with a script. This script:
+
 * gets the current configurations for all vms on openshift and then loops through each to
   * modify the storage and network interfaces to use SATA/e1000e to prevent any potential virtio/storage issues for unsupported guest operating systems
   * apply the updated config
@@ -251,4 +252,3 @@ done
 echo "All VM configurations updated successfully!"
 
 ```
-

@@ -8,13 +8,17 @@ The idea behind this is that without OpenShift Git Ops, working with an easily o
 
 To apply this template to your cluster, simply run the helm install command:
 
-`helm install gitops-day1 . --values=./your/values.yaml`
+```bash
+helm install gitops-day1 . --values=./your/values.yaml
+```
 
 This applies the yaml to the cluster, and will perform the day 1 operations. Note that it might take a few minutes for everything to come up and be ready, so be patient. You can tell the installation has finished and was successful by navigating to ArgoCD (top right apps menu in OCP web ui -> ArgoCD), logging in via OpenShift, and seeing the blank ArgoCD page. From there, you can verify the git repository was successfully added by navigating to Settings (on the left) -> Repositories. You should see your gitOps git repo in the list, with a green checkmark indicating success.
 
 You can also use the following command to output the finished product without actually applying it to OpenShift, in order to debug and check:
 
-`helm template test . --debug | less`
+```bash
+helm template test . --debug | less
+```
 
 ### Values
 
