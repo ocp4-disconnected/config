@@ -9,8 +9,12 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
 
 ## Prerequisites
 
-- **RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
-- **Environment Configurations**:
+### RHEL Install
+
+**RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
+
+  > **NOTE:** If The goal is to have a fips enabled cluster, the bastion host also has to FIPS aswell. If you dont need fips, you can ignore the following configurations.
+**Environment Configurations**:
 
   > **NOTE:** These configurations can be done post install. Changes to usbguard/sysctl.conf will require a reboot, while fapolicyd will only require restart on the service.
 
@@ -62,23 +66,20 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
       ```
   
   7. Clone the Repository:
-
-      ```bash
+      ```shell
       git clone https://github.com/cjnovak98/ocp4-disconnected-config
       ```
 
-  8. Navigate to the Project Directory:
-
-      ```bash
-      cd ocp4-disconnected-config
+  8. Navigate to the Playbooks Directory:
+      ```shell
+      cd ocp4-disconnected-config/playbooks
       ```
 
-  9. Install the Necessary Collection:
-
-      ```bash
-      ansible-playbook ./playbooks/ansible-galaxy.yml -e update_collection=true
+  9. Install Required Ansible Collections: 
+      ```shell
+      ansible-playbook ansible-galaxy.yml
       ```
-
+---
 
 ## Running the Automation
 
@@ -158,7 +159,6 @@ Once you have the content downloaded, transfer it to your disconnected machine a
 
 You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
 
-> NOTE: If the pull-secret is absent, it will cause the automation to fail but you can simply add it and rerun the playbook.
 
 ### Run the Deployment Playbook:
 
