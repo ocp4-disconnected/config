@@ -14,6 +14,7 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
 **RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
 
   > **NOTE:** If The goal is to have a fips enabled cluster, the bastion host also has to FIPS aswell. If you dont need fips, you can ignore the following configurations.
+
 **Environment Configurations**:
 
   > **NOTE:** These configurations can be done post install. Changes to usbguard/sysctl.conf will require a reboot, while fapolicyd will only require restart on the service.
@@ -64,30 +65,32 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
       ```bash
       sudo dnf install -y ansible-core container-tools
       ```
+
 ### Automation
 
-  1. Clone this Repository:
-      ```shell
-      git clone https://github.com/cjnovak98/ocp4-disconnected-config
-      ```
+1. Clone this Repository:
 
-  2. Navigate to the Playbooks Directory:
-      ```shell
-      cd ocp4-disconnected-config/playbooks
-      ```
+```bash
+git clone https://github.com/cjnovak98/ocp4-disconnected-config
+```
 
-  3. Install Required Ansible Collections( 1st time/connected system ): 
+2. Navigate to the Playbooks Directory:
+```bash
+cd ocp4-disconnected-config/playbooks
+```
 
-      **NOTE:** This will install [disconnected-collection](https://github.com/cjnovak98/ocp4-disconnected-collection) and should be run an a fresh system, when nothing else has been ran
+3. Install Required Ansible Collections( 1st time/connected system ): 
 
-      ```shell
-      ansible-playbook inital-ansible-collection.yml
-      ```
-      or
-      ```shell
-      ./inital-ansible-collection.yml
-      ```
+**NOTE:** This will install [disconnected-collection](https://github.com/cjnovak98/ocp4-disconnected-collection) and should be run an a fresh system, when nothing else has been ran
 
+```shell
+ansible-playbook initial-ansible-collection.yml
+```
+or
+
+```shell
+./initial-ansible-collection.yml
+```
 
 ---
 
@@ -175,13 +178,13 @@ Install Required Ansible Collection from the previous step:
 
  **NOTE:** This will install need the media to be mounted, and the group bars set.
 
-```shell
+```bash
 ansible-playbook disconnected-ansible-collection.yml
 ```
 or
-```shell
-./disconnected-ansible-collection.yml
 
+```bash
+./disconnected-ansible-collection.yml
 ```
 
 ### Run the Deployment Playbook:
@@ -191,6 +194,7 @@ For both connected and disconnected clusters, deploy the cluster by running:
 ```bash
 ansible-playbook -K deploy-cluster.yml
 ```
+
 or
 
 ```bash
