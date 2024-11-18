@@ -1,3 +1,5 @@
+![](docs/images/Red_Hat_Logo_2019.png "Red Hat Logo")
+
 # Openshift 4 Disconnected Collection
 
 ## Overview
