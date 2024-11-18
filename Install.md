@@ -4,10 +4,12 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
 
 ## Prerequisites
 
-- **RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
+### RHEL Install
+
+**RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
 
   > **NOTE:** If The goal is to have a fips enabled cluster, the bastion host also has to FIPS aswell. If you dont need fips, you can ignore the following configurations.
-- **Environment Configurations**:
+**Environment Configurations**:
 
   > **NOTE:** These configurations can be done post install. Changes to usbguard/sysctl.conf will require a reboot, while fapolicyd will only require restart on the service.
 
@@ -52,21 +54,31 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
       ansible --version
       podman -v
       ```
-  
-  7. Clone the Repository:
+### Automation
+
+  1. Clone this Repository:
       ```shell
       git clone https://github.com/cjnovak98/ocp4-disconnected-config
       ```
 
-  8. Navigate to the Playbooks Directory:
+  2. Navigate to the Playbooks Directory:
       ```shell
       cd ocp4-disconnected-config/playbooks
       ```
 
-  9. Install Required Ansible Collections: 
+  3. Install Required Ansible Collections( 1st time/connected system ): 
+
+      **NOTE:** This will install [disconnected-collection](https://github.com/cjnovak98/ocp4-disconnected-collection) and should be run an a fresh system, when nothing else has been ran
+
       ```shell
-      ansible-playbook ansible-galaxy.yml
+      ansible-playbook inital-ansible-collection.yml
       ```
+      or
+      ```shell
+      ./inital-ansible-collection.yml
+      ```
+
+
 ---
 
 ## Running the Automation
@@ -153,6 +165,20 @@ Once you have the content downloaded, transfer it to your disconnected machine a
 
 It is recommended to use the target directory (`common_openshift_dir`) on a mounted hard drive. This approach allows all downloaded content to be stored directly on the drive, which can then be unmounted and physically transferred to the disconnected system. If this isn't feasible, you would need to transfer the content manually using tools like `cp` or `rsync`.
 
+### Install the collection on a Disconnected machine
+
+Install Required Ansible Collection from the previous step: 
+
+ **NOTE:** This will install need the media to be mounted, and the group bars set.
+
+```shell
+ansible-playbook disconnected-ansible-collection.yml
+```
+or
+```shell
+./disconnected-ansible-collection.yml
+
+```
 
 ### Run the Deployment Playbook:
 
