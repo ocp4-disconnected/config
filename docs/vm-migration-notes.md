@@ -11,7 +11,7 @@ This guide outlines the steps to migrate virtual machines (VMs) from VMware vCen
 
 * Ensure you have the necessary access permissions to both VMware vCenter and OpenShift Virtualization clusters.
 * Create source provider(s) for vmware and/or vcenter:
-	* Steps for creating a provider can be found here: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#mtv-overview-page_mtv
+	* Steps for creating a provider can be found here: [https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#mtv-overview-page_mtv](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7/html-single/installing_and_using_the_migration_toolkit_for_virtualization/index#mtv-overview-page_mtv)
 * Verify the following operators are properly configured in OpenShift:
 	* Virtualization Operator
 		* for hosting the migrated virtual machines
@@ -179,9 +179,9 @@ spec:
 * High RAM Usage: Monitor node resource usage during the migration process. Nodes with high memory consumption may affect the migration speed or cause failures.
 
 ### More information:
-* More detailed information can be found in the migration toolkit user guide: https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7
+* More detailed information can be found in the migration toolkit user guide: [https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7](https://docs.redhat.com/en/documentation/migration_toolkit_for_virtualization/2.7)
 
-* More detailed information about OpenShift Virtualization in general can be found here: https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/virtualization/index
+* More detailed information about OpenShift Virtualization in general can be found here: [https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/virtualization/index](https://docs.redhat.com/en/documentation/openshift_container_platform/4.17/html/virtualization/index)
 
 
 ## Automation Notes
