@@ -11,7 +11,7 @@ To use, you will simply add an application in Argo, and supply this repo/directo
 To do this you can run the following command:
 
 ```bash
-oc apply -f cluster-day2-app.yml
+oc apply -f ./helm/cluster-day2-app.yml
 ```
 
 To create the ArgoCD application manually you can use similar values to the below:
