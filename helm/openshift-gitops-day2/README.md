@@ -8,6 +8,14 @@ In this case, comments have been provided in both the default `values.yaml` and 
 
 To use, you will simply add an application in Argo, and supply this repo/directory, as well as the values file customized for your environment:
 
+To do this you can run the following command:
+
+```bash
+oc apply -f cluster-day2-app.yml
+```
+
+To create the ArgoCD application manually you can use similar values to the below:
+
 * Application Name: cluster-day2
 * Project Name: default
 * Sync Policy: Automatic
