@@ -1,4 +1,6 @@
-{{- range $i, $value := .Values.chrony.roles }}
+# This sets the chrony configuraiton for specified node roles
+# This is referenced in proxy.yaml
+{{ range $i, $value := .Values.chrony.roles }}
 ---
 apiVersion: machineConfiguration.openshift.io/v1
 kind: MachineConfig
@@ -27,4 +29,5 @@ spec:
       mode: 420
       path: /etc/chrony.conf
   osImageUrl: ""
-{{- end }}
+{{ end }}
+# end chrony configs

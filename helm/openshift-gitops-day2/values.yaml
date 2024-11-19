@@ -1,21 +1,34 @@
+# General cluster-level information
 cluster:
+  # Used in the proxy to specify the certs to use there.
+  # Used in custom-ca.yaml in turn used by proxy.yaml
   ca:
+    # true if you have a cert and want to set it, false to skip setting a cluster ca.
     specify: true
     configMapName: cluster-ca
     content: |- # The cluster's CA
       ----- CA Content ------
       ......
       ----- end content ----
+  # Ingress related configuraiton.
+  # Used in:
+  #  - ingress-certs-secret.yaml
+  #  - ingress-controller.yaml
   ingress:
     secretName: ingress-cert
-    cert: |-
+    cert: |- # The content of the ssl cert to use for ingress
       ---- cert content ----
       ....
       ---- content ------
-    key:
+    key: # The content of the ssl cert key to use for ingress
       ----- cert content ----
       .....
       ----- cert content ----
+# TODO:: doublecheck updated from site
+# Configuration for NodeNetworkConfigurationPolicy
+# Used in:
+#  - nncps.yaml
+#  - nncp-bond.yaml ?
 nncps:
   bond:
     name: bond0
@@ -38,16 +51,22 @@ nncps:
 #        ip: 192.168.1.2 # TODO:: specify
   # ... TODO:: fill out
 
+# LDAP configuration.
+# Used in:
+#  - ldap-accounts.yaml
+#  - ldap-bind-secret.yaml
+#  - ocp-oauth-sec.yaml
 ldap:
+  # The name of the LDAPSyncConfig (ldap-accounts.yaml)
   syncConfigName: foo
   accountName: sAMAccountName
   bindDN: # like some.svc.ocp
-  bindPW: foo # plaintext
+  bindPW: foo # plaintext password to access LDAP server
   server:
     name: # like NAME LDAP
     urlFull: # like: ldap://fdqn/dn?accountName
     urlShort: # like: ldap://fdqn
-  groupUIDNameMappingKey: # Like "cn=foo,ou=bar..."
+  groupUIDNameMapping: '"cn=foo,ou=bar": foo' # Like "cn=foo,ou=bar...": bar
   queries:
     group:
       baseDN: # Like "cn=foo,ou=bar..."
@@ -55,12 +74,22 @@ ldap:
       baseDN: # Like "cn=foo,ou=bar..."
       filter: # Like "(cn=foo,ou=bar...)"
 
+# Chrony configuration.
+# The chrony configuration defined in configContent is applied to all OCP nodes with each of the roles specified.
+# Used in:
+#  - chrony-configuration.yaml
 chrony:
   roles:
     - role: master
     - role: worker
   configContent: |-
-    # content of chrony config
+    # EXAMPLE chrony config
+    server pool.ntp.org iburst
+    driftfile /var/lib/chrony/drift
+    makestep 10 3
+    rtcsync
 
+# Storage settings for the cluster.
+# Used in ocp-trident.yaml
 storage:
   provisioner: #IP/hostname

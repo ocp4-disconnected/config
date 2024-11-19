@@ -4,12 +4,11 @@
   vars:
     mirror_content_pull_mirror: true
   roles:
-    - role: ocp4.disconnected.common
-      tags: registry, stage_0
-      when: common_connected_cluster is false
     - role: ocp4.disconnected.mirror_content
       tags: push_cluster_images, stage_0
       vars:
         direction: pull
-      when: mirror_content_pull_mirror | bool
+      when: 
+        - mirror_content_pull_mirror | bool
+        - common_connected_cluster is false
 

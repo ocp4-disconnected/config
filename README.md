@@ -1,4 +1,6 @@
-# Openshift 4 Disconnected collection
+![](docs/images/Red_Hat_Logo_2019.png "Red Hat Logo")
+
+# Openshift 4 Disconnected Collection
 
 ## Overview
 
@@ -12,7 +14,7 @@
 - cluster_version: This variable controls the version of the cluster and allows for the pulling of operators and additional images (for the cluster) via oc-mirror. This requires an active subscription with a pull secret in ~/.docker/config.json. It will pull all the required binaries along with some additional nice-to-haves (such as Butane).
 
 - cluster_deployment: This variable controls how the cluster is deployed. It will generate the install-config and agent-config based on configured variables. 
-- static this is used to set things that vary rarly change or set varaibles definded in other vars, that are built ontop of other varables
+- static this is used to set things that very rarely change or set variables defined in other vars, that are built ontop of other variables
 
 #### Some assumptions include:
 - SSH keys will not exist.
@@ -27,8 +29,6 @@ Post-Install Configuration
 #### Status
 - This is a work in progress, and we will continue to make enhancements over time.
 
-#### Requirements (connected system)
-- TODO
 #### Requirements (disconnected system)
 - Packages:
   - nmstate
@@ -37,7 +37,10 @@ Post-Install Configuration
 - Ansible-collections
   - dellemc.openmanage
 
+## Additional Info:
+[View notes on recommended procedures for vm migrations](/docs/vm-migration-notes.adoc)
+
 ## Thanks:
-This started as as a fork from [hyperkinetierdcn/ansible-ocp4-agent](https://github.com/hyperkinetierdcn/ansible-ocp4-agent), but we have since diverged quite a bit away, but still would like to give credit.
+This started as as a fork from [hyperkineticnerd/ansible-ocp4-agent](https://github.com/hyperkineticnerd/ansible-ocp4-agent), but we have since diverged quite a bit away, but still would like to give credit.
 
 
