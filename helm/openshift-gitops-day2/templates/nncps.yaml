@@ -1,4 +1,5 @@
 {{ range .Values.nncps.nodes }}
+---
 # Defines node-specific NodeNetworkConfigurationPolicy
 # References nncp-bond.yaml
 apiVersion: nmstate.io/v1
@@ -9,7 +10,7 @@ metadata:
     argocd.argoproj.io/sync-wave: "5"
 spec:
   nodeSelecotor:
-    kubernetes.io/hostname: {{ .name }}
+    kubernetes.io/hostname: {{ .node }}
   desiredState:
     interfaces:
   {{ range .vlans }}
