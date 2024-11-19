@@ -155,6 +155,9 @@ common_nodes:
 
 ### Run Content Gathering Playbook to Prepare Disconnected Environments:
 
+**NOTE:** Ensure A Valid Pull-Secret Exists. You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
+
+
 If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run which will gather the appropriate content: 
 
 ```bash
@@ -168,15 +171,11 @@ or
 
 Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content)
 
-### Ensure A Valid Pull-Secret Exists: 
-
-You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
-
 ### Install the collection on a Disconnected machine
 
 Install Required Ansible Collection from the previous step: 
 
- **NOTE:** This will install need the media to be mounted, and the group bars set.
+ **NOTE:** This will install need the media to be mounted, and the group vars set.
 
 ```bash
 ansible-playbook disconnected-ansible-collection.yml
