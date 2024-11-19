@@ -6,7 +6,24 @@ In this case, comments have been provided in both the default `values.yaml` and 
 
 ## Deployment
 
-To use, you will simply add an application in Argo, and supply this repo/directory, as well as the values file customized for your environment:
+### Configuring the Template
+
+To use, you will simply add an application in ArgoCD (Openshift GitOps), and supply this repo/directory, as well as the values file customized for your environment.
+
+Since the intent is to have ArgoCD automatically sync your configurations, it is important to first ensure you have prepared the appropriate values for your environment. When creating the application manually in argoCD you have the option to override the values but it is recommended to maintain the values in a file that can be managed and updated as needed. This method also allows for a more automated method of creating the ArgoCD application. To do this, it is recommended that you copy the default values file found at: `./helm/openshift-gitops-day2/values.yml` to a separate file, like `./helm/openshift-gitops-day2/day2-values-prod.yml`. 
+
+This template expects the following cluster specific configurations for the following in your helm values:
+
+1. Cluster-wide certificiates
+2. Networking configurations for each node in your cluster
+3. LDAP sync configuration
+4. Chrony configuration
+5. Storage configuration
+
+The example values file structure can be seen [here](values.yaml)
+
+
+### Configuring ArgoCD (Openshift Gitops) 
 
 To do this you can run the following command:
 
@@ -16,18 +33,18 @@ oc apply -f ./helm/cluster-day2-app.yml
 
 To create the ArgoCD application manually you can use similar values to the below:
 
-* Application Name: cluster-day2
-* Project Name: default
-* Sync Policy: Automatic
-* Source:
-  * Repository URL: Select the ocp4-disconnected-config repo running on the bastion host
-  * Revision: HEAD (or override to your desired branch)
-  * Path: ./helm/openshift-gitops-day2
-* Destination:
-  * Cluster URL: https://kubernetes.default.svc # Use this value to target the same cluster that Argo is running on.
-  * Namespace: leave blank or set to default if required
-* Values:
-  * Override the values as needed. If Argo was able to successfully connect to the source repo configuration, then you should see a list of optional values to override. You can also upload your own `values.yaml` file.
+- Application Name: cluster-day2
+- Project Name: default
+- Sync Policy: Automatic
+- Source:
+  - Repository URL: Select the ocp4-disconnected-config repo running on the bastion host
+  - Revision: HEAD (or override to your desired branch)
+  - Path: ./helm/openshift-gitops-day2
+- Destination:
+  - Cluster URL: https://kubernetes.default.svc # Use this value to target the same cluster that Argo is running on.
+  - Namespace: leave blank or set to default if required
+- Values:
+  - Override the values as needed. If Argo was able to successfully connect to the source repo configuration, then you should see a list of optional values to override. You can also upload your own `values.yaml` file.
 
 To get to Argo, simply select it from the top right dropdown on the OpenShift web ui.
 
