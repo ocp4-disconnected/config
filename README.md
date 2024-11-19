@@ -24,7 +24,7 @@ Post-Install Configuration
 #### Goals
 - The current goal for post-install configuration is to deploy ArgoCD and have it manage the configuration and enforcement.
 
-- To assist with this, a local Git repository will be configured as described in this [article.](https://thenewstack.io/create-a-local-git-repository-on-linux-with-the-help-of-ssh/)
+- To assist with this, a local Git repository will be configured as described in [this article.](https://thenewstack.io/create-a-local-git-repository-on-linux-with-the-help-of-ssh/)
 
 #### Status
 - This is a work in progress, and we will continue to make enhancements over time.
