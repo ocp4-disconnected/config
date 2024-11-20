@@ -1,0 +1,56 @@
+---
+name: NFS Service Playbook
+hosts: nfs-server
+become: true
+
+vars:
+        nfs-dir: /nfs/share
+        nfs-permissions: 0777
+        nfs-client-ip: 192.168.0.0/24 
+        nfs-options: rw,sync
+
+tasks:
+
+        - name: Ensure nfs packages installed
+          ansible.builtin.dnf:
+                  name:
+                          - nfs-utils
+                          - nfs4-acl-tools
+                  state: present
+
+        - name: Ensure share directory exists
+          ansible.builtin.file:
+                  path: {{ nfs-dir }}
+                  state: directory
+                  mode: {{ nfs-permissions }}
+                  owner: root
+                  group: root
+
+        - name: Ensure export is created
+          notify: Restart the nfs service
+          ansible.builtin.lininfile:
+                  path: /etc/exports
+                  state: present
+                  line: "{{ nfs-dir }} {{ nfs-client-ip }} {{ nfs-options }}"
+
+        - name: Export the share
+          ansible.builtin.command: "exportfs -rav"
+
+        - name: Ensure firewall enabled
+          ansible.posix.firewalld:
+                  service: {{ item }}
+                  state: enabled
+                  permanent: true
+                  immediate: true
+          with_items:
+                  - nfs
+                  - rpc-bind
+                  - mountd
+
+handlers:
+
+        - name: Restart the nfs service
+          ansible.builtin.service:
+                  name: nfs-server
+                  state: restarted
+                  enabled: true
