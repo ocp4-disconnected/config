@@ -6,11 +6,12 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "5"
 bindDN: {{ .Values.ldap.bindDN }}
-bindPassword: {{ .Values.ldap.bindPW }}
+bindPassword: "{{ .Values.ldap.bindPW }}"
 insecure: true
 url: {{ .Values.ldap.server.urlShort }}
 groupUIDNameMapping:
-{{ .Values.ldap.groupUIDNameMapping | indent 2 }}
+  # TODO:: let this be more flexible by inserting yaml instead. Ran into quoting issue
+  "{{ .Values.ldap.groupUIDNameMappingKey }}": Administrators
 augmentedActiveDirectory:
   groupUIDAttributes: dn
   groupNameAttributes: [ cn ]

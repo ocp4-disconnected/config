@@ -3,18 +3,33 @@
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
-  name: bond0
+  name: {{ .Values.nncps.bond.name }}
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   desiredState:
     interfaces:
-      - name: bond0
+      - name: {{ .Values.nncps.bond.name }}
         type: bond
         link-aggregation:
           mode: 802.3ad
-          port: # TODO:: templatize?
-            - ens2f0
-            - ens2f1
-            - ens3f0
-            - ens3f1
+          port:
+{{ toYaml .Values.nncps.bond.bond.ports | indent 12 }}
+{{ range $i, $curVlan := .Values.nncps.bond.vlans }}
+      - name: {{ $.Values.nncps.bond.name }}.{{ $curVlan.id }}
+        state: up
+        type: vlan
+        vlan:
+          base-iface: {{ $.Values.nncps.bond.name }}
+          id: {{ $curVlan.id }}
+      - bridge:
+          port:
+            - name: {{ $.Values.nncps.bond.name }}.{{ $curVlan.id }}
+              vlan:
+                mode: access
+                tag: {{ $curVlan.id }}
+        name: br-{{ $.Values.nncps.bond.name }}.{{ $curVlan.id }}
+        state: up
+        type: linux-bridge 
+{{end}}
+

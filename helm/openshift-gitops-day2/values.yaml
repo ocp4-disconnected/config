@@ -5,6 +5,7 @@ cluster:
   ca:
     # true if you have a cert and want to set it, false to skip setting a cluster ca.
     specify: true
+    configMapName: cluster-ca
     content: |- # The cluster's CA
       ----- CA Content ------
       ......
@@ -29,10 +30,22 @@ cluster:
 #  - nncps.yaml
 #  - nncp-bond.yaml ?
 nncps:
-  - name: master-0
+  bond:
+    name: bond0
+    bond:
+      ports:
+        - ens2f0
+        - ens3f0  
+        # etc
     vlans:
-      - id: 1 # TODO:: specify, int
-        ip: 192.168.1.1 # TODO:: specify
+      - id: 677
+      # etc
+  nodes:
+    - name: bond-ips
+      node: master-0
+      vlans:
+        - id: 1 # TODO:: specify, int
+          ip: 192.168.1.1 # TODO:: specify
 #  - name: worker-1
 #    vlans:
 #      - id: 2 # TODO:: specify, int
@@ -78,6 +91,11 @@ chrony:
     rtcsync
 
 # Storage settings for the cluster.
-# Used in ocp-trident.yaml
+# Used in ocp-trident.yaml, trident-nad.yaml
 storage:
-  provisioner: #IP/hostname
+  # The location of the trident/netapp host
+  provisioner: a.b.c.trident.netapp.io #IP/hostname
+  nad:
+    mgmtAddress: "192.168.1.10/24"
+    masterBond: "bond0.123"
+

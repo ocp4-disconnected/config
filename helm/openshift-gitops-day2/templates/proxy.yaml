@@ -8,7 +8,8 @@ metadata:
     argocd.argoproj.io/sync-wave: "5"
 spec:
   trustedCS:
-    name: custom-ca
+    name: {{ .Values.cluster.ca.configMapName }}
 {{ else }}
 # Did not specify cluster ca
 {{ end }}
+
