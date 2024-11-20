@@ -9,8 +9,13 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
 
 ## Prerequisites
 
-- **RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
-- **Environment Configurations**:
+### RHEL Install
+
+**RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
+
+  > **NOTE:** If the goal is to have a FIPS-enabled cluster, the bastion host has to be FIPS-enabled as well. If you don't need FIPS, you can ignore the following configurations.
+
+**Environment Configurations**:
 
   > **NOTE:** These configurations can be done post install. Changes to usbguard/sysctl.conf will require a reboot, while fapolicyd will only require restart on the service.
 
@@ -60,25 +65,34 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
       ```bash
       sudo dnf install -y ansible-core container-tools
       ```
-  
-  7. Clone the Repository:
 
-      ```bash
-      git clone https://github.com/cjnovak98/ocp4-disconnected-config
-      ```
+### Automation
 
-  8. Navigate to the Project Directory:
+1. Clone this Repository:
 
-      ```bash
-      cd ocp4-disconnected-config
-      ```
+```bash
+git clone https://github.com/cjnovak98/ocp4-disconnected-config
+```
 
-  9. Install the Necessary Collection:
+2. Navigate to the Playbooks Directory:
+```bash
+cd ocp4-disconnected-config/playbooks
+```
 
-      ```bash
-      ansible-playbook ./playbooks/ansible-galaxy.yml -e update_collection=true
-      ```
+3. Install Required Ansible Collections( 1st time/connected system ): 
 
+**NOTE:** This will install [disconnected-collection](https://github.com/cjnovak98/ocp4-disconnected-collection) and should be run on a fresh system, before anything else has been run.
+
+```shell
+ansible-playbook initial-ansible-collection.yml
+```
+or
+
+```shell
+./initial-ansible-collection.yml
+```
+
+---
 
 ## Running the Automation
 
@@ -141,6 +155,9 @@ common_nodes:
 
 ### Run Content Gathering Playbook to Prepare Disconnected Environments:
 
+**NOTE:** Ensure a valid pull secret exists. You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` on the host where you're running the automation. 
+
+
 If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run which will gather the appropriate content: 
 
 ```bash
@@ -154,11 +171,20 @@ or
 
 Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content)
 
-### Ensure A Valid Pull-Secret Exists: 
+### Install the Collection on a Disconnected Machine
 
-You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
+Install required Ansible Collection from the previous step: 
 
-> NOTE: If the pull-secret is absent, it will cause the automation to fail but you can simply add it and rerun the playbook.
+ **NOTE:** This will install need the media to be mounted, and the group vars set.
+
+```bash
+ansible-playbook disconnected-ansible-collection.yml
+```
+or
+
+```bash
+./disconnected-ansible-collection.yml
+```
 
 ### Run the Deployment Playbook:
 
@@ -167,6 +193,7 @@ For both connected and disconnected clusters, deploy the cluster by running:
 ```bash
 ansible-playbook -K deploy-cluster.yml
 ```
+
 or
 
 ```bash
