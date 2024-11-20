@@ -24,7 +24,7 @@
 - ansible.builtin.include_tasks: idrac.yml
   loop: "{{ filtered_idracs }}"
   loop_control:
-    loop_var: idrac_node
+    loop_var: media_share_idracs
   when: media_share_idrac | bool and  filtered_idracs | length > 0
 
 - ansible.builtin.include_tasks: stop_temp_web_server.yml
