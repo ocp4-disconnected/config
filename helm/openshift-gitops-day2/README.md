@@ -28,7 +28,7 @@ The example values file structure can be seen [here](values.yaml)
 To do this you can run the following command:
 
 ```bash
-oc apply -f ./helm/cluster-day2-app.yml
+oc apply -f ./cluster-day2-app.yml
 ```
 
 To create the ArgoCD application manually you can use similar values to the below:
@@ -66,8 +66,8 @@ Relevant templates:
  - [nmstate-namespace.yaml](templates/nmstate-namespace.yaml)
  - [nmstate-operator.yaml](templates/nmstate-operator.yaml)
  - [nmstate-operatorgroup.yaml](templates/nmstate-operatorgroup.yaml)
- - [nncp-bond.yaml](templates/nncp-bond.yaml)
- - [nncps.yaml](templates/nncps.yaml)
+ - [nmstate-nncp-bond.yaml](templates/nmstate-nncp-bond.yaml)
+ - [nmstate-nncp-nodes.yaml](templates/nmstate-nncp-nodes.yaml)
 
 The nmstate operator is what brings in the NodeNetworkConfigurationPolicy CRD's , allowing us to further tweak the network setup of the cluster.
 
@@ -83,13 +83,13 @@ Relevant templates:
 
  - [ldap-accounts](templates/ldap-accounts.yaml)
  - [ldap-bind-secret.yaml](templates/ldap-bind-secret.yaml)
- - [ocp-oauth-sec.yaml](templates/ocp-oauth-sec.yaml)
+ - [ldap-oauth-provider.yaml](templates/ldap-oauth-provider.yaml)
 
 ### Storage
 
 Relevant templates:
 
- - [ocp-trident.yaml](templates/ocp-trident.yaml)
+ - [trident-sc.yaml](templates/trident-sc.yaml)
  - [trident-machineconfig-master.yaml](templates/trident-machineconfig-master.yaml)
  - [trident-machineconfig-worker.yaml](templates/trident-machineconfig-worker.yaml)
  - [trident-nad.yaml](templates/trident-nad.yaml)
@@ -109,7 +109,7 @@ os-n overview trident.html#nfs](https://docs.netapp.com/us-en/netapp-solutions/c
 
 Relevant templates:
 
- - [custom-ca.yaml](templates/custom-ca.yaml)
+ - [proxy-custom-ca-cm.yaml](templates/proxy-custom-ca-cm.yaml)
  - [proxy.yaml](templates/proxy.yaml)
 
 #### Ingress

@@ -1,5 +1,5 @@
 # Defines the standard bond to use in the other nncps configuration
-# Referenced in nncps.yaml
+# Referenced in nmstate-nncp-nodes.yaml
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
