@@ -1,6 +1,6 @@
 ---
-name: NFS Service Playbook
-hosts: nfs-server
+name: NFS Server Playbook
+hosts: localhost
 become: true
 
 vars:
