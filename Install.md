@@ -13,7 +13,7 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
 
 **RHEL 9 Installation**: Install Red Hat Enterprise Linux 9 and register it with your Red Hat account.
 
-  > **NOTE:** If The goal is to have a fips enabled cluster, the bastion host also has to FIPS aswell. If you dont need fips, you can ignore the following configurations.
+  > **NOTE:** If the goal is to have a FIPS-enabled cluster, the bastion host has to be FIPS-enabled as well. If you don't need FIPS, you can ignore the following configurations.
 
 **Environment Configurations**:
 
@@ -81,7 +81,7 @@ cd ocp4-disconnected-config/playbooks
 
 3. Install Required Ansible Collections( 1st time/connected system ): 
 
-**NOTE:** This will install [disconnected-collection](https://github.com/cjnovak98/ocp4-disconnected-collection) and should be run an a fresh system, when nothing else has been ran
+**NOTE:** This will install [disconnected-collection](https://github.com/cjnovak98/ocp4-disconnected-collection) and should be run on a fresh system, before anything else has been run.
 
 ```shell
 ansible-playbook initial-ansible-collection.yml
@@ -155,7 +155,7 @@ common_nodes:
 
 ### Run Content Gathering Playbook to Prepare Disconnected Environments:
 
-**NOTE:** Ensure A Valid Pull-Secret Exists. You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` of the host where you're running the automation. 
+**NOTE:** Ensure a valid pull secret exists. You can get your pull secret from [https://console.redhat.com/openshift/create/local](https://console.redhat.com/openshift/create/local) and store it in `~/.docker/config` on the host where you're running the automation. 
 
 
 If you are deploying on a disconnected system then you will first need to gather all of the openshift content on a machine that has internet connection and transfer it over. There is a playbook that you can run which will gather the appropriate content: 
@@ -171,9 +171,9 @@ or
 
 Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content)
 
-### Install the collection on a Disconnected machine
+### Install the Collection on a Disconnected Machine
 
-Install Required Ansible Collection from the previous step: 
+Install required Ansible Collection from the previous step: 
 
  **NOTE:** This will install need the media to be mounted, and the group vars set.
 
