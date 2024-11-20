@@ -6,7 +6,7 @@ authors:
     - "Matt Riensch (example@gmail.com)"
     - "Christopher Novak (example@gmail.com)"
 dependencies:
-    "dellemc.openmanage": "9.5.0"
+    "dellemc.openmanage": "9.1.0"
     "containers.podman": "1.16.1"
     "ansible.posix": "1.5.4"
     "cisco.nxos": "8.1.0"
