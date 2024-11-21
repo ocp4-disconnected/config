@@ -9,7 +9,7 @@
     log_level: "info"                   # Replace with desired log level
     bootstrap_complete_text: "bootstrap is complete" # standard text displayed by the openshift-install command
     oc_command: "oc get nodes --no-headers | awk '{print $2}' | grep Ready | wc -l" # gets the count of nodes in a ready state
-    node_count: "{{ common_nodes | length }}" #set to number of nodes in the cluster that needs to be marked 'ready' for a healthy deployment
+    node_count: "{{ common_nodes | selectattr('name', 'search', '^master') | list | length }}" #set to number of nodes in the cluster that needs to be marked 'ready' for a healthy deployment
 
   tasks:
 
@@ -23,6 +23,9 @@
         msg: "{{ bootstrap_output.stderr_lines[-1] }}"
       when: bootstrap_output.stderr is search(bootstrap_complete_text)
 
+    - name: debug
+      ansible.builtin.debug:
+        msg: "{{ node_count }}"
 
     - name: Monitor node health
       ansible.builtin.shell:
