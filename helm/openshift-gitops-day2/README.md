@@ -28,20 +28,20 @@ The example values file structure can be seen [here](values.yaml)
 To do this you can run the following command:
 
 ```bash
-oc apply -f ./helm/cluster-day2-app.yml
+oc apply -f ./cluster-day2-app.yml
 ```
 
 To create the ArgoCD application manually you can use similar values to the below:
 
-- Application Name: cluster-day2
-- Project Name: default
-- Sync Policy: Automatic
+- Application Name: `cluster-day2`
+- Project Name: `default`
+- Sync Policy: `Automatic`
 - Source:
-  - Repository URL: Select the ocp4-disconnected-config repo running on the bastion host
-  - Revision: HEAD (or override to your desired branch)
-  - Path: ./helm/openshift-gitops-day2
+  - Repository URL: Select the `ocp4-disconnected-config` repo running on the bastion host
+  - Revision: `HEAD` (or override to your desired branch)
+  - Path: `./helm/openshift-gitops-day2`
 - Destination:
-  - Cluster URL: https://kubernetes.default.svc # Use this value to target the same cluster that Argo is running on.
+  - Cluster URL: `https://kubernetes.default.svc` # Use this value to target the same cluster that Argo is running on.
   - Namespace: leave blank or set to default if required
 - Values:
   - Override the values as needed. If Argo was able to successfully connect to the source repo configuration, then you should see a list of optional values to override. You can also upload your own `values.yaml` file.
@@ -54,7 +54,7 @@ You can also use the following command to see what will be applied before actual
 helm template test . --debug | less
 ```
 
-The default [values.yaml](values.yaml) is designed to be give you the basic layout, as well as provide a template for your own custom values file. Simply make a copy of this default, and start filling in your real-world data. You can even run the above template command, adding `--values=/path/to/yourValues.yaml` before the `|` to tell Helm to use your new file, in order to check your work.
+The default [values.yaml](values.yaml) is designed to be give you the basic layout, as well as provide a template for your own custom values file. Simply make a copy of this default, and start filling in your real-world data. You can even run the above template command, adding `-f /path/to/yourValues.yaml` before the `|` to tell Helm to use your new file, in order to check your work.
 
 ## Components overview
 
@@ -66,8 +66,8 @@ Relevant templates:
  - [nmstate-namespace.yaml](templates/nmstate-namespace.yaml)
  - [nmstate-operator.yaml](templates/nmstate-operator.yaml)
  - [nmstate-operatorgroup.yaml](templates/nmstate-operatorgroup.yaml)
- - [nncp-bond.yaml](templates/nncp-bond.yaml)
- - [nncps.yaml](templates/nncps.yaml)
+ - [nmstate-nncp-bond.yaml](templates/nmstate-nncp-bond.yaml)
+ - [nmstate-nncp-nodes.yaml](templates/nmstate-nncp-nodes.yaml)
 
 The nmstate operator is what brings in the NodeNetworkConfigurationPolicy CRD's , allowing us to further tweak the network setup of the cluster.
 
@@ -83,13 +83,13 @@ Relevant templates:
 
  - [ldap-accounts](templates/ldap-accounts.yaml)
  - [ldap-bind-secret.yaml](templates/ldap-bind-secret.yaml)
- - [ocp-oauth-sec.yaml](templates/ocp-oauth-sec.yaml)
+ - [ldap-oauth-provider.yaml](templates/ldap-oauth-provider.yaml)
 
 ### Storage
 
 Relevant templates:
 
- - [ocp-trident.yaml](templates/ocp-trident.yaml)
+ - [trident-sc.yaml](templates/trident-sc.yaml)
  - [trident-machineconfig-master.yaml](templates/trident-machineconfig-master.yaml)
  - [trident-machineconfig-worker.yaml](templates/trident-machineconfig-worker.yaml)
  - [trident-nad.yaml](templates/trident-nad.yaml)
@@ -109,7 +109,7 @@ os-n overview trident.html#nfs](https://docs.netapp.com/us-en/netapp-solutions/c
 
 Relevant templates:
 
- - [custom-ca.yaml](templates/custom-ca.yaml)
+ - [proxy-custom-ca-cm.yaml](templates/proxy-custom-ca-cm.yaml)
  - [proxy.yaml](templates/proxy.yaml)
 
 #### Ingress

@@ -1,11 +1,11 @@
 # General cluster-level information
 cluster:
   # Used in the proxy to specify the certs to use there.
-  # Used in custom-ca.yaml in turn used by proxy.yaml
+  # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
   ca:
     # true if you have a cert and want to set it, false to skip setting a cluster ca.
     specify: true
-    configMapName: cluster-ca
+    configMapName: cluster-proxy-ca
     content: |- # The cluster's CA
       ----- CA Content ------
       ......
@@ -27,8 +27,8 @@ cluster:
 # TODO:: doublecheck updated from site
 # Configuration for NodeNetworkConfigurationPolicy
 # Used in:
-#  - nncps.yaml
-#  - nncp-bond.yaml ?
+#  - nmstate-nncp-nodes.yaml
+#  - nmstate-nncp-bond.yaml 
 nncps:
   bond:
     name: bond0
@@ -56,7 +56,7 @@ nncps:
 # Used in:
 #  - ldap-accounts.yaml
 #  - ldap-bind-secret.yaml
-#  - ocp-oauth-sec.yaml
+#  - ldap-oauth-provider.yaml
 ldap:
   # The name of the LDAPSyncConfig (ldap-accounts.yaml)
   syncConfigName: foo
@@ -91,7 +91,7 @@ chrony:
     rtcsync
 
 # Storage settings for the cluster.
-# Used in ocp-trident.yaml, trident-nad.yaml
+# Used in trident-sc.yaml, trident-nad.yaml
 storage:
   # The location of the trident/netapp host
   provisioner: a.b.c.trident.netapp.io #IP/hostname
