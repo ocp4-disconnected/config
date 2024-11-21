@@ -1,8 +1,8 @@
 ---
 - name: Monitor OpenShift installation bootstrap process
-   ansible.builtin.command:
-     cmd: "openshift-install --dir {{ install_dir }} agent wait-for bootstrap-complete --log-level={{ log_level }}"
-   register: bootstrap_output
+  ansible.builtin.command:
+    cmd: "openshift-install --dir {{ install_dir }} agent wait-for bootstrap-complete --log-level={{ log_level }}"
+  register: bootstrap_output
 
 - name: Check status of cluster bootstrap
   debug:
