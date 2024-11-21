@@ -1,0 +1,37 @@
+---
+- name: Monitor OpenShift Installation Status
+  hosts: localhost
+  gather_facts: no
+  vars:
+    install_dir: "/path/to/install/dir"  # Replace with your actual install directory
+    log_level: "info"                   # Replace with desired log level
+    bootstrap_complete_text: "cluster bootstrap-complete"
+    oc_command: "oc get nodes"
+  tasks:
+
+    - name: Monitor OpenShift installation bootstrap process
+      shell: >
+        openshift-install
+        --dir {{ install_dir }}
+        agent wait-for bootstrap-complete
+        --log-level={{ log_level }}
+      register: bootstrap_output
+      retries: 10
+      delay: 30
+      until: "'{{ bootstrap_complete_text }}' in bootstrap_output.stdout"
+
+    - name: Print the last line of bootstrap output
+      debug:
+        msg: "{{ bootstrap_output.stdout_lines[-1] }}"
+
+    - name: Monitor node health
+      shell: "{{ oc_command }}"
+      register: node_status
+      retries: 10
+      delay: 15
+      until: >
+        node_status.stdout_lines | select('search', '^\\S+\\s+Ready') | length == node_status.stdout_lines | length
+
+    - name: Print node status
+      debug:
+        msg: "{{ node_status.stdout_lines }}"
