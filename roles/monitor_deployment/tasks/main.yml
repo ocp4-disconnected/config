@@ -1,0 +1,25 @@
+---
+- name: Monitor OpenShift installation bootstrap process
+   ansible.builtin.command:
+     cmd: "openshift-install --dir {{ install_dir }} agent wait-for bootstrap-complete --log-level={{ log_level }}"
+   register: bootstrap_output
+
+- name: Check status of cluster bootstrap
+  debug:
+    msg: "{{ bootstrap_output.stderr_lines[-1] }}"
+  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+
+
+- name: Monitor node health
+  ansible.builtin.shell:
+    cmd: "{{ oc_command }}"
+  register: node_status
+  retries: 120
+  delay: 15
+  until: node_status.stdout >= node_count
+  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+
+- name: status
+  ansible.builtin.debug:
+    msg: "Node ready count is: {{node_status.stdout}}"
+  when: node_status.stdout >= node_count
