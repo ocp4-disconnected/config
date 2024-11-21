@@ -31,9 +31,10 @@
       retries: 120
       delay: 15
       until: node_status.stdout == node_count
-      when: bootstrap_output.stderr is search( "bootstrap is complete")
+      when: bootstrap_output.stderr is search( "{{bootstrap_complete_text}}")
 
     - name: status
       ansible.builtin.debug:
         msg: "Node ready count is: {{node_status.stdout}}"
+      when: node_status.stdout == node_count
 
