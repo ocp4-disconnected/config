@@ -305,7 +305,7 @@
   loop: "{{ common_git_repos }}"
   loop_control:
     label: "{{ item }}"
-  when: common_connected_cluster is true
+  when: mirror_content_pull_mirror is true
 
 - ansible.builtin.include_tasks: generate_ca.yml
   when: not common_connected_cluster 
