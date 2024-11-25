@@ -4,9 +4,9 @@ metadata:
   name: private-repo
   namespace: {{ .Values.gitOps.namespace }}
   labels:
-    argocd.argoproj.io/secret-type: repo-creds
+    argocd.argoproj.io/secret-type: repository
 stringData:
   type: git
   url: {{ .Values.gitRepoTemplate.url }}
-data:
+  insecure: "true"
   sshPrivateKey: {{ .Values.gitRepoTemplate.sshPrivateKey | b64enc}}
