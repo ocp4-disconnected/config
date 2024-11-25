@@ -4,7 +4,6 @@ cluster:
   # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
   ca:
     # true if you have a cert and want to set it, false to skip setting a cluster ca.
-    specify: true
     configMapName: cluster-proxy-ca
     content: |- # The cluster's CA
       ----- CA Content ------
@@ -94,7 +93,7 @@ chrony:
 # Used in trident-sc.yaml, trident-nad.yaml
 storage:
   # The location of the trident/netapp host
-  provisioner: a.b.c.trident.netapp.io #IP/hostname
+  provisioner: csi.trident.netapp.io
   nad:
     mgmtAddress: "192.168.1.10/24"
     masterBond: "bond0.123"
