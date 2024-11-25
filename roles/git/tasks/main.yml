@@ -61,7 +61,7 @@
 - name: Copy bare git repos to git user directory
   ansible.builtin.copy:
     src: "{{ item.path }}"
-    dest: "{{ git_user_repo_dir }}/{{ item.path | basename }}"
+    dest: "{{ git_user_repo_dir }}"
     remote_src: true
     mode: '0755'
     owner: git
