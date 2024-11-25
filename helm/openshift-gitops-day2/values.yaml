@@ -28,6 +28,10 @@ cluster:
 # Used in:
 #  - nmstate-nncp-nodes.yaml
 #  - nmstate-nncp-bond.yaml 
+nmstate:
+  enabled: true
+  catalog_source: cs-redhat-operator-index
+
 nncps:
   bond:
     name: bond0
@@ -43,8 +47,8 @@ nncps:
     - name: bond-ips
       node: master-0
       vlans:
-        - id: 1 # TODO:: specify, int
-          ip: 192.168.1.1 # TODO:: specify
+        - id: 1
+          ip: 192.168.1.1
 #  - name: worker-1
 #    vlans:
 #      - id: 2 # TODO:: specify, int
