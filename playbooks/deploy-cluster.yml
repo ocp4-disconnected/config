@@ -33,3 +33,5 @@
         image_source: operators
         direction: push
       when: not common_connected_cluster | bool
+    - role: ocp4.disconnected.monitor_deployment
+      tags: agent_install, stage_1
