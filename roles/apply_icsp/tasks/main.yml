@@ -1,0 +1,48 @@
+---
+- name: Disable all the default marketplace sources
+  shell:
+    cmd: |
+      oc patch OperatorHub cluster --type json -p '[{"op": "add", "path": "/spec/disableAllDefaultSources", "value": true}]' 
+
+- name: Find all result directories in oc-mirror-workspace
+  ansible.builtin.find:
+    paths: "{{ playbook_dir }}/oc-mirror-workspace"
+    file_type: directory
+    patterns: "results-*"
+  register: result_dirs
+
+- name: Search for catalog*.yaml files in result directories
+  ansible.builtin.find:
+    paths: "{{ item.path }}"
+    patterns: "catalog*.yaml"
+    file_type: file
+  with_items: "{{ result_dirs.files }}"
+  register: catalog_files
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Search for imagecontentsourcepolicy.yml files in result directories
+  ansible.builtin.find:
+    paths: "{{ item.path }}"
+    patterns: "imagecontentsourcepolicy.yml"
+    file_type: file
+  with_items: "{{ result_dirs.files }}"
+  register: icsp_files
+  loop_control:
+    label: "{{ item.path }}"
+
+- name: Apply any catalog files using oc
+  ansible.builtin.command:
+    cmd: oc apply -f "{{ item.path }}"
+  with_items: "{{ catalog_files.results }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: catalog_files.results | length > 0
+
+- name: Apply any ICSPs using oc
+  ansible.builtin.command:
+    cmd: oc apply -f "{{ item.path }}"
+  with_items: "{{ icsp_files.results }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: icsp_files.results | length > 0
