@@ -164,34 +164,7 @@ or
 Once you have the content downloaded, transfer it to your disconnected machine and put in the content directory (i.e. /pods/content), you will also need the `ocp4-disconnected-config` folder used to run this playbook
 
 ---
-
-### Install the Collection on a Disconnected Machine
-
-You can either transfter the content from the media used to get it to the disconnected side, or update `playbooks/group_vars/all/cluster-deployment.yml` to point to the mount point of the media
-
-  **Example:** For testing, im running from a 1TB external drive, mounted in `/pods/content` and the 
-  dirctory structure was:
-
-  ```bash
-  ls /pods/content
-  bin   downloads   images   ocp4-disconnected-config
-  ```
-
-Install required Ansible Collection from the previous step: 
-
-
- **NOTE:** This will install need the media to be mounted, the group vars set, and be in the `ocp4-disconnected-config/playbooks` directory
-
-```bash
-ansible-playbook disconnected-ansible-collection.yml
-```
-or
-
-```bash
-./disconnected-ansible-collection.yml
-```
-
-### Run the Deployment Playbook:
+### Running on Disconnected side
 
 #### Update Environment Variables
 
@@ -246,8 +219,34 @@ common_nodes:
 ```
 
 **NOTE:** if cluster hardware supports idrac, uncomment to idrac vars.
+You can either transfter the content from the media used to get it to the disconnected side, or update `playbooks/group_vars/all/cluster-deployment.yml` to point to the mount point of the media
 
-For both connected and disconnected clusters, deploy the cluster by running:
+  **Example:** For testing, im running from a 1TB external drive, mounted in `/pods/content` and the 
+  dirctory structure was:
+
+  ```bash
+  ls /pods/content
+  bin   downloads   images   ocp4-disconnected-config
+  ```
+
+#### Install the Collection on a Disconnected Machine
+
+Install required Ansible Collection from the previous step: 
+
+
+ **NOTE:** This will install need the media to be mounted, the group vars set, and be in the `ocp4-disconnected-config/playbooks` directory
+
+```bash
+ansible-playbook disconnected-ansible-collection.yml
+```
+or
+
+```bash
+./disconnected-ansible-collection.yml
+```
+
+#### Run the Deployment Playbook:
+
 
 ```bash
 ansible-playbook -K deploy-cluster.yml
