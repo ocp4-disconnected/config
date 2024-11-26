@@ -5,7 +5,7 @@ gitOps:
 
 gitRepoTemplate:
   # The URL of the repository setup in the Ansible step.
-  url: git@<ip of host>:repos
+  url: git@<ip of host>:repos/ocp4-disconnected-config
   # The SSH key of the user that ran the Ansible step, used to connect to the git repo
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----

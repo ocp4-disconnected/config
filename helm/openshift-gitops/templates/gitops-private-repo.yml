@@ -9,4 +9,4 @@ stringData:
   type: git
   url: {{ .Values.gitRepoTemplate.url }}
   insecure: "true"
-  sshPrivateKey: {{ .Values.gitRepoTemplate.sshPrivateKey | b64enc}}
+  sshPrivateKey: {{ .Values.gitRepoTemplate.sshPrivateKey | quote }
