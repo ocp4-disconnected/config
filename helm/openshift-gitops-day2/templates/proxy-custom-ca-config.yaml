@@ -1,0 +1,27 @@
+{{- with .Values.cluster.ca }}
+---
+# This optionally specifies a CA to use in a cluster-wide CA.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .configMapName  }}
+  namespace: openshift-config
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+data:
+  ca-bundle.crt: |
+{{ .content | indent 4 }}
+
+---
+# If the cluster CA config was provided, uses it in the cluster's proxy.
+apiVersion: config.openshift.io/v1
+kind: Proxy
+metadata:
+  name: cluster
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  trustedCS:
+    name: {{ .configMapName }}
+
+{{- end }}

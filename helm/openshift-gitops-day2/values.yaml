@@ -4,7 +4,6 @@ cluster:
   # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
   ca:
     # true if you have a cert and want to set it, false to skip setting a cluster ca.
-    specify: true
     configMapName: cluster-proxy-ca
     content: |- # The cluster's CA
       ----- CA Content ------
@@ -29,6 +28,11 @@ cluster:
 # Used in:
 #  - nmstate-nncp-nodes.yaml
 #  - nmstate-nncp-bond.yaml 
+nmstate:
+  enabled: true
+  catalog_source: cs-redhat-operator-index
+  target_namespace: openshift-nmstate
+
 nncps:
   bond:
     name: bond0
@@ -44,8 +48,8 @@ nncps:
     - name: bond-ips
       node: master-0
       vlans:
-        - id: 1 # TODO:: specify, int
-          ip: 192.168.1.1 # TODO:: specify
+        - id: 1
+          ip: 192.168.1.1
 #  - name: worker-1
 #    vlans:
 #      - id: 2 # TODO:: specify, int
@@ -94,7 +98,7 @@ chrony:
 # Used in trident-sc.yaml, trident-nad.yaml
 storage:
   # The location of the trident/netapp host
-  provisioner: a.b.c.trident.netapp.io #IP/hostname
+  provisioner: csi.trident.netapp.io
   nad:
     mgmtAddress: "192.168.1.10/24"
     masterBond: "bond0.123"

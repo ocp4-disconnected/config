@@ -1,6 +1,7 @@
 gitOps:
   namespace: openshift-gitops
-  source: redhat-operators
+#  source: redhat-operators
+  source: cs-redhat-operator-index
 
 gitRepoTemplate:
   # The URL of the repository setup in the Ansible step.
@@ -9,11 +10,3 @@ gitRepoTemplate:
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
     -----END OPENSSH PRIVATE KEY-----
-icsp:
-  operator-0:
-    labels:
-      operators.openshift.org/catelog: "true"
-    mirrors:
-    - mirrors:
-      - fqdn.lab/quay
-      source: registry.redhat.io/quay

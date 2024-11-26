@@ -1,3 +1,7 @@
+{{- with .Values.nmstate }}
+
+---
+
 # Brings in the nmstate operator, installs it on the cluster.
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -5,12 +9,15 @@ metadata:
   labels:
     operators.coreos.com/kubernetes-nmstate-operator.openshift-nmstate: ""
   name: kubernetes-nmstate-operator
-  namespace: openshift-nmstate
+  namespace: {{ .target_namespace | default "openshift-nmstate" }}
   annotations:
     argocd.argoproj.io/sync-wave: "3"
 spec:
-  channel: stable
+  channel: {{ .channel | default "stable" }}
   installPlanApproval: Automatic
   name: kubernetes-nmstate-operator
-  source: redhat-operators
-  sourceNamespace: openshift-marketplace
+  source: {{ .catalog_source | default "redhat-operators" }}
+  sourceNamespace: {{ .sourceNamespace | default "openshift-marketplace" }}
+
+
+{{- end }}

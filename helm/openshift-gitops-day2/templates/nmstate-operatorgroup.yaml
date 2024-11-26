@@ -1,3 +1,4 @@
+{{- with .Values.nmstate }}
 # Brings in the operator group used for the nmstate operator.
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
@@ -5,8 +6,10 @@ metadata:
   annotations:
     olm.providedAPIs: NMState.v1.nmstate.io
     argocd.argoproj.io/sync-wave: "2"
-  name: openshift-nmstate
-  namespace: openshift-nmstate
+  name: {{ .target_namespace | default "openshift-nmstate" }}
+  namespace: {{ .target_namespace | default "openshift-nmstate" }}
 spec:
   targetNamespaces:
-  - openshift-nmstate
+  - {{ .target_namespace | default "openshift-nmstate" }}
+  
+  {{- end }}

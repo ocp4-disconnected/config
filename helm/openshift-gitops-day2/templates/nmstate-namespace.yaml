@@ -1,3 +1,4 @@
+{{- with .Values.nmstate }}
 # Defines the namespace we want to place the nmstate operator into
 apiVersion: v1
 kind: Namespace
@@ -5,9 +6,11 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "1"
   labels:
-    kubernetes.io/metadata.name: openshift-nmstate
-    name: openshift-nmstate
-  name: openshift-nmstate
+    kubernetes.io/metadata.name: {{ .target_namespace | default "openshift-nmstate" }}
+    name: {{ .target_namespace | default "openshift-nmstate" }}
+  name: {{ .target_namespace | default "openshift-nmstate" }}
 spec:
   finalizers:
   - kubernetes
+
+{{- end }}

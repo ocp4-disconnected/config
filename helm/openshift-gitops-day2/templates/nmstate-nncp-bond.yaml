@@ -1,21 +1,22 @@
+{{- with .Values.nncps.bond }}
 # Defines the standard bond to use in the other nncps configuration
 # Referenced in nmstate-nncp-nodes.yaml
 apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
-  name: {{ .Values.nncps.bond.name }}
+  name: {{ .name }}
   annotations:
     argocd.argoproj.io/sync-wave: "4"
 spec:
   desiredState:
     interfaces:
-      - name: {{ .Values.nncps.bond.name }}
+      - name: {{ .name }}
         type: bond
         link-aggregation:
           mode: 802.3ad
           port:
-{{ toYaml .Values.nncps.bond.bond.ports | indent 12 }}
-{{ range $i, $curVlan := .Values.nncps.bond.vlans }}
+{{ toYaml .bond.ports | indent 12 }}
+{{- range $i, $curVlan := .vlans }}
       - name: {{ $.Values.nncps.bond.name }}.{{ $curVlan.id }}
         state: up
         type: vlan
@@ -31,5 +32,5 @@ spec:
         name: br-{{ $.Values.nncps.bond.name }}.{{ $curVlan.id }}
         state: up
         type: linux-bridge 
-{{end}}
-
+{{- end -}}
+{{- end -}}
