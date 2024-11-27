@@ -9,7 +9,7 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "5"
 spec:
-  nodeSelecotor:
+  nodeSelector:
     kubernetes.io/hostname: {{ .node }}
   desiredState:
     interfaces:
