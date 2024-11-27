@@ -330,7 +330,9 @@ If you are running a disconnected server (or atleast on a network with no DNS), 
 
 #### Check Variables
 
-Validate the variables definded from the `Run the Deployment Playbook` portion above
+  Validate the variables definded from the `Run the Deployment Playbook` portion above
+
+  **NOTE:** Double check the `add_worker_disk_type: sda` playbooks/group_vars/all/cluster-deployment.yml matches the actual disk type of the target nodes; i.e. vda (virtual drives), sda (sata drives), or nvme drives.
 
 #### Run the playbook
 ```bash
