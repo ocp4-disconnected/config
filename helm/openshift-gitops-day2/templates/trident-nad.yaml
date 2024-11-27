@@ -3,6 +3,8 @@ kind: NetworkAttachmentDefinition
 metadata:
   name: mgmt-vlan
   namespace: trident-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
 spec:
   config: |-
     {

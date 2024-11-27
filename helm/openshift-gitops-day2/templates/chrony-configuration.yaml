@@ -1,33 +1,25 @@
+{{ range $i, $value := .Values.chrony.roles }}
 # This sets the chrony configuraiton for specified node roles
 # This is referenced in proxy.yaml
-{{ range $i, $value := .Values.chrony.roles }}
 ---
-apiVersion: machineConfiguration.openshift.io/v1
+apiVersion: machineconfiguration.openshift.io/v1
 kind: MachineConfig
 metadata:
   labels:
     machineconfiguration.openshift.io/role: {{ $value.role }}
   name: 99-{{ $value.role }}-chrony-configuration
   annotations:
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "6"
 spec:
   config:
     ignition:
-      config: {}
-      security:
-        tls: {}
-      timeouts: {}
       version: 2.2.0
-    networkd: {}
-    passwd: {}
     storage:
       files:
-      - contents:
-        source: data:text/plain;charset=utf-8;base64,{{ $.Values.chrony.configContent | b64enc }}
-        verification: {}
-      filesystem: root
-      mode: 420
-      path: /etc/chrony.conf
-  osImageUrl: ""
-{{ end }}
+        - contents:
+            source: data:text/plain;charset=utf-8;base64,{{ $.Values.chrony.configContent | b64enc }}
+          filesystem: root
+          mode: 420
+          path: /etc/chrony.conf
 # end chrony configs
+{{ end }}
