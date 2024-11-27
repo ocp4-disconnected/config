@@ -39,8 +39,7 @@ media_share_idracs:
 
 # Single Node Worker
 
-#add_worker_disk_type: vda
-
+worker_iso_disk_type: sda
 
 ## Cluster Node Config, The number of master nodes will effect if this a HA or Single node.
 
