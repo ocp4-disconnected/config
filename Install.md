@@ -334,7 +334,7 @@ Validate the variables definded from the `Run the Deployment Playbook` portion a
 
 #### Run the playbook
 ```bash
-ansible-playbook create-worker-for-single-node.yml
+ansible-playbook -K create-worker-for-single-node.yml
 ```
 
 or
