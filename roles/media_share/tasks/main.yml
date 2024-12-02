@@ -14,12 +14,14 @@
   when: media_share_idrac | bool and  filtered_idracs | length > 0
   
 - name: Create the temporary webserver | runs in background via tmux
-  shell:
-    cmd: 'tmux new-session -d -s temp-webserver python3 -m http.server'
+  shell: |
+    if ! tmux has-session -t temp-webserver 2>/dev/null; then
+      tmux new-session -d -s temp-webserver python3 -m http.server
+    fi
   args:
     chdir: "{{ common_openshift_cluster_install_dir }}"
   failed_when: false
-  when: media_share_idrac | bool and  filtered_idracs | length > 0
+  when: media_share_idrac | bool and filtered_idracs | length > 0
 
 - ansible.builtin.include_tasks: idrac.yml
   loop: "{{ filtered_idracs }}"
