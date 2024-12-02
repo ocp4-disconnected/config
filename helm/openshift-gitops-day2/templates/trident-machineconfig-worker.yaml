@@ -4,7 +4,7 @@ metadata:
   name: 98-worker-nfs-rpc-slot-tables
   labels:
     machineconfiguration.openshift.io/role: worker
-    argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-wave: "6"
 spec:
   config:
     ignition:

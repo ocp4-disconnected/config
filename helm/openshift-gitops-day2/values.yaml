@@ -3,26 +3,26 @@ cluster:
   # Used in the proxy to specify the certs to use there.
   # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
   ca:
-    # true if you have a cert and want to set it, false to skip setting a cluster ca.
-    configMapName: cluster-proxy-ca
-    content: |- # The cluster's CA
-      ----- CA Content ------
-      ......
-      ----- end content ----
-  # Ingress related configuraiton.
-  # Used in:
-  #  - ingress-certs-secret.yaml
-  #  - ingress-controller.yaml
-  ingress:
-    secretName: ingress-cert
-    cert: |- # The content of the ssl cert to use for ingress
-      ---- cert content ----
-      ....
-      ---- content ------
-    key: # The content of the ssl cert key to use for ingress
-      ----- cert content ----
-      .....
-      ----- cert content ----
+#    # true if you have a cert and want to set it, false to skip setting a cluster ca.
+#    configMapName: cluster-proxy-ca
+#    content: |- # The cluster's CA
+#      ----- CA Content ------
+#      ......
+#      ----- end content ----
+#  # Ingress related configuraiton.
+#  # Used in:
+#  #  - ingress-certs-secret.yaml
+#  #  - ingress-controller.yaml
+#  ingress:
+#    secretName: ingress-cert
+#    cert: |- # The content of the ssl cert to use for ingress
+#      ---- cert content ----
+#      ....
+#      ---- content ------
+#    key: # The content of the ssl cert key to use for ingress
+#      ----- cert content ----
+#      .....
+#      ----- cert content ----
 # TODO:: doublecheck updated from site
 # Configuration for NodeNetworkConfigurationPolicy
 # Used in:
@@ -39,10 +39,13 @@ nncps:
     bond:
       ports:
         - ens2f0
+        - ens2f1
         - ens3f0  
+        - ens3f1
         # etc
     vlans:
       - id: 677
+      - id: 58
       # etc
   nodes:
     - name: bond-ips
@@ -62,22 +65,22 @@ nncps:
 #  - ldap-bind-secret.yaml
 #  - ldap-oauth-provider.yaml
 ldap:
-  # The name of the LDAPSyncConfig (ldap-accounts.yaml)
-  syncConfigName: foo
-  accountName: sAMAccountName
-  bindDN: # like some.svc.ocp
-  bindPW: foo # plaintext password to access LDAP server
-  server:
-    name: # like NAME LDAP
-    urlFull: # like: ldap://fdqn/dn?accountName
-    urlShort: # like: ldap://fdqn
-  groupUIDNameMapping: '"cn=foo,ou=bar": foo' # Like "cn=foo,ou=bar...": bar
-  queries:
-    group:
-      baseDN: # Like "cn=foo,ou=bar..."
-    user:
-      baseDN: # Like "cn=foo,ou=bar..."
-      filter: # Like "(cn=foo,ou=bar...)"
+#  # The name of the LDAPSyncConfig (ldap-accounts.yaml)
+#  syncConfigName: foo
+#  accountName: sAMAccountName
+#  bindDN: # like some.svc.ocp
+#  bindPW: foo # plaintext password to access LDAP server
+#  server:
+#    name: # like NAME LDAP
+#    urlFull: # like: ldap://fdqn/dn?accountName
+#    urlShort: # like: ldap://fdqn
+#  groupUIDNameMapping: '"cn=foo,ou=bar": foo' # Like "cn=foo,ou=bar...": bar
+#  queries:
+#    group:
+#      baseDN: # Like "cn=foo,ou=bar..."
+#    user:
+#      baseDN: # Like "cn=foo,ou=bar..."
+#      filter: # Like "(cn=foo,ou=bar...)"
 
 # Chrony configuration.
 # The chrony configuration defined in configContent is applied to all OCP nodes with each of the roles specified.
@@ -101,5 +104,5 @@ storage:
   provisioner: csi.trident.netapp.io
   nad:
     mgmtAddress: "192.168.1.10/24"
-    masterBond: "bond0.123"
+    masterBond: "bond0.672"
 
