@@ -277,7 +277,7 @@ If you are running a disconnected server (or atleast on a network with no DNS), 
 
 3. Choose Your Interface:
 
-    Highlight the desired network interface (e.g., eth0, ens33, or eth0.12 etc.).
+    Highlight the interface that lives in the same IP space and VLAN as your soon to be deployed cluster (e.g. eth0, or eth0.670).
 
     Press Enter to edit the selected connection.
 
