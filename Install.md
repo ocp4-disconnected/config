@@ -258,3 +258,91 @@ or
 ```bash
 ./deploy-cluster.yml
 ```
+
+### Fix DNS for disconnected cluser without a DNS Server.
+If you are running a disconnected server (or atleast on a network with no DNS), We recommend that you now point your bastion at master-0 node to be able to resolve cluster resources (ingress/api) 
+
+
+1. Open nmtui Interface:
+
+    Run the following command in your terminal:
+    ```bash
+    sudo nmtui
+    ```
+
+2. Select "Edit a Connection":
+
+    Use the arrow keys to navigate to Edit a connection and press Enter.
+
+
+3. Choose Your Interface:
+
+    Highlight the interface that lives in the same IP space and VLAN as your soon to be deployed cluster (e.g. eth0, or eth0.670).
+
+    Press Enter to edit the selected connection.
+
+
+4. Edit IPv4:
+
+    Use the arrow keys to navigate to IPv4 CONFIGURATION.
+
+
+5. Add DNS Server:
+
+    Navigate to the DNS servers field.
+
+    Enter the IP of master-0.
+
+
+6. Save Changes:
+
+    Use the arrow keys to navigate to <OK> and press Enter to save the settings.
+
+
+7. Activate the Connection:
+
+    Navigate back to the main nmtui menu and select Activate a connection.
+
+    Highlight the interface you just edited, and press Enter to deactivate and reactivate the connection, applying the changes.
+
+
+8. Verify the DNS Settings:
+
+    Run the following command to ensure the DNS server is correctly applied:
+    ```bash
+    nmcli dev show <interface_name> | grep IP4.DNS
+    ```
+    Replace <interface_name> with the name of your network interface.
+
+9. Test with oc:
+
+    You can test resolution with oc by running the following:
+    ```bash
+    oc whoami
+    ```
+
+    It should return: 
+    ```bash
+    sysadmin
+    ```
+
+### Add an additional node:
+
+#### Check Variables
+
+  Validate the variables definded from the `Run the Deployment Playbook` portion above
+
+  **NOTE:** Double check the `add_worker_disk_type: sda` playbooks/group_vars/all/cluster-deployment.yml matches the actual disk type of the target nodes; i.e. vda (virtual drives), sda (sata drives), or nvme drives.
+
+#### Run the playbook
+```bash
+ansible-playbook -K create-worker-for-single-node.yml
+```
+
+or
+
+```bash
+./create-worker-for-single-node.yml
+```
+
+**NOTE:** DNS needs to be functional as definded in the previous section, or it will fail when pulling the worker ignition file from the "cluster".
