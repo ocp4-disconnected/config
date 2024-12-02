@@ -8,6 +8,7 @@ metadata:
   name: {{ .name }}
   annotations:
     argocd.argoproj.io/sync-wave: "5"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   nodeSelector:
     kubernetes.io/hostname: {{ .node }}
