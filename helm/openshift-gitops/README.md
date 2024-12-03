@@ -30,6 +30,7 @@ gitRepoTemplate:
     -----END OPENSSH PRIVATE KEY-----
 ```
 
+
 ## Usage
 
 To apply this template to your cluster, simply run the helm install command:
