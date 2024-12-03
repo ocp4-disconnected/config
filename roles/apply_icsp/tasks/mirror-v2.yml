@@ -1,0 +1,15 @@
+---
+- name: Find all yamls from working-dir
+  ansible.builtin.find:
+    paths: "{{ common_openshift_oc_mirror_dir }}/{{ image_source }}/working-dir/cluster-resources"
+    patterns: "*.yaml"
+    file_type: file
+  register: v2_yamls
+
+- name: Apply any catalog files using oc
+  ansible.builtin.command:
+    cmd: oc apply -f "{{ item.path }}"
+  with_items: "{{ v2_yamls.results }}"
+  loop_control:
+    label: "{{ item.path }}"
+  when: v2_yamls.results | length > 0

@@ -12,7 +12,7 @@
   retries: 5
   delay: 10
   until: push_images_v1.rc == 0
-  when: mirror_content_oc_mirror_v2 is false
+  when: not mirror_content_oc_mirror_v2 | default(false) | bool
 
 - name: push {{ image_source }} images into registry with oc-mirror v2
   ansible.builtin.command:
@@ -23,4 +23,4 @@
   retries: 5
   delay: 10
   until: push_images_v2.rc == 0
-  when: mirror_content_oc_mirror_v2 is true
+  when: mirror_content_oc_mirror_v2 | bool
