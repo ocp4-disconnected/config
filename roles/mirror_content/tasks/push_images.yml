@@ -7,7 +7,7 @@
 - name: push {{ image_source }} images into registry
   ansible.builtin.command:
     cmd: "oc-mirror --from {{ common_openshift_oc_mirror_dir }}/{{ image_source }} \
-      docker://{{ ipv4_address | first }}:{{ common_registry_port }}"
+      docker://{{ ipv4_address | first }}:{{ common_registry_port }} {{ '--v2 --workspace file://.' if mirror_content_oc_mirror_v2 | default(false) | bool else '' }}"
   register: push_images
   retries: 5
   delay: 10
