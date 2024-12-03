@@ -4,11 +4,23 @@
     ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
   when: ipv4_address is undefined
 
-- name: push {{ image_source }} images into registry
+- name: push {{ image_source }} images into registry with oc-mirror v1
   ansible.builtin.command:
     cmd: "oc-mirror --from {{ common_openshift_oc_mirror_dir }}/{{ image_source }} \
-      docker://{{ ipv4_address | first }}:{{ common_registry_port }} {{ '--v2 --workspace file://.' if mirror_content_oc_mirror_v2 | default(false) | bool else '' }}"
-  register: push_images
+      docker://{{ ipv4_address | first }}:{{ common_registry_port }}"
+  register: push_images_v1
   retries: 5
   delay: 10
-  until: push_images.rc == 0
+  until: push_images_v1.rc == 0
+  when: mirror_content_oc_mirror_v2 is false
+
+- name: push {{ image_source }} images into registry with oc-mirror v2
+  ansible.builtin.command:
+    cmd: "oc-mirror --from file://{{ common_openshift_oc_mirror_dir }}/{{ image_source }} \
+      --config {{ common_openshift_oc_mirror_dir }}/{{ image_source }}.yml \
+      docker://{{ ipv4_address | first }}:{{ common_registry_port }} --v2"
+  register: push_images_v2
+  retries: 5
+  delay: 10
+  until: push_images_v2.rc == 0
+  when: mirror_content_oc_mirror_v2 is true
