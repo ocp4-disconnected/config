@@ -8,7 +8,8 @@ common_openshift_dir: /pods/content
 common_connected_cluster: false
 mirror_content_pull_mirror: false
 
-common_openshift_interface: ens1
+#agent_iso_cluster_name: ocp-sno
+common_openshift_interface: eno1
 common_fips_enabled: true
 common_cluster_domain: example.com
 
