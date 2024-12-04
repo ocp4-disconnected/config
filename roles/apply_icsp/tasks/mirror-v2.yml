@@ -1,7 +1,7 @@
 ---
 - name: Find all yamls from working-dir
   ansible.builtin.find:
-    paths: "{{ common_openshift_oc_mirror_dir }}/{{ image_source }}/working-dir/cluster-resources"
+    paths: "{{ common_openshift_oc_mirror_dir }}/operators/working-dir/cluster-resources"
     patterns: "*.yaml"
     file_type: file
   register: v2_yamls
