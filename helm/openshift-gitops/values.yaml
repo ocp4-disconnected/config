@@ -1,7 +1,7 @@
 gitOps:
   namespace: openshift-gitops
 #  source: redhat-operators
-  source: cs-redhat-operator-index
+  source: cs-redhat-operator-index-v4-16
 
 gitRepoTemplate:
   # The URL of the repository setup in the Ansible step.
