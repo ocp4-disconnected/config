@@ -31,4 +31,5 @@
   kubernetes.core.helm:
     chart_ref: "{{ playbook_dir }}/../helm/openshift-gitops"
     release_name: "{{ helm_day1_release_name }}"
+    release_namespace: default
 
