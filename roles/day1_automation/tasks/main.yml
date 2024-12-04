@@ -24,7 +24,7 @@
 
 - name: Check for existing helm release
   ansible.builtin.command:
-    cmd: "helm list | grep {{ helm_day1_release_name }} | wc -l"
+    cmd: "helm list 2>/dev/null | grep {{ helm_day1_release_name }} | wc -l"
   register: helm_release_exists
 
 - name: Run a fresh helm install
