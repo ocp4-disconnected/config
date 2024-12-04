@@ -15,7 +15,7 @@
 
 - name: Generate day1 values file
   ansible.builtin.template:
-    src: "day1-values.yaml.j2" 
+    src: "day1-values.yaml.j2"
     dest: "{{ helm_values_filepath }}"
     mode: '0644'
     owner: "{{ ansible_user_id }}"
