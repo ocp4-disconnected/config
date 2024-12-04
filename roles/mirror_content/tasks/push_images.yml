@@ -24,3 +24,9 @@
   delay: 10
   until: push_images_v2.rc == 0
   when: mirror_content_oc_mirror_v2 | bool
+
+- name: Write oc-mirror output to log file
+  ansible.builtin.copy:
+    content: "{{ push_images_v2.stdout }}"
+    dest: "~/oc-mirror-{{ image_source }}-register.log"
+  when: push_images_v2.rc == 0
