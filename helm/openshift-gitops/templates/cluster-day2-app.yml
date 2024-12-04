@@ -15,4 +15,4 @@ spec:
     repoURL: {{ .Values.gitRepoTemplate.url | quote }}
     targetRevision: HEAD
   syncPolicy:
-    automated: {}
+    manual: {}
