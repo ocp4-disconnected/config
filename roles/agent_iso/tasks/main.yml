@@ -43,7 +43,7 @@
 - name: Generate configuration files
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ common_openshift_cluster_install_dir }}/{{ item }}"
+    dest: "{{ common_openshift_cluster_install_dir }}/{{ item }}-copy"
     mode: '0644'
     owner: "{{ ansible_user_id }}"
     group: wheel
@@ -54,8 +54,8 @@
 
 - name: Create copys of configuration files
   ansible.builtin.copy:
-    src: "{{ common_openshift_cluster_install_dir }}/{{ item }}"
-    dest: "{{ common_openshift_cluster_install_dir }}/{{ item }}-copy"
+    src: "{{ common_openshift_cluster_install_dir }}/{{ item }}-copy"
+    dest: "{{ common_openshift_cluster_install_dir }}/{{ item }}"
     remote_src: yes
   with_items:
    - install-config.yaml
