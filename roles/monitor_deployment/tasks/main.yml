@@ -12,14 +12,28 @@
 
 - name: Monitor node health
   ansible.builtin.shell:
-    cmd: "{{ oc_command }}"
+    cmd: "{{ oc_command_node_status}}"
   register: node_status
   retries: 120
   delay: 15
   until: node_status.stdout >= node_count
   when: bootstrap_output.stderr is search(bootstrap_complete_text)
 
-- name: status
+- name: Node Status
   ansible.builtin.debug:
     msg: "Node ready count is: {{node_status.stdout}}"
   when: node_status.stdout >= node_count
+
+- name: Monitor cluster operator status
+  ansible.builtin.shell:
+    cmd: "{{ oc_command_co_status}}"
+  register: co_status
+  retries: 120
+  delay: 15
+  until: co_status.stdout = 0
+  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+
+- name: Cluster Operator Status
+  ansible.builtin.debug:
+    msg: "No more cluster operators in Avialbe=False state"
+  when: co_status.stdout = 0

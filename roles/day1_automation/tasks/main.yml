@@ -1,0 +1,23 @@
+---
+# tasks file for day1_automation
+- name: Set fact for {{ common_ip_space }} IPv4 address
+  set_fact:
+    ipv4_address: "{{ ansible_all_ipv4_addresses | select('match', '^' + common_ip_space + '\\.') | list }}"
+  when: ipv4_address is undefined
+
+- name: Extract the first IP address
+  set_fact:
+    current_host_ip: "{{ ipv4_address | first  }}"
+
+- name: get SSH private key
+  set_fact:
+    sshKey: "{{ lookup('ansible.builtin.file', common_ssh_key) }}"
+
+- name: Generate day1 values file
+  ansible.builtin.template:
+    src: "day1-values.yaml.j2"
+    dest: "{{ helm_values_filepath }}"
+    mode: '0644'
+    owner: "{{ ansible_user_id }}"
+    group: wheel
+  become: true
