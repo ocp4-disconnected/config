@@ -8,7 +8,7 @@
 
     - name: Extract the first IP address
       set_fact:
-        current_host_ip: {{ ipv4_address | first  }}
+        current_host_ip: "{{ ipv4_address | first  }}"
     
     - name: get SSH private key
       set_fact:
