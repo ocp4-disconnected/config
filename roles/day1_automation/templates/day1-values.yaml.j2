@@ -7,4 +7,4 @@ gitRepoTemplate:
   url: git@{{ ipv4_address | first  }}:repos/ocp4-disconnected-config
   # The SSH key of the user that ran the Ansible step, used to connect to the git repo
   sshPrivateKey: |
-    "{{ lookup('ansible.builtin.file', common_ssh_key) | indent }}"
+    {{ lookup('ansible.builtin.file', common_ssh_key) | indent }}
