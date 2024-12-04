@@ -9,7 +9,7 @@
 - name: Apply any catalog files using oc
   ansible.builtin.command:
     cmd: oc apply -f "{{ item.path }}"
-  with_items: "{{ v2_yamls.results }}"
+  with_items: "{{ v2_yamls.files }}"
   loop_control:
     label: "{{ item.path }}"
-  when: v2_yamls.results | length > 0
+  when: v2_yamls.files | length > 0
