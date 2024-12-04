@@ -21,3 +21,14 @@
     owner: "{{ ansible_user_id }}"
     group: wheel
   become: true
+
+- name: run helm install command
+  # ansible.builtin.command:
+  #   cmd: 
+  #     - cd {{ playbook_dir }}/../helm/openshift-gitops && pwd
+  #     - helm install {{ helm_day1_release_name }} {{ helm_options }} .
+  # when: auto_run_helm | bool
+  kubernetes.core.helm:
+    chart_ref: "{{ playbook_dir }}/../helm/openshift-gitops"
+    release_name: "{{ helm_day1_release_name }}"
+
