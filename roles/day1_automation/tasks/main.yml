@@ -26,5 +26,5 @@
   ansible.builtin.command:
     cmd: 
       - cd {{ playbook_dir }}/../helm/openshift-gitops
-      - helm install {{ helm_day1_release_name }} .
-  when: "{{ auto_run_helm | bool }}"
+      - helm install {{ helm_day1_release_name }} . {{ helm_options }}
+  when: auto_run_helm | bool
