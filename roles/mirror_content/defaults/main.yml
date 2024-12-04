@@ -1,4 +1,4 @@
 ## This file is empty - was not generated from a skeleton config. If you would like to look at an example, please run `ansible-galaxy role init example_skeleton` for more info
 
 #image_source: cluster-images
-mirror_content_oc_mirror_v2: true
+common_oc_mirror_v2: true

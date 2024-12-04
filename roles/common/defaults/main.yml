@@ -9,6 +9,7 @@ common_git_repos:
 common_install_dir: "{{ ansible_user_dir }}"
 common_trident_version: v24.06.0
 common_fips_enabled: true
+common_oc_mirror_v2: true
 
 ## OpenShift Connected Install Variables
 common_openshift_interface: eno1
