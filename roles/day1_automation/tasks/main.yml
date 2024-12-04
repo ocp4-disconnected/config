@@ -15,17 +15,28 @@
 
 - name: Generate day1 values file
   ansible.builtin.template:
-    src: "day1-values.yaml.j2"
+    src: "day1-values.yaml.j2" 
     dest: "{{ helm_values_filepath }}"
     mode: '0644'
     owner: "{{ ansible_user_id }}"
     group: wheel
   become: true
 
-- name: run helm install command
+- name: Check for existing helm release
+  ansible.builtin.command:
+    cmd: "helm list | grep {{ helm_day1_release_name }} | wc -l"
+  register: helm_release_exists
+
+- name: Run a fresh helm install
   ansible.builtin.command: 
     cmd: "helm install {{ helm_day1_release_name }} {{ helm_options }} ."
   args:
     chdir: "{{ playbook_dir }}/../helm/openshift-gitops"
-  when: auto_run_helm | bool
+  when: auto_run_helm | bool and helm_release_exists.stdout == "0"
 
+- name: Run a helm upgrade on existing helm release
+  ansible.builtin.command: 
+    cmd: "helm upgrade {{ helm_day1_release_name }} ."
+  args:
+    chdir: "{{ playbook_dir }}/../helm/openshift-gitops"
+  when: auto_run_helm | bool and helm_release_exists.stdout != "0"
