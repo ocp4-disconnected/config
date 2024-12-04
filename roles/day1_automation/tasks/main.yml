@@ -26,6 +26,11 @@
   ansible.builtin.command:
     cmd: "helm list"
   register: helm_release_exists
+  ignore_errors: yes
+
+- name: Display any existing helm releases
+  ansible.builtin.debug:
+    msg: "{{ helm_release_exists.stdout }}"
 
 - name: Run a fresh helm install
   ansible.builtin.command: 
