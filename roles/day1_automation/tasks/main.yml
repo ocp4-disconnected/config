@@ -21,3 +21,10 @@
     owner: "{{ ansible_user_id }}"
     group: wheel
   become: true
+
+- name: run helm install command
+  ansible.builtin.command:
+    cmd: 
+      - cd {{ playbook_dir }}/../helm/openshift-gitops
+      - helm install {{ helm_day1_release_name }} .
+  when: "{{ auto_run_helm | bool }}"
