@@ -1,8 +1,7 @@
 ---
 # defaults file for monitor_deployment
 
-install_dir: "/ansible/isac/install-2024-08-06"
 log_level: "info"
 bootstrap_complete_text: "bootstrap is complete"
-oc_command: "oc get nodes --no-headers | awk '{print $2}' | grep Ready | wc -l"
+oc_command: "oc get nodes --no-headers | awk '{print $2}' | grep Ready | grep -iv "Not" | wc -l"
 node_count: "{{ common_nodes | selectattr('name', 'search', '^master') | list | length }}"
