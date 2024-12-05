@@ -26,12 +26,13 @@
 
 - name: Monitor cluster operator status
   ansible.builtin.shell:
-    cmd: "{{ oc_command_co_status}}"
+    cmd: "{{ item }}"
   register: co_status
   retries: 120
   delay: 15
   until: co_status.stdout == "0"
   when: bootstrap_output.stderr is search(bootstrap_complete_text)
+  with_items: {{ oc_command_co_status }}
 
 - name: Cluster Operator Status
   ansible.builtin.debug:

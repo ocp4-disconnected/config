@@ -4,5 +4,8 @@
 log_level: "info"
 bootstrap_complete_text: "bootstrap is complete"
 oc_command_node_status: "oc get nodes --no-headers | awk '{print $2}' | grep Ready | grep -iv 'Not' | wc -l"
-oc_command_co_status: "oc get co |awk '{print $3}' |grep -i 'false' | wc -l"
+oc_command_co_status: 
+  - "oc get co |awk '{print $3}' |grep -i 'false' | wc -l"
+  - "oc get co |awk '{print $4}' |grep -i 'true' | wc -l"
+  - "oc get co |awk '{print $5}' |grep -i 'true' | wc -l"
 node_count: "{{ common_nodes | selectattr('name', 'search', '^master') | list | length }}"
