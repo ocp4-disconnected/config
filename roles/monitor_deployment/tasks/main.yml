@@ -8,14 +8,18 @@
 - name: Monitor OpenShift installation bootstrap process (FIPS MODE)
   ansible.builtin.command:
     cmd: "openshift-install-fips --dir {{ common_openshift_cluster_install_dir }} agent wait-for bootstrap-complete --log-level={{ log_level }}"
-  register: bootstrap_output
+  register: bootstrap_output_fips
   when: common_fips_enabled
 
 - name: Check status of cluster bootstrap
   debug:
     msg: "{{ bootstrap_output.stderr_lines[-1] }}"
-  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+  when: not common_fips_enabled and bootstrap_output.stderr is search(bootstrap_complete_text)
 
+- name: Check status of cluster bootstrap (FIPS MODE)
+  debug:
+    msg: "{{ bootstrap_output.stderr_lines[-1] }}"
+  when: common_fips_enabled and bootstrap_output_fips.stderr is search(bootstrap_complete_text)
 
 - name: Monitor node health
   ansible.builtin.shell:
