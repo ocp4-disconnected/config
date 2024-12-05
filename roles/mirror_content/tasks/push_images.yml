@@ -18,7 +18,10 @@
   ansible.builtin.shell: |
     oc-mirror --from file://{{ common_openshift_oc_mirror_dir }}/{{ image_source }} \
       --config {{ common_openshift_oc_mirror_dir }}/{{ image_source }}.yml \
-      docker://{{ ipv4_address | first }}:{{ common_registry_port }} --v2 | tee ~/.oc-mirror-{{ image_source }}.log
+      docker://{{ ipv4_address | first }}:{{ common_registry_port }} --v2
+  environment:
+    OC_MIRROR_CACHE: "{{ common_openshift_oc_mirror_dir }}/.cache"
+
   register: push_images_v2
   retries: 5
   delay: 10
