@@ -36,5 +36,6 @@
 
 - name: Cluster Operator Status
   ansible.builtin.debug:
-    msg: "No more cluster operators in Available=False state"
-  when: co_status.stdout == "0"
+    msg: "Cluster operators in appropriate state"
+  when: item.stdout == "0"
+  with_items: "{{ co_status }}"
