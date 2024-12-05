@@ -33,3 +33,9 @@
   until: co_status.stdout == "0"
   when: bootstrap_output.stderr is search(bootstrap_complete_text)
   with_items: "{{ oc_command_co_status }}"
+
+- name: Cluster Operator Status
+  ansible.builtin.debug:
+    msg: "Cluster operators in appropriate state"
+  when: item.stdout == "0"
+  with_items: "{{ co_status.results }}"
