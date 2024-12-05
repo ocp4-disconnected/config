@@ -30,10 +30,10 @@
   register: co_status
   retries: 120
   delay: 15
-  until: co_status.stdout = 0
+  until: co_status.stdout == "0"
   when: bootstrap_output.stderr is search(bootstrap_complete_text)
 
 - name: Cluster Operator Status
   ansible.builtin.debug:
-    msg: "No more cluster operators in Avialbe=False state"
-  when: co_status.stdout = 0
+    msg: "No more cluster operators in Available=False state"
+  when: co_status.stdout == "0"
