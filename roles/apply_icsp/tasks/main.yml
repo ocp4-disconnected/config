@@ -6,7 +6,8 @@
 
 - name: Run workflow for applying ICSP with oc-mirror v1
   include_tasks: mirror-v1.yml
-  when: not common_oc_mirror_v2 | default(false) | bool 
+  when: not common_oc_mirror_v2 | bool 
+
   
 - name: Run workflow for applying ICSP with oc-mirror v2
   include_tasks: mirror-v2.yml
