@@ -46,7 +46,6 @@
     mode: '0644'
   with_items:
     - openshift-client-linux.tar.gz
-    - oc-mirror.rhel9.tar.gz
     - openshift-install-linux.tar.gz
     - openshift-install-rhel9-amd64.tar.gz
   when: download_bin is changed
