@@ -41,10 +41,15 @@
     operators_unhealthy=$(oc get co --no-headers | grep {{ common_openshift_release }} | awk '$3 != "True" || $4 == "True" || $5 == "True"' | wc -l)
     if [ $operators_found -eq 0 ]; then
       echo "Bad output for oc get complete"
+    else
+      echo "Operators found: $operators_found"
     fi
 
     if [ $operators_unhealthy -ne 0 ]; then
       echo "Bad operator status found"
+    else
+      echo "All Operators Healthy:"
+      echo $(oc get co)
     fi
   register: co_status
   # retries: 120
