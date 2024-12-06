@@ -26,6 +26,8 @@
   ansible.builtin.command: 
     cmd: "{{ common_openshift_client_bin }}/oc-mirror --config {{ common_openshift_oc_mirror_dir }}/{{ item }} \
       file://{{ common_openshift_oc_mirror_dir }}/{{ item.split ('.')[0] }} {{ '--v2' if common_oc_mirror_v2 | default(false) | bool else '' }}"
+  environment:
+    OC_MIRROR_CACHE: "{{ common_openshift_oc_mirror_dir }}/.cache"  
   register: mirror_pull
   when: template_result.changed | bool
   retries: 5
