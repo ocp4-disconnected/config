@@ -2,6 +2,7 @@
 - name: Monitor OpenShift installation bootstrap process
   ansible.builtin.command:
     cmd: "openshift-install --dir {{ common_openshift_cluster_install_dir }} agent wait-for bootstrap-complete --log-level={{ log_level }}"
+    timeout: 10800 #3 hours
   register: bootstrap_output
   when: not common_fips_enabled
 
@@ -25,8 +26,8 @@
   ansible.builtin.shell:
     cmd: "{{ oc_command_node_status}}"
   register: node_status
-  retries: 120
-  delay: 15
+  retries: 240
+  delay: 15 #240 retries at 15 seconds = 1 hour timeout
   until: node_status.stdout >= node_count
 
 - name: Node Status
@@ -54,8 +55,8 @@
     
     echo $(oc get co)
   register: co_status
-  retries: 120
-  delay: 15
+  retries: 240
+  delay: 15 #240 retries at 15 seconds = 1 hour timeout
   until: '"Bad" not in co_status.stdout'
 
 - name: Cluster Operator Status
