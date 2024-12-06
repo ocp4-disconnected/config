@@ -28,7 +28,7 @@
   retries: 120
   delay: 15
   until: node_status.stdout >= node_count
-  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+  # when: bootstrap_output.stderr is search(bootstrap_complete_text)
 
 - name: Node Status
   ansible.builtin.debug:
@@ -44,7 +44,7 @@
   retries: 120
   delay: 15
   until: '"Bad" not in co_status.stdout'
-  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+  # when: bootstrap_output.stderr is search(bootstrap_complete_text)
   # with_items: "{{ oc_command_co_status }}"
 
 - name: Cluster Operator Status
