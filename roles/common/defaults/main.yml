@@ -11,6 +11,8 @@ common_trident_version: v24.06.0
 common_fips_enabled: true
 common_oc_mirror_v2: true
 
+
+
 ## OpenShift Connected Install Variables
 common_openshift_interface: eno1
 common_cluster_domain: example.com
@@ -19,6 +21,7 @@ commond_connected_cluster: true
 
 ## Openshift Disconnected Install Variables
 common_openshift_release: 4.14.16
+common_oc_mirror_release: 4.17.8
 common_previous_openshift_release: 4.14.16
 common_registry_volume: /pods/registry #### NEED TO RE-EVALUATE. FOR SOME REASON AGENT INSTALL USES THIS
 common_ip_space: 192.168.69

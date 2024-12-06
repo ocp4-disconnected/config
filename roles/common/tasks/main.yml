@@ -51,6 +51,16 @@
     - openshift-install-rhel9-amd64.tar.gz
   when: download_bin is changed
 
+
+- name: Download latest oc-mirror
+  ansible.builtin.get_url:
+    url: "{{ common_openshift_download_base_url }}/ocp/{{ common_oc_mirror_release }}/{{ item }}"
+    dest: "{{ common_openshift_download_dir }}"
+    mode: '0644'
+  with_items:
+    - oc-mirror.rhel9.tar.gz
+  when: download_bin is changed
+
 - name: Extract oc tools
   ansible.builtin.unarchive:
     src: "{{ common_openshift_download_dir }}/{{ item }}"
