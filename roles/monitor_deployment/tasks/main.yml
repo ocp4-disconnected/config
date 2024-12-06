@@ -38,8 +38,8 @@
 - name: Monitor cluster operator status
   ansible.builtin.shell:
     cmd: 
-      - "if [ $(oc get co --no-headers | grep {{ common_openshift_release }} | wc -l) -eq 0 ]; then echo 'Bad output for oc get co'; fi"
-      - "if [ $(oc get co --no-headers | grep {{ common_openshift_release }} | awk '$3 != "True" || $4 == "True" || $5 == "True"' | wc -l) -eq 0 ]; then echo 'Bad output for oc get co'; fi"
+      - if [ $(oc get co --no-headers | grep "{{ common_openshift_release }}" | wc -l) -eq 0 ]; then echo 'Bad output for oc get co'; fi
+      - if [ $(oc get co --no-headers | grep "{{ common_openshift_release }}" | awk '$3 != "True" || $4 == "True" || $5 == "True"' | wc -l) -eq 0 ]; then echo 'Bad output for oc get co'; fi
   register: co_status
   retries: 120
   delay: 15
