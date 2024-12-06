@@ -37,16 +37,20 @@
 
 - name: Monitor cluster operator status
   ansible.builtin.shell:
-    cmd: "{{ item }}"
+    cmd: 
+      - "if [ $(oc get co --no-headers | grep {{ common_openshift_release }} | wc -l) -eq 0 ]; then echo 'Bad output for oc get co'; fi"
+      - "if [ $(oc get co --no-headers | grep {{ common_openshift_release }} | awk '$3 != "True" || $4 == "True" || $5 == "True"' | wc -l) -eq 0 ]; then echo 'Bad output for oc get co'; fi"
   register: co_status
   retries: 120
   delay: 15
-  until: co_status.stdout == "0"
+  until: "Bad" not in co_status.stdout
   when: bootstrap_output.stderr is search(bootstrap_complete_text)
-  with_items: "{{ oc_command_co_status }}"
+  # with_items: "{{ oc_command_co_status }}"
 
 - name: Cluster Operator Status
   ansible.builtin.debug:
-    msg: "Cluster operators in appropriate state"
+    msg: 
+      - "Cluster operators in appropriate state"
+      - "{{ co_status }}"
   when: item.stdout == "0"
-  with_items: "{{ co_status.results }}"
+  # with_items: "{{ co_status.results }}"
