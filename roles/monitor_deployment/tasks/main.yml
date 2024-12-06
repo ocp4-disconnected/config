@@ -2,22 +2,33 @@
 - name: Monitor OpenShift installation bootstrap process
   ansible.builtin.command:
     cmd: "openshift-install --dir {{ common_openshift_cluster_install_dir }} agent wait-for bootstrap-complete --log-level={{ log_level }}"
+    timeout: 10800 #3 hours
   register: bootstrap_output
+  when: not common_fips_enabled
+
+- name: Monitor OpenShift installation bootstrap process (FIPS MODE)
+  ansible.builtin.command:
+    cmd: "openshift-install-fips --dir {{ common_openshift_cluster_install_dir }} agent wait-for bootstrap-complete --log-level={{ log_level }}"
+  register: bootstrap_output_fips
+  when: common_fips_enabled
 
 - name: Check status of cluster bootstrap
   debug:
     msg: "{{ bootstrap_output.stderr_lines[-1] }}"
-  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+  when: not common_fips_enabled and bootstrap_output.stderr is search(bootstrap_complete_text)
 
+- name: Check status of cluster bootstrap (FIPS MODE)
+  debug:
+    msg: "{{ bootstrap_output_fips.stderr_lines[-1] }}"
+  when: common_fips_enabled and bootstrap_output_fips.stderr is search(bootstrap_complete_text)
 
 - name: Monitor node health
   ansible.builtin.shell:
     cmd: "{{ oc_command_node_status}}"
   register: node_status
-  retries: 120
-  delay: 15
+  retries: 240
+  delay: 15 #240 retries at 15 seconds = 1 hour timeout
   until: node_status.stdout >= node_count
-  when: bootstrap_output.stderr is search(bootstrap_complete_text)
 
 - name: Node Status
   ansible.builtin.debug:
@@ -25,15 +36,31 @@
   when: node_status.stdout >= node_count
 
 - name: Monitor cluster operator status
-  ansible.builtin.shell:
-    cmd: "{{ oc_command_co_status}}"
+  ansible.builtin.shell: |
+    operators_found=$(oc get co --no-headers | grep {{ common_openshift_release }} | wc -l)
+    
+    operators_unhealthy=$(oc get co --no-headers | grep {{ common_openshift_release }} | awk '$3 != "True" || $4 == "True" || $5 == "True"' | wc -l)
+    
+    if [ $operators_found -eq 0 ]; then
+      echo "Bad output for oc get co"
+    else
+      echo "Operators Count (Total): $operators_found"
+    fi
+
+    if [ $operators_unhealthy -ne 0 ]; then
+      echo "Bad operator status found"
+    else
+      echo "Operators Count (UNHEALTHY): $operators_unhealthy"
+    fi
+    
+    echo $(oc get co)
   register: co_status
-  retries: 120
-  delay: 15
-  until: co_status.stdout == "0"
-  when: bootstrap_output.stderr is search(bootstrap_complete_text)
+  retries: 240
+  delay: 15 #240 retries at 15 seconds = 1 hour timeout
+  until: '"Bad" not in co_status.stdout'
 
 - name: Cluster Operator Status
   ansible.builtin.debug:
-    msg: "No more cluster operators in Available=False state"
-  when: co_status.stdout == "0"
+    msg: 
+      - "Cluster operators in appropriate state"
+      - "{{ co_status.stdout_lines }}"
