@@ -52,9 +52,9 @@
       echo $(oc get co)
     fi
   register: co_status
-  # retries: 120
-  # delay: 15
-  # until: '"Bad" not in co_status.stdout'
+  retries: 120
+  delay: 15
+  until: '"Bad" not in co_status.stdout'
   # when: bootstrap_output.stderr is search(bootstrap_complete_text)
   # with_items: "{{ oc_command_co_status }}"
 
@@ -62,6 +62,6 @@
   ansible.builtin.debug:
     msg: 
       - "Cluster operators in appropriate state"
-      - "{{ co_status }}"
+      - "{{ co_status.stdout_lines }}"
   # when: item.stdout == "0"
   # with_items: "{{ co_status.results }}"
