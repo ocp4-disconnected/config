@@ -12,17 +12,7 @@ spec:
       - name: {{ .Values.storage.configContainerName }}
         image: {{ .Values.storage.configContainerImage }}
         command: |
-          echo \
-          '{ \
-              "version": 1, \
-              "storageDriverName": "ontap-nas", \
-              "backendName": "ontap-nas-backend", \
-              "managementLIF": "{{ .Values.storage.managementLIF }}", \
-              "dataLIF": "{{ .Values.storage.dataLIF }}", \
-              "svm": "nfssvm", \
-              "username": "{{ .Values.storage.username }}", \
-              "password": "{{ .Values.storage.password }}" \
-          }' | jq . > backend.json
+          echo '{"version": 1, "storageDriverName": "ontap-nas", "backendName": "ontap-nas-backend", "managementLIF": "{{ .Values.storage.managementLIF }}", "dataLIF": "{{ .Values.storage.dataLIF }}", "svm": "nfssvm", "username": "{{ .Values.storage.username }}", "password": "{{ .Values.storage.password }}"}' | jq . > backend.json
 
           tridentctl install \
             --namespace {{ .Values.storage.namespace }} \

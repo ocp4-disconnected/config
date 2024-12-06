@@ -108,12 +108,12 @@ storage:
 
   #set up job that runs tridentctl commands
   namespace: trident
-  imageRegistry: 192.168.69.242:5000/sig-storage
+  imageRegistry: 1.1.1.1:5000/sig-storage #changeme
   autosupportImage: netapp/trident-autosupport:24.06
   tridentImage: netapp/trident:24.06.0
   configContainerImage: "ubi8/ubi:latest"
   configContainerName: tridentctl
-  managementLIF: 10.6.70.30
-  dataLIF: 10.6.72.44
+  managementLIF: 1.1.1.1 #changeme
+  dataLIF: 1.1.1.1 #changme 
   username: openshift
-  password: redhatr3dh4tredhat
+  password: changeme
