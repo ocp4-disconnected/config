@@ -43,7 +43,7 @@
   register: co_status
   retries: 120
   delay: 15
-  until: "Bad" not in co_status.stdout
+  until: '"Bad" not in co_status.stdout'
   when: bootstrap_output.stderr is search(bootstrap_complete_text)
   # with_items: "{{ oc_command_co_status }}"
 
