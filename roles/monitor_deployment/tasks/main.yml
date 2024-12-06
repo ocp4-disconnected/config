@@ -19,7 +19,7 @@
 
 - name: Check status of cluster bootstrap (FIPS MODE)
   debug:
-    msg: "{{ bootstrap_output.stderr_lines[-1] }}"
+    msg: "{{ bootstrap_output_fips.stderr_lines[-1] }}"
   when: common_fips_enabled and bootstrap_output_fips.stderr is search(bootstrap_complete_text)
 
 - name: Monitor node health
