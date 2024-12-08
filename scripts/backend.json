@@ -1,0 +1,10 @@
+{
+    "version": 1,
+    "storageDriverName": "ontap-nas",
+    "backendName": "ontap-nas-backend",
+    "managementLIF": "192.168.8.4",
+    "dataLIF": "192.168.8.3",
+    "svm": "nfssvm",
+    "username": "openshift",
+    "password": "changeme"
+}
