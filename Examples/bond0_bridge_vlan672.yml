@@ -7,14 +7,14 @@ spec:
     "cniVersion": "0.3.1",
     "name": "bond0-bridge-vlan672", 
     "type": "bridge", 
-    "bridge": "bond0-br0", 
+    "bridge": "br-bond0.672", 
     "macspoofchk": false, 
     "vlan": 672,
     "ipam": {
       "type": "static",
       "addresses": [
         {
-          "address": "192.168.10.10/24"
+          "address": "192.168.72.2/24"
         }
       ]
     }

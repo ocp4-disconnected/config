@@ -7,7 +7,7 @@ spec:
     "cniVersion": "0.3.1",
     "name": "bond0-bridge-vlan677", 
     "type": "bridge", 
-    "bridge": "bond0-br0", 
+    "bridge": "br-bond0.677", 
     "macspoofchk": false, 
     "vlan": 677
   }'

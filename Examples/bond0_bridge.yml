@@ -14,7 +14,7 @@ spec:
           - eth1
           - eth2
           - eth3
-      - name: bond0-br0
+      - name: br-bond0
         type: linux-bridge
         state: up
         bridge:
