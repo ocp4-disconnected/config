@@ -3,6 +3,8 @@ apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
   name: bond0-bridge-vlan58 
+  labels:
+    argocd.argoproj.io/sync-wave: "7"
 spec:
   config: '{
     "cniVersion": "0.3.1",
@@ -17,6 +19,8 @@ apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
   name: bond0-bridge-vlan670 
+  labels:
+    argocd.argoproj.io/sync-wave: "7"
 spec:
   config: '{
     "cniVersion": "0.3.1",
@@ -30,7 +34,9 @@ spec:
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
-  name: bond0-bridge-vlan677 
+  name: bond0-bridge-vlan677
+  labels:
+    argocd.argoproj.io/sync-wave: "7"
 spec:
   config: '{
     "cniVersion": "0.3.1",
