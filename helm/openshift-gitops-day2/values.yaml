@@ -46,14 +46,16 @@ nncps:
     vlans:
       - id: 677
       - id: 58
+      - id: 670
       # etc
   nodes:
     - name: bond-ips
       node: master-0
       vlans:
-        - id: 1
+        - id: 672
           ip: 192.168.1.1
-#  - name: worker-1
+#  - name: bond-ips-2
+#    node: worker-0
 #    vlans:
 #      - id: 2 # TODO:: specify, int
 #        ip: 192.168.1.2 # TODO:: specify
