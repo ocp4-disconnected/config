@@ -35,3 +35,8 @@
       when: not common_connected_cluster | bool
     - role: ocp4.disconnected.monitor_deployment
       tags: agent_install, stage_1
+    - role: ocp4.disconnected.apply_icsp
+      tags: apply_icsp, stage_2
+    - role: ocp4.disconnected.day1_automation
+      tags: day1_automation, stage_2
+

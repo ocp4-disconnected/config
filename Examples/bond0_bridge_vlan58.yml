@@ -9,5 +9,6 @@ spec:
     "type": "bridge", 
     "bridge": "br-bond0.58", 
     "macspoofchk": false, 
-    "vlan": 58
+    "vlan": 58,
+    "disableContainerInterface": true
   }'

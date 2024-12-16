@@ -1,6 +1,0 @@
-#!/usr/bin/ansible-playbook -K
-- hosts: localhost
-  gather_facts: true
-  roles:
-    - role: ocp4.disconnected.git
-      tags: git, stage_2

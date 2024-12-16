@@ -3,11 +3,12 @@ common_git_repos:
   - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
   - "https://github.com/cjnovak98/ocp4-disconnected-config"
 
-common_openshift_cluster_install_dir:  "{{ common_install_dir }}/install"
+#common_install_dir: "/home/your_user_dir" ## This can also be set to any root directory you'd like. It just needs permissions.
 common_openshift_dir: /pods/content
 common_connected_cluster: false
 mirror_content_pull_mirror: false
 
+#worker_iso_disk_type: sda
 #agent_iso_cluster_name: ocp-sno
 common_openshift_interface: eno1
 common_fips_enabled: true
@@ -29,7 +30,7 @@ common_nodes:
 
 
 # iDRAC
-#idrac: false  ### NEED TO WRITE LOGIC/REMOVE THIS VAR. MAKE IT SMARTER!!!
+#idrac: false
 #idrac_user: test
 #idrac_password: tester
 
@@ -40,23 +41,3 @@ media_share_idracs:
     ip: '{{ ip_space }}.8'
 
 # Single Node Worker
-
-#worker_iso_disk_type: sda
-
-# Configure vlans (for managment networks on nodes for HA deployment or Single node Master only)
-
-#################################
-#### NEED TO CONVERT TO HELM#####
-#################################
-#bond_name: bond0
-#bond_mode: 802.3ad
-#bond_interfaces:
-#  - name: eno1
-#  - name: eno2
-#  - name: eno3
-#  - name: eno4
-#vlans:
-#  - id: 111
-#    ip: 10.11.1
-#  - id: 112
-#    ip: 10.11.2
