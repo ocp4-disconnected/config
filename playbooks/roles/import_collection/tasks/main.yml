@@ -28,5 +28,5 @@
 
 - name: Install ansible collection from the internet
   ansible.builtin.command:
-    cmd: ansible-galaxy collection install git+https://github.com/cjnovak98/ocp4-disconnected-collection.git -U
+    cmd: ansible-galaxy collection install -r "{{ playbook_dir }}"/../collections/requirements.yml -U
   when: collection_install is changed and update_collection | bool and internet is changed

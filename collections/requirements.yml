@@ -2,4 +2,4 @@
 collections:
   - name: https://github.com/cjnovak98/ocp4-disconnected-collection.git
     type: git
-    version: main
+    version: 1.0.1

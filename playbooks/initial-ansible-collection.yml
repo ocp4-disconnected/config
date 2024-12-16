@@ -1,6 +1,6 @@
 #!/usr/bin/ansible-playbook
 - hosts: localhost
-  gather_facts: false
+  gather_facts: true
   roles:
     - role: import_collection
       tags: import_collection, always
