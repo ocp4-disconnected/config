@@ -351,7 +351,13 @@ or
 
 ### Running specific plays with Tags
 
-We have written the playbooks with tags to be able to call specific stages (0,1 and 2) or specific roles without having to have a large number of playbooks, you can refer the the playbooks to see what tags/roles you can call with tags. Anything definded in the tags line is able to call this role
+We have written the playbooks with tags to be able to call specific stages (0,1 and 2) or specific roles without having to have a large number of playbooks, you can refer the the playbooks to see what tags/roles you can call with tags. Anything defind in the tags line is able to call this role
+
+#### Why Use Tags?
+Tags allow you to:
+- **Execute specific roles or tasks:** Useful for debugging or focusing on specific workflows.
+- **Run stages or groups of tasks:** Stages represent logical groups of roles or steps in the automation pipeline.
+- **Reduce redundancy:** Skip unnecessary steps and only run what’s needed.
 
 ```bash
  - role: ocp4.disconnected.mirror_content
@@ -374,7 +380,7 @@ or
 ./deploy-cluster --tags push_cluster_images
 ```
 
-Stages represent muliple roles that are considered a stage, we can defined tags on more that one play, only those play and any defined dependince will run when called
+Stages represent muliple roles that are considered a stage, we can define tags on more that one play, only those play and any defined dependince will run when called
 
 ```bash
     - role: ocp4.disconnected.git
