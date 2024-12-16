@@ -348,3 +348,56 @@ or
 ```
 
 > **NOTE:** DNS needs to be functional as definded in the previous section, or it will fail when pulling the worker ignition file from the "cluster".
+
+### Running specific plays with Tags
+
+We have written the playbooks with tags to be able to call specific stages (0,1 and 2) or specific roles without having to have a large number of playbooks, you can refer the the playbooks to see what tags/roles you can call with tags. Anything defind in the tags line is able to call this role
+
+#### Why Use Tags?
+Tags allow you to:
+- **Execute specific roles or tasks:** Useful for debugging or focusing on specific workflows.
+- **Run stages or groups of tasks:** Stages represent logical groups of roles or steps in the automation pipeline.
+- **Reduce redundancy:** Skip unnecessary steps and only run what’s needed.
+
+```bash
+ - role: ocp4.disconnected.mirror_content
+      tags: push_cluster_images, stage_0
+      vars:
+        image_source: cluster-images
+        direction: push
+```
+
+Here is an example of how to run the push cluster images role, and stage 2 roles without having to run rest of the playbook. (this will still run common as it a dependicy for every role)
+
+
+```bash
+ansible-playbook -K deploy-cluster-yml --tags push_cluster_images
+```
+
+or
+
+```bash
+./deploy-cluster --tags push_cluster_images
+```
+
+Stages represent muliple roles that are considered a stage, we can define tags on more that one play, only those play and any defined dependince will run when called
+
+```bash
+    - role: ocp4.disconnected.git
+      tags: git, stage_2
+    - role: ocp4.disconnected.mirror_content
+      tags: mirror_content, stage_2
+      vars:
+        image_source: operators
+        direction: push
+```
+
+```bash
+ansible-playbook -K deploy-cluster-yml --tags stage_2
+```
+
+or
+
+```bash
+./deploy-cluster --tags stage_2
+```
