@@ -28,6 +28,11 @@ cluster:
 # Used in:
 #  - nmstate-nncp-nodes.yaml
 #  - nmstate-nncp-bond.yaml 
+mtv:
+  enabled: true
+  catalog_source: cs-redhat-operator-index-v4-16
+  target_namespace: openshift-mtv
+  
 nmstate:
   enabled: true
   catalog_source: cs-redhat-operator-index-v4-16
