@@ -63,3 +63,4 @@
     msg: 
       - "Cluster operators in appropriate state"
       - "{{ co_status.stdout_lines }}"
+
