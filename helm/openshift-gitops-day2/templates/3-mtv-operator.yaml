@@ -1,0 +1,23 @@
+{{- with .Values.mtv }}
+
+---
+
+# Brings in the nmstate operator, installs it on the cluster.
+apiVersion: operators.coreos.com/v1alpha1
+kind: Subscription
+metadata:
+  labels:
+    operators.coreos.com/mtv-operator.openshift-mtv: ""
+  name: mtv-operator
+  namespace: {{ .target_namespace | default "openshift-mtv" }}
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
+spec:
+  channel: {{ .channel | default "release-v2.6" }}
+  installPlanApproval: Automatic
+  name: mtv-operator
+  source: {{ .catalog_source | default "redhat-operators" }}
+  sourceNamespace: {{ .sourceNamespace | default "openshift-marketplace" }}
+  startingCSV: mtv-operator.v2.6.3
+
+{{- end }}
