@@ -28,6 +28,23 @@ cluster:
 # Used in:
 #  - nmstate-nncp-nodes.yaml
 #  - nmstate-nncp-bond.yaml 
+mtv:
+  enabled: true
+  catalog_source: cs-redhat-operator-index-v4-16
+  target_namespace: openshift-mtv
+  controller_max_vm_inflight: 20
+  # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source
+  provider:
+    name: mtv-provider
+    secret: mtv-secret
+    url: https://mtv-url/sdk
+    endpoint: mtv-endpoint
+    init_image: mtv-registry/init/image:1
+
+namespace:
+  - ns: openshift-mtv
+  - ns: openshift-nmstate
+  
 nmstate:
   enabled: true
   catalog_source: cs-redhat-operator-index-v4-16

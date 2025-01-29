@@ -1,0 +1,17 @@
+{{- range $i, $namespace := .Values.namespace }}
+---
+# Defines the namespace we want to place the nmstate operator into
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+  labels:
+    kubernetes.io/metadata.name: {{ $namespace.ns }}
+    name: {{ $namespace.ns }}
+  name: {{ $namespace.ns }}
+spec:
+  finalizers:
+  - kubernetes
+
+{{- end }}
