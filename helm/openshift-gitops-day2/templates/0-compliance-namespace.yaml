@@ -9,4 +9,5 @@ metadata:
   labels:
     openshift.io/cluster-monitoring: "true"
     pod-security.kubernetes.io/enforce: privileged 
-  name: {{ .target_namespace | default openshift-compliance }}
+  name: {{ .target_namespace | default "openshift-compliance" }}
+{{- end -}}
