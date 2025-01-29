@@ -10,6 +10,7 @@ metadata:
   namespace: {{ .target_namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   controller_max_vm_inflight: {{ .controller_max_vm_inflight | default "20" }}
   feature_ui_plugin: 'true'

@@ -8,6 +8,7 @@ kind: Provider
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "4"
+    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
   name: {{ .provider.name | default "mtv-provider" }}
   namespace: {{ .target_namespace | default "openshift-mtv" }}
 spec:
