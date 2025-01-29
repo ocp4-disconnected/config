@@ -8,14 +8,15 @@ kind: Provider
 metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "4"
-  name: {{ .provider.name | mtv-provider }}
+  name: {{ .provider.name | default "mtv-provider" }}
   namespace: {{ .target_namespace | default "openshift-mtv" }}
 spec:
   secret: 
     name: {{ .provider.secret }}
-    namespace: {{ .target_namespace
+    namespace: {{ .target_namespace }}
   type: openshift
   url: .provider.url
   settings:
     sdkEndpoint: {{ .provider.endpoint }}
     vddkInitImage: {{ .provider.init_image }}
+{{- end -}}

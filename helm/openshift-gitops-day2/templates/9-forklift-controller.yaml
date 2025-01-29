@@ -7,7 +7,7 @@ apiVersion: forklift.konveyor.io/v1beta1
 kind: ForkliftController
 metadata:
   name: forklift-controller
-  namespace: {{ .taget_namespace }}
+  namespace: {{ .target_namespace }}
   annotations:
     argocd.argoproj.io/sync-wave: "4"
 spec:
@@ -15,3 +15,4 @@ spec:
   feature_ui_plugin: 'true'
   feature_validation: 'true'
   feature_volume_populator: 'true'
+{{- end -}}
