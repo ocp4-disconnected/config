@@ -4,17 +4,18 @@ common_git_repos:
   - "https://github.com/cjnovak98/ocp4-disconnected-config"
 
 #common_install_dir: "/home/your_user_dir" ## This can also be set to any root directory you'd like. It just needs permissions.
-common_openshift_dir: /pods/content
+common_openshift_dir: /opt/pods
 common_connected_cluster: false
 mirror_content_pull_mirror: false
+media_share_webserver: true
 
 #worker_iso_disk_type: sda
 #agent_iso_cluster_name: ocp-sno
-common_openshift_interface: eno1
-common_fips_enabled: true
+common_openshift_interface: enp1s0
+#common_fips_enabled: false
 common_cluster_domain: example.com
 
-common_ip_space: 192.168.122
+common_ip_space: 192.168.100
 common_nodes:
   - name: master-0
     ip: '42'
@@ -36,8 +37,8 @@ common_nodes:
 
 media_share_idracs:
   - name: master-0
-    ip: '{{ ip_space }}.5'
+    ip: '{{ common_ip_space }}.5'
   - name: worker-0
-    ip: '{{ ip_space }}.8'
+    ip: '{{ common_ip_space }}.8'
 
 # Single Node Worker
