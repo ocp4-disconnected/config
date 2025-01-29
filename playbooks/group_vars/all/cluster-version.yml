@@ -1,14 +1,8 @@
 # Generate agent
-
 common_openshift_release: 4.16.4
 common_previous_openshift_release: 4.16.3
 common_trident_version: v24.06.0
 mirror_content_oc_mirror_v2: true
-
-
-# Disconnected Images
-
-#content_generation_pull_mirror: true
 
 ## Operators To be mirrored, based on index they are in
 content_generation_disconnected_operators:
@@ -17,11 +11,16 @@ content_generation_disconnected_operators:
     - name: kubevirt-hyperconverged
     - name: mtv-operator
     - name: openshift-gitops-operator
+    - name: container-security-operator
+    - name: cluster-logging
+    - name: compliance-operator
+    - name: local-storage-operator
+    - name: lvms-operator
   - redhat-marketplace-index:
   - community-operator-index:
   - certified-operator-index:
 
-## additionalImages for oc-mirror to pull. Include version
+## AdditionalImages for oc-mirror to pull. Include version
 content_generation_additionalImages:
   - name: registry.redhat.io/ubi8/ubi:latest
   - name: registry.redhat.io/ubi9/ubi:latest
@@ -35,9 +34,5 @@ content_generation_additionalImages:
   - name: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.10.0 
   - name: netapp/trident-operator:24.06.0 
 
-
-
-#### ARCHIVED (?)
-
-#content_generation_ansible_collection_requirements:
-#  - name: dellemc.openmanage
+## URL of file containing pgpkey
+mirror_content_pgpkey_location: https://raw.githubusercontent.com/openshift/cluster-update-keys/d44fca585d081a72cb2c67734556a27bbfc9470e/manifests.rhel/0000_90_cluster-update-keys_configmap.yaml
