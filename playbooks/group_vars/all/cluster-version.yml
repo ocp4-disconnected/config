@@ -1,6 +1,6 @@
 # Generate agent
 
-common_openshift_release: 4.16.4
+common_openshift_release: 4.16.23
 common_previous_openshift_release: 4.16.3
 common_trident_version: v24.06.0
 

@@ -1,12 +1,12 @@
 gitOps:
   namespace: openshift-gitops
-#  source: redhat-operators
   source: cs-redhat-operator-index-v4-16
 
 gitRepoTemplate:
   # The URL of the repository setup in the Ansible step.
-  url: git@<ip of host>:repos/ocp4-disconnected-config
+  url: git@IP.OF.GIT.SERVER:repos/ocp4-disconnected-config
   # The SSH key of the user that ran the Ansible step, used to connect to the git repo
   sshPrivateKey: |
     -----BEGIN OPENSSH PRIVATE KEY-----
+    
     -----END OPENSSH PRIVATE KEY-----

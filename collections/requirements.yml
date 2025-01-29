@@ -1,5 +1,5 @@
 ---
 collections:
-  - name: https://github.com/cjnovak98/ocp4-disconnected-collection.git
+  - name: https://github.com/ocp4-disconnected/collection.git
     type: git
-    version: 1.0.1
+    version: 102-update-automation-to-handle-centralized-variables-input

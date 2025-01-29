@@ -1,57 +1,14 @@
-# Common
-debug: true
-
-common_git_repos:
-  - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
-  - "https://github.com/cjnovak98/ocp4-disconnected-config"
-
-#common_install_dir: "/home/your_user_dir" ## This can also be set to any root directory you'd like. It just needs permissions.
-common_openshift_dir: /pods/content
-common_connected_cluster: true
-mirror_content_pull_mirror: false
-
-#worker_iso_disk_type: sda
-# agent_iso_cluster_name: mars
-common_openshift_interface: eno2
-common_fips_enabled: false
-common_cluster_domain: example.com
-
-common_ip_space: 192.168.4
-common_nodes:
-  - name: master-0
-    ip: '42'
-    mac: EC:F4:BB:DC:F4:F5
-
-# Registry
-#common_registry_volume: /pods/registry
-#registry_username: openshift
-#registry_password: CHANGEME
-
-
-# iDRAC
-# idrac: true
-# media_share_idrac: true
-# idrac_user: root
-# idrac_password: calvin
-
-# media_share_idracs:
-#   - name: master-1
-#     ip: '{{ common_ip_space }}.49'
-
-# Single Node Worker
 # General cluster-level information
 cluster:
   # Used in the proxy to specify the certs to use there.
   # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
     ca:
-      
-
+            
 mtv:
     enabled: true
-    # catalog_source: {{ mtv.catalog_source if mtv["catalog_source"] is defined else "cs-redhat-operator-index-v4-16" }}
-    catalog_source: redhat-operators
+    catalog_source: cs-redhat-operator-index-v4-16
     target_namespace: openshift-mtv
-    controller_max_vm_inflight: "20"
+    controller_max_vm_inflight: 20
     # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source
     provider:
         name: mtv-provider
@@ -66,8 +23,7 @@ namespace:
   
 nmstate:
     enabled: true
-    # catalog_source: cs-redhat-operator-index-v4-16
-    catalog_source: redhat-operators
+    catalog_source: cs-redhat-operator-index-v4-16
     target_namespace: openshift-nmstate
 
 nncps:
@@ -88,7 +44,7 @@ nncps:
         node: master-0
         vlans:
           - id: 672
-            ip: 192.168.1.1
+            ip: 192.168.4.1
 
 # LDAP configuration.
 # Used in:
@@ -134,6 +90,6 @@ storage:
   # The location of the trident/netapp host
   provisioner: csi.trident.netapp.io
   nad:
-    mgmtAddress: "192.168.1.10/24"
+    mgmtAddress: "192.168.4.10/24"
     masterBond: "bond0.672"
 

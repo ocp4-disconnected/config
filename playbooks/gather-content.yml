@@ -10,5 +10,5 @@
         direction: pull
       when: 
         - mirror_content_pull_mirror | bool
-        - common_connected_cluster is false
+        - not common_connected_cluster | bool
 
