@@ -2,6 +2,7 @@
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
 metadata:
+  argocd.argoproj.io/sync-wave: "2"
   name: compliance-operator
   namespace: openshift-compliance
 spec:
