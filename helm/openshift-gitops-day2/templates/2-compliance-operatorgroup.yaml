@@ -1,0 +1,14 @@
+{{- with .Values.compliance }}
+
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  name: {{ .name | default "compliance-operator" }}
+  namespace: {{ .target_namespace | default "openshift-compliance" }}
+spec:
+  targetNamespaces:
+  - {{ .target_namespace | default "openshift-compliance" }}
+{{- end -}}

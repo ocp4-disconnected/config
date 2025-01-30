@@ -17,6 +17,7 @@ content_generation_disconnected_operators:
     - name: kubevirt-hyperconverged
     - name: mtv-operator
     - name: openshift-gitops-operator
+    - name: compliance-operator
   - redhat-marketplace-index:
   - community-operator-index:
   - certified-operator-index:
