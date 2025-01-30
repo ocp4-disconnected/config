@@ -16,6 +16,7 @@ content_generation_disconnected_operators:
     - name: compliance-operator
     - name: local-storage-operator
     - name: lvms-operator
+    - name: compliance-operator
   - redhat-marketplace-index:
   - community-operator-index:
   - certified-operator-index:
