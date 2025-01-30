@@ -1,0 +1,11 @@
+---
+# tasks file for day1_automation
+- name: apply argo app
+  ansible.builtin.command:
+    cmd: "echo {{ lookup('template', 'day2-argo-app.j2') }}"
+  register: contents
+
+- name: debug
+  ansible.builtin.debug:
+    msg: {{ contents.stdout }}
+
