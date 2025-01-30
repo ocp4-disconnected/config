@@ -10,7 +10,10 @@ common_connected_cluster: false
 =======
 mirror_content_pull_mirror: false
 media_share_webserver: true
+<<<<<<< HEAD
 >>>>>>> c552822 (added var for pgp location, added more operators to be pulled by default)
+=======
+>>>>>>> c552822a27926abd81d1bff5a6d6c74635577e74
 
 #worker_iso_disk_type: sda
 #agent_iso_cluster_name: ocp-sno

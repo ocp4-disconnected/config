@@ -2,7 +2,10 @@
 common_openshift_release: 4.16.4
 common_previous_openshift_release: 4.16.3
 common_trident_version: v24.06.0
+<<<<<<< HEAD
 mirror_content_oc_mirror_v2: true
+=======
+>>>>>>> c552822a27926abd81d1bff5a6d6c74635577e74
 
 ## Operators To be mirrored, based on index they are in
 content_generation_disconnected_operators:
