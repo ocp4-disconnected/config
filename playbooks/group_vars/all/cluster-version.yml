@@ -3,6 +3,7 @@
 common_openshift_release: 4.16.4
 common_previous_openshift_release: 4.16.3
 common_trident_version: v24.06.0
+mirror_content_oc_mirror_v2: true
 
 
 # Disconnected Images
@@ -16,6 +17,7 @@ content_generation_disconnected_operators:
     - name: kubevirt-hyperconverged
     - name: mtv-operator
     - name: openshift-gitops-operator
+    - name: compliance-operator
   - redhat-marketplace-index:
   - community-operator-index:
   - certified-operator-index:
