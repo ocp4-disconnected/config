@@ -4,8 +4,6 @@
   vars:
    common_content_pull: false
   roles:
-    - role: import_collection
-      tags: import_collection
     - role: ocp4.disconnected.registry
       tags: registry, stage_0
       when: common_connected_cluster is false
@@ -24,7 +22,6 @@
       tags: agent_install, stage_1
     - role: ocp4.disconnected.media_share
       tags: idrac, stage_1
-      when: media_share_idrac | bool
       vars:
         role: master
     - role: ocp4.disconnected.git
@@ -36,7 +33,7 @@
         direction: push
       when: not common_connected_cluster | bool
     - role: ocp4.disconnected.monitor_deployment
-      tags: agent_install, stage_1
+      tags: agent_install, stage_2
     - role: ocp4.disconnected.apply_icsp
       tags: apply_icsp, stage_2
     - role: ocp4.disconnected.day1_automation

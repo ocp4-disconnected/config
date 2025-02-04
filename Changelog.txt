@@ -1,0 +1,20 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [1.0.2RC1]
+### Added
+- More operators to be pulled by default
+
+### Changed
+- Where pull secret gets checked and validated
+- Tag for monitor_deployment
+
+### Fixed
+- Capitalization on comments
+- Variable for IPS in idrac array
+
+### Removed
+- Running import_collection before gather-content and deploy-cluster. plays will fail if not already installed
+
+---
