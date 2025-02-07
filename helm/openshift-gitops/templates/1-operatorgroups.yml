@@ -10,8 +10,14 @@ metadata:
     {{- end }}
     argocd.argoproj.io/sync-wave: "1"
   name: {{ .name }}
-  namespace: {{ .namespace }}
+  namespace: {{ .targetNamespaces | default .subNamespace }}
 spec:
+  {{- if eq .name "openshift-gitops-operator"}}
+  spec:
+    upgradeStrategy: Default
+  {{ else }}
   targetNamespaces:
-  - {{ .namespace }}
+  - {{ .targetNamespaces | default .subNamespace }}
+  {{- end }}
+
 {{- end }}

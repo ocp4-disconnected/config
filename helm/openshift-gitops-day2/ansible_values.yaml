@@ -2,60 +2,31 @@
 cluster:
   # Used in the proxy to specify the certs to use there.
   # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
-  ca:
-#    # true if you have a cert and want to set it, false to skip setting a cluster ca.
-#    configMapName: cluster-proxy-ca
-#    content: |- # The cluster's CA
-#      ----- CA Content ------
-#      ......
-#      ----- end content ----
-#  # Ingress related configuraiton.
-#  # Used in:
-#  #  - ingress-certs-secret.yaml
-#  #  - ingress-controller.yaml
-#  ingress:
-#    secretName: ingress-cert
-#    cert: |- # The content of the ssl cert to use for ingress
-#      ---- cert content ----
-#      ....
-#      ---- content ------
-#    key: # The content of the ssl cert key to use for ingress
-#      ----- cert content ----
-#      .....
-#      ----- cert content ----
-# TODO:: doublecheck updated from site
-# Configuration for NodeNetworkConfigurationPolicy
-# Used in:
-#  - nmstate-nncp-nodes.yaml
-#  - nmstate-nncp-bond.yaml
-
-compliance:
-  enabled: true
-  name: compliance-operator
-  catalog_source: cs-redhat-operator-index-v4-16
-  target_namespace: openshift-compliance
-
+    ca:
+            
 mtv:
-  enabled: true
-  catalog_source: cs-redhat-operator-index-v4-16
-  target_namespace: openshift-mtv
-  controller_max_vm_inflight: 20
-  # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source
-  provider:
-    name: mtv-provider
-    secret: mtv-secret
-    url: https://mtv-url/sdk
-    endpoint: mtv-endpoint
-    init_image: mtv-registry/init/image:1
+    enabled: True
+    # catalog_source: cs-redhat-operator-index-v4-16
+    catalog_source: redhat-operators
+    target_namespace: openshift-mtv
+    controller_max_vm_inflight: 20
+    # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source
+    provider:
+        name: mtv-provider
+        secret: mtv-secret
+        url: https://mtv-url/sdk
+        endpoint: mtv-endpoint
+        init_image: mtv-registry/init/image:1
 
 namespace:
-  - ns: openshift-mtv
-  - ns: openshift-nmstate
-
+    - ns: openshift-mtv
+    - ns: openshift-nmstate
+  
 nmstate:
-  enabled: true
-  catalog_source: cs-redhat-operator-index-v4-16
-  target_namespace: openshift-nmstate
+    enabled: true
+    # catalog_source: cs-redhat-operator-index-v4-16
+    catalog_source: redhat-operators
+    target_namespace: openshift-nmstate
 
 nncps:
   bond:
@@ -64,7 +35,7 @@ nncps:
       ports:
         - ens2f0
         - ens2f1
-        - ens3f0
+        - ens3f0  
         - ens3f1
         # etc
     vlans:
@@ -78,12 +49,6 @@ nncps:
       vlans:
         - id: 672
           ip: 192.168.1.1
-#  - name: bond-ips-2
-#    node: worker-0
-#    vlans:
-#      - id: 2 # TODO:: specify, int
-#        ip: 192.168.1.2 # TODO:: specify
-  # ... TODO:: fill out
 
 # LDAP configuration.
 # Used in:

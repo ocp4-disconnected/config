@@ -1,9 +1,9 @@
 # Common
 debug: true
-
+argo_sync_ref: "58-add-structure-for-central-variable-management-for-end-to-end-worklow"
 common_git_repos:
-  - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
-  - "https://github.com/cjnovak98/ocp4-disconnected-config"
+  - "https://github.com/ocp4-disconnected/collection.git"
+  - "https://github.com/ocp4-disconnected/config.git"
 
 #common_install_dir: "/home/your_user_dir" ## This can also be set to any root directory you'd like. It just needs permissions.
 common_openshift_dir: /pods/content

@@ -51,7 +51,7 @@ desiredState:
 
 * Create VLANs: Create VLANs to map network traffic between VMware and OpenShift Virtualization. 
     * Example VLAN IDs: `677` (primary), `58` (for public networks), 59 (for public networks).
-[Example NodeNetworkConfigurationPolicy](https://github.com/cjnovak98/ocp4-disconnected-config/blob/main/Examples/node_network_config_policy.yaml)
+[Example NodeNetworkConfigurationPolicy](https://github.com/ocp4-disconnected/config/blob/main/Examples/node_network_config_policy.yaml)
 
 * Network Attachment: Apply network attachment definitions (NAD) that point to the appropriate VLAN. For instance, the primary network for the migrated VMs will map to VLAN 677, while public-facing VMs might use VLAN 58.
   

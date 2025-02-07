@@ -1,21 +1,35 @@
+namespaces:
+  - ns: openshift-gitops-operator
+  - ns: openshift-gitops
+  - ns: openshift-nmstate
+  - ns: openshift-mtv
+
 operators:
-  - name: openshift-gitops
-    namespace: openshift-gitops
-    source: cs-redhat-operator-index-v4-16
+  - name: openshift-gitops-operator
+    subNamespace: openshift-gitops
+    targetNamespace: openshift-gitops-operator
+    # source: cs-redhat-operator-index-v4-16
+    source: redhat-operators
     channel: latest
     installPlanApproval: Automatic
     sourceNamespace: openshift-marketplace
   - name: kubernetes-nmstate-operator
-    namespace: openshift-nmstate
-    source: cs-redhat-operator-index-v4-16
+    subNamespace: openshift-nmstate
+    # source: cs-redhat-operator-index-v4-16
+    source: redhat-operators
+    installPlanApproval: Automatic
     providedAPIs: "NMState.v1.nmstate.io"
     channel: stable
-  - name: openshift-mtv
-    namespace: openshift-mtv
-    source: cs-redhat-operator-index-v4-16
+    startingCSV: kubernetes-nmstate-operator.4.16.0-202501211505
+    sourceNamespace: openshift-marketplace
+  - name: mtv-operator
+    subNamespace: openshift-mtv
+    # source: cs-redhat-operator-index-v4-16
+    source: redhat-operators
     providedAPIs: "ForkliftController.v1beta1.forklift.konveyor.io,Hook.v1beta1.forklift.konveyor.io,Host.v1beta1.forklift.konveyor.io,Migration.v1beta1.forklift.konveyor.io,NetworkMap.v1beta1.forklift.konveyor.io,OpenStackVolumePopulator.v1beta1.forklift.konveyor.io,OvirtVolumePopulator.v1beta1.forklift.konveyor.io,Plan.v1beta1.forklift.konveyor.io,Provider.v1beta1.forklift.konveyor.io,StorageMap.v1beta1.forklift.konveyor.io"
     channel: release-v2.6
     startingCSV: mtv-operator.v2.6.3
+    sourceNamespace: openshift-marketplace
 
 gitopsConfig:
   # The URL of the repository setup in the Ansible step.
