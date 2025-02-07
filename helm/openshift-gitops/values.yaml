@@ -1,9 +1,23 @@
-gitOps:
-  namespace: openshift-gitops
-  source: cs-redhat-operator-index-v4-16
-  # source: redhat-operators
+operators:
+  - name: openshift-gitops
+    namespace: openshift-gitops
+    source: cs-redhat-operator-index-v4-16
+    channel: latest
+    installPlanApproval: Automatic
+    sourceNamespace: openshift-marketplace
+  - name: kubernetes-nmstate-operator
+    namespace: openshift-nmstate
+    source: cs-redhat-operator-index-v4-16
+    providedAPIs: "NMState.v1.nmstate.io"
+    channel: stable
+  - name: openshift-mtv
+    namespace: openshift-mtv
+    source: cs-redhat-operator-index-v4-16
+    providedAPIs: "ForkliftController.v1beta1.forklift.konveyor.io,Hook.v1beta1.forklift.konveyor.io,Host.v1beta1.forklift.konveyor.io,Migration.v1beta1.forklift.konveyor.io,NetworkMap.v1beta1.forklift.konveyor.io,OpenStackVolumePopulator.v1beta1.forklift.konveyor.io,OvirtVolumePopulator.v1beta1.forklift.konveyor.io,Plan.v1beta1.forklift.konveyor.io,Provider.v1beta1.forklift.konveyor.io,StorageMap.v1beta1.forklift.konveyor.io"
+    channel: release-v2.6
+    startingCSV: mtv-operator.v2.6.3
 
-gitRepoTemplate:
+gitopsConfig:
   # The URL of the repository setup in the Ansible step.
   url: git@<ip of git host>:repos/ocp4-disconnected-config
   # The SSH key of the user that ran the Ansible step, used to connect to the git repo

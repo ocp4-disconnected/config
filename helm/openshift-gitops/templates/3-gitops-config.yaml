@@ -1,0 +1,40 @@
+{{- with .Values.gitopsConfig}}
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: cluster-role-binding
+subjects:
+  - kind: ServiceAccount
+    name: openshift-gitops-argocd-application-controller
+    namespace: {{ .namespace | default "openshift-gitops" }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: secrets-cluster-role
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: secrets-cluster-role
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ .secretName | default "private-repo" }}
+  namespace: {{ .namespace | default "openshift-gitops" }}
+  labels:
+    argocd.argoproj.io/secret-type: repository
+stringData:
+  type: git
+  url: {{ .url }}
+  insecure: "true"
+  sshPrivateKey: {{ .sshPrivateKey | trim | quote }}
+
+{{- end }}

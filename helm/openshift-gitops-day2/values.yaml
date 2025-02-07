@@ -5,7 +5,7 @@ cluster:
     ca:
             
 mtv:
-    enabled: True
+    enabled: true
     # catalog_source: cs-redhat-operator-index-v4-16
     catalog_source: redhat-operators
     target_namespace: openshift-mtv
@@ -18,9 +18,7 @@ mtv:
         endpoint: mtv-endpoint
         init_image: mtv-registry/init/image:1
 
-namespace:
-    - ns: openshift-mtv
-    - ns: openshift-nmstate
+
   
 nmstate:
     enabled: true
@@ -30,22 +28,22 @@ nmstate:
 
 nncps:
     bond:
-        name: bond0
-        bond:
-        ports:
-            - ens2f0
-            - ens2f1
-            - ens3f0  
-            - ens3f1
-        vlans:
-        - id: 677
-        - id: 58
-        - id: 670
+      name: bond0
+      bond:
+      ports:
+        - ens2f0
+        - ens2f1
+        - ens3f0  
+        - ens3f1
+      vlans:
+      - id: 677
+      - id: 58
+      - id: 670
     nodes:
-        - name: bond-ips
+      - name: bond-ips
         node: master-0
         vlans:
-            - id: 672
+          - id: 672
             ip: 192.168.1.1
 
 # LDAP configuration.
