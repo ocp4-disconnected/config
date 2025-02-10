@@ -27,9 +27,15 @@ cluster:
 # Configuration for NodeNetworkConfigurationPolicy
 # Used in:
 #  - nmstate-nncp-nodes.yaml
-#  - nmstate-nncp-bond.yaml
+#  - nmstate-nncp-bond.yaml 
 
 compliance:
+  enabled: true
+  name: compliance-operator
+  catalog_source: cs-redhat-operator-index-v4-16
+  target_namespace: openshift-compliance
+
+mtv:
   enabled: true
   name: compliance-operator
   catalog_source: cs-redhat-operator-index-v4-16

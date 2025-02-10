@@ -2,4 +2,4 @@
 collections:
   - name: https://github.com/ocp4-disconnected/collection.git
     type: git
-    version: 102-update-automation-to-handle-centralized-variables-input
+    version: 1.0.2-rc1

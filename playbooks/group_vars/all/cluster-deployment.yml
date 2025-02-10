@@ -9,18 +9,22 @@ common_git_repos:
 common_openshift_dir: /pods/content
 common_connected_cluster: true
 mirror_content_pull_mirror: false
+media_share_webserver: true
 
 #worker_iso_disk_type: sda
-# agent_iso_cluster_name: mars
-common_openshift_interface: eno2
-common_fips_enabled: false
+#agent_iso_cluster_name: ocp-sno
+common_openshift_interface: enp1s0
+#common_fips_enabled: false
 common_cluster_domain: example.com
 
-common_ip_space: 192.168.4
+common_ip_space: 192.168.100
 common_nodes:
   - name: master-0
     ip: '42'
-    mac: EC:F4:BB:DC:F4:F5
+    mac: 52:54:00:8d:13:77
+  - name: worker-0
+    ip: '43'
+    mac: 52:54:00:8d:13:78
 
 # Registry
 #common_registry_volume: /pods/registry
@@ -29,14 +33,15 @@ common_nodes:
 
 
 # iDRAC
-# idrac: true
-# media_share_idrac: true
-# idrac_user: root
-# idrac_password: calvin
+#idrac: false
+#idrac_user: test
+#idrac_password: tester
 
-# media_share_idracs:
-#   - name: master-1
-#     ip: '{{ common_ip_space }}.49'
+media_share_idracs:
+  - name: master-0
+    ip: '{{ common_ip_space }}.5'
+  - name: worker-0
+    ip: '{{ common_ip_space }}.8'
 
 # Single Node Worker
 # General cluster-level information
