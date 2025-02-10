@@ -9,6 +9,6 @@
       vars:
         direction: pull
       when: 
-        - common_content_pull | bool
-        - common_connected_cluster is false
+        - mirror_content_pull_mirror | bool
+        - not common_connected_cluster | bool
 

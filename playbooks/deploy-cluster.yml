@@ -38,4 +38,5 @@
       tags: apply_icsp, stage_2
     - role: ocp4.disconnected.day1_automation
       tags: day1_automation, stage_2
-
+    - role: ocp4.disconnected.day2_automation
+      tags: day2_automation, stage_2

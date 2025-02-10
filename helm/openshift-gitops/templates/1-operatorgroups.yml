@@ -1,0 +1,23 @@
+{{- range $attr, $operator := .Values.operators }}
+---
+# Brings in the operator group used for the nmstate operator.
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  annotations:
+    {{- if .providedAPIs }}
+    olm.providedAPIs: {{ .providedAPIs }}
+    {{- end }}
+    argocd.argoproj.io/sync-wave: "1"
+  name: {{ .name }}
+  namespace: {{ .targetNamespaces | default .subNamespace }}
+spec:
+  {{- if eq .name "openshift-gitops-operator"}}
+  spec:
+    upgradeStrategy: Default
+  {{ else }}
+  targetNamespaces:
+  - {{ .targetNamespaces | default .subNamespace }}
+  {{- end }}
+
+{{- end }}

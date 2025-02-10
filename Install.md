@@ -75,7 +75,7 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
   1. Clone this Repository:
 
       ```bash
-      git clone https://github.com/cjnovak98/ocp4-disconnected-config
+      git clone https://github.com/ocp4-disconnected/config.git
       ```
 
   2. Navigate to the Playbooks Directory:
@@ -85,7 +85,7 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
 
   3. Install Required Ansible Collections( 1st time/connected system ): 
 
-      > **NOTE:** This will install [disconnected-collection](https://github.com/cjnovak98/ocp4-disconnected-collection) and should be run on a fresh system, before anything else has been run.
+      > **NOTE:** This will install [disconnected-collection](https://github.com/ocp4-disconnected/collection) and should be run on a fresh system, before anything else has been run.
 
       ```shell
       ansible-playbook initial-ansible-collection.yml
@@ -208,8 +208,8 @@ or
 # Example playbooks/group_vars/all/cluster-deployment.yml
 
 common_git_repos:
-  - "https://github.com/cjnovak98/ocp4-disconnected-collection.git"
-  - "https://github.com/cjnovak98/ocp4-disconnected-config"
+  - "https://github.com/ocp4-disconnected/collection.git"
+  - "https://github.com/ocp4-disconnected/config.git"
 
 common_openshift_dir: /pods/content
 common_connected_cluster: false

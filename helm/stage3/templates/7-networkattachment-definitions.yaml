@@ -5,6 +5,7 @@ apiVersion: k8s.cni.cncf.io/v1
 kind: NetworkAttachmentDefinition
 metadata:
   name: {{ $.Values.nncps.bond.name }}-bridge-vlan{{ $curVlan.id }} 
+  namespace: {{ $.Values.nadNamespace | default "default" }}
   annotations:
     argocd.argoproj.io/sync-wave: "7"
     argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true

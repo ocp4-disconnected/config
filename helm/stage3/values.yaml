@@ -27,7 +27,7 @@ cluster:
 # Configuration for NodeNetworkConfigurationPolicy
 # Used in:
 #  - nmstate-nncp-nodes.yaml
-#  - nmstate-nncp-bond.yaml 
+#  - nmstate-nncp-bond.yaml
 
 compliance:
   enabled: true
@@ -37,13 +37,7 @@ compliance:
 
 mtv:
   enabled: true
-  name: compliance-operator
   catalog_source: cs-redhat-operator-index-v4-16
-  target_namespace: openshift-compliance
-
-mtv:
-  enabled: true
-  catalogsource: cs-redhat-operator-index-v4-16
   target_namespace: openshift-mtv
   controller_max_vm_inflight: 20
   # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source

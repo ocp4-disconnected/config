@@ -16,7 +16,7 @@ spec:
         link-aggregation:
           mode: 802.3ad
           port:
-{{ toYaml .bond.ports | indent 12 }}
+{{ toYaml .ports | indent 12 }}
 {{- range $i, $curVlan := .vlans }}
       - name: {{ $.Values.nncps.bond.name }}.{{ $curVlan.id }}
         state: up

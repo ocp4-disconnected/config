@@ -1,0 +1,72 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-monitor-operators-status
+  namespace: openshift-operators
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  ttlSecondsAfterFinished: 30
+  template:
+    spec:
+      serviceAccountName: {{ .Release.Name }}-monitor-sa
+      containers:
+        - name: monitor-operators
+          image: {{ .Values.jobImage | default "quay.io/openshift/origin-cli:latest" }}
+          command: ["/bin/bash", "-c"]
+          args:
+            - |
+              # Configuration for retries and timeout
+              MAX_RETRIES=120  # Check every 30 seconds for up to 10 minutes
+              SLEEP_INTERVAL=5  # Time in seconds between retry cycles
+
+              # Function to check operator subscription status
+              check_operator_status() {
+                local operator=$1
+                local namespace=$2
+
+                status=$(oc get subscription "$operator" -n "$namespace" \
+                  -o jsonpath='{.status.state}' 2>/dev/null)
+
+                if [[ "$status" == "AtLatestKnown" ]]; then
+                  echo "Operator '$operator' in namespace '$namespace' is at latest known state: $status"
+                  return 0
+                else
+                  echo "Operator '$operator' not at 'AtLatestKnown' state. Current state: ${status:-'Not found'}"
+                  return 1
+                fi
+              }
+
+              # Main retry logic
+              for ((retry=1; retry<=MAX_RETRIES; retry++)); do
+                echo "Retry cycle $retry/$MAX_RETRIES..."
+
+                all_operators_ready=true
+
+                # Iterate over operators and check their status
+                {{- range $i, $op := .Values.operators }}
+                check_operator_status "{{ .name }}" "{{ .subNamespace }}"
+                if [[ $? -ne 0 ]]; then
+                  all_operators_ready=false
+                fi
+                {{- if eq $i (sub (len $.Values.operators) 1) }}
+                echo "----------------------------------------"
+                {{- end }}
+                {{- end }}
+
+                # If all operators are ready, exit successfully
+                if [[ "$all_operators_ready" == true ]]; then
+                  echo "All operators are at 'AtLatestKnown' state."
+                  exit 0
+                fi
+
+                # Wait before the next retry
+                echo "Waiting $SLEEP_INTERVAL seconds before next retry..."
+                sleep "$SLEEP_INTERVAL"
+              done
+
+              echo "Timed out waiting for all operators to reach 'AtLatestKnown' status."
+              exit 1
+      restartPolicy: Never
+  backoffLimit: 4

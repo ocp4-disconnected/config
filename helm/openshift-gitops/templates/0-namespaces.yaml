@@ -1,0 +1,17 @@
+{{- range $attr, $namespace := .Values.namespaces }}
+---
+# Defines the namespace we want to place the nmstate operator into
+apiVersion: v1
+kind: Namespace
+metadata:
+  labels:
+    kubernetes.io/metadata.name: {{ .ns }}
+    name: {{ .ns }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade
+  name: {{ .ns }}
+spec:
+  finalizers:
+  - kubernetes
+
+{{- end }}
