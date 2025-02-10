@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2RC2]
+### Added
+- looping templates in helm day1 helm chart to create the required objects for operators specified in the values file
+- job template config to be post-install hook that monitors for successful install of operators. allows for the helm install command to wait until the install is complete
+- stage 3 helm chart
+- new values file in group_vars to hold the day2 values
+
+### Changed
+- Day 1 automation now responsible for installing all operators via helm
+- Day 2 now split into 2 stages for configuring operators vs installing objects
+- NetworkAttachmentDefinitions now specify the 'default' namespace
+
+
+### Fixed
+- All references to the old repos have been updated
+- upgraded tag for ocp4-disconnected collection to 1.0.2RC2
+
+### Removed
+
+---
+
 ## [1.0.2RC1]
 ### Added
 - More operators to be pulled by default
