@@ -37,7 +37,7 @@ compliance:
 
 mtv:
   enabled: true
-  catalog_source: cs-redhat-operator-index-v4-16
+  catalogsource: cs-redhat-operator-index-v4-16
   target_namespace: openshift-mtv
   controller_max_vm_inflight: 20
   # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source
