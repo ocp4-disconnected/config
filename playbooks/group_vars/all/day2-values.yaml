@@ -36,9 +36,9 @@ nncps:
             - ens3f0  
             - ens3f1
         vlans:
-        - id: 677
-        - id: 58
-        - id: 670
+          - id: 677
+          - id: 58
+          - id: 670
     nodes:
       - name: bond-ips
         node: master-0
