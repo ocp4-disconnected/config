@@ -1,57 +1,81 @@
+namespaces:
+  - ns: openshift-gitops-operator
+  - ns: openshift-gitops
+  - ns: openshift-nmstate
+  - ns: openshift-mtv
+
+operators:
+  - name: openshift-gitops-operator
+    subNamespace: openshift-gitops
+    targetNamespace: openshift-gitops-operator
+    source: {{ "cs-redhat-operator-index-v4-16" if common_connected_cluster is false else "redhat-operators" }}
+    channel: latest
+    installPlanApproval: Automatic
+    sourceNamespace: openshift-marketplace
+  - name: kubernetes-nmstate-operator
+    subNamespace: openshift-nmstate
+    source: {{ "cs-redhat-operator-index-v4-16" if common_connected_cluster is false else "redhat-operators" }}
+    installPlanApproval: Automatic
+    providedAPIs: "NMState.v1.nmstate.io"
+    channel: stable
+    sourceNamespace: openshift-marketplace
+  - name: mtv-operator
+    subNamespace: openshift-mtv
+    source: {{ "cs-redhat-operator-index-v4-16" if common_connected_cluster is false else "redhat-operators" }}
+    providedAPIs: "ForkliftController.v1beta1.forklift.konveyor.io,Hook.v1beta1.forklift.konveyor.io,Host.v1beta1.forklift.konveyor.io,Migration.v1beta1.forklift.konveyor.io,NetworkMap.v1beta1.forklift.konveyor.io,OpenStackVolumePopulator.v1beta1.forklift.konveyor.io,OvirtVolumePopulator.v1beta1.forklift.konveyor.io,Plan.v1beta1.forklift.konveyor.io,Provider.v1beta1.forklift.konveyor.io,StorageMap.v1beta1.forklift.konveyor.io"
+    channel: release-v2.7
+    sourceNamespace: openshift-marketplace
+
 # General cluster-level information
-cluster:
-  # Used in the proxy to specify the certs to use there.
-  # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
-    ca:
+# cluster:
+#   # Used in the proxy to specify the certs to use there.
+#   # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
+#     ca:
             
 mtv:
-    enabled: true
-    catalog_source: cs-redhat-operator-index-v4-16
-    target_namespace: openshift-mtv
-    controller_max_vm_inflight: 20
-    # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source
-    provider:
-        name: mtv-provider
-        secret: mtv-secret
-        url: https://mtv-url/sdk
-        endpoint: mtv-endpoint
-        init_image: mtv-registry/init/image:1
+  enabled: true
+  catalog_source: "cs-redhat-operator-index-v4-16"
+  target_namespace: "openshift-mtv"
+  controller_max_vm_inflight: 20
+  provider:
+    name: "mtv-provider2"
+    secret: "mtv-secret"
+    url: "https://mtv-url/sdk"
+    endpoint: "mtv-endpoint"
+    init_image: "mtv-registry/init/image:1"
 
-namespace:
-    - ns: openshift-mtv
-    - ns: openshift-nmstate
   
 nmstate:
-    enabled: true
-    catalog_source: cs-redhat-operator-index-v4-16
-    target_namespace: openshift-nmstate
+  enabled: true
+  catalog_source: cs-redhat-operator-index-v4-16
+  target_namespace: openshift-nmstate
 
 nncps:
+  bond:
+    name: bond0
     bond:
-        name: bond0
-        bond:
-        ports:
-            - ens2f0
-            - ens2f1
-            - ens3f0  
-            - ens3f1
-        vlans:
-          - id: 677
-          - id: 58
-          - id: 670
-    nodes:
-      - name: bond-ips
-        node: master-0
-        vlans:
-          - id: 672
-            ip: 192.168.4.1
+      ports:
+        - ens2f0
+        - ens2f1
+        - ens3f0  
+        - ens3f1
+    vlans:
+      - id: 677
+      - id: 58
+      - id: 670
+  nodes:
+    - name: bond-ips
+      node: master-0
+      vlans:
+        - id: 672
+          ip: 192.168.4.1
 
 # LDAP configuration.
 # Used in:
 #  - ldap-accounts.yaml
 #  - ldap-bind-secret.yaml
 #  - ldap-oauth-provider.yaml
-ldap:
+# ldap:
 #  # The name of the LDAPSyncConfig (ldap-accounts.yaml)
 #  syncConfigName: foo
 #  accountName: sAMAccountName
