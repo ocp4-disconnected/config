@@ -8,9 +8,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 - argo sync policy for day2
+- defaults/set operator source location
+- set default connected cluster to false
 
 ### Fixed
 - references to old repo
+- day2 vars arithmetic expression, needs to be literal
 
 ## [1.0.2RC2]
 ### Added

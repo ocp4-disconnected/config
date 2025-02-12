@@ -8,20 +8,20 @@ operators:
   - name: openshift-gitops-operator
     subNamespace: openshift-gitops
     targetNamespace: openshift-gitops-operator
-    source: {{ "cs-redhat-operator-index-v4-16" if common_connected_cluster is false else "redhat-operators" }}
+    source: "{{ 'cs-redhat-operator-index-v4-16' if common_connected_cluster is false else 'redhat-operators' }}"
     channel: latest
     installPlanApproval: Automatic
     sourceNamespace: openshift-marketplace
   - name: kubernetes-nmstate-operator
     subNamespace: openshift-nmstate
-    source: {{ "cs-redhat-operator-index-v4-16" if common_connected_cluster is false else "redhat-operators" }}
+    source: "{{ 'cs-redhat-operator-index-v4-16' if common_connected_cluster is false else 'redhat-operators' }}"
     installPlanApproval: Automatic
     providedAPIs: "NMState.v1.nmstate.io"
     channel: stable
     sourceNamespace: openshift-marketplace
   - name: mtv-operator
     subNamespace: openshift-mtv
-    source: {{ "cs-redhat-operator-index-v4-16" if common_connected_cluster is false else "redhat-operators" }}
+    source: "{{ 'cs-redhat-operator-index-v4-16' if common_connected_cluster is false else 'redhat-operators' }}"
     providedAPIs: "ForkliftController.v1beta1.forklift.konveyor.io,Hook.v1beta1.forklift.konveyor.io,Host.v1beta1.forklift.konveyor.io,Migration.v1beta1.forklift.konveyor.io,NetworkMap.v1beta1.forklift.konveyor.io,OpenStackVolumePopulator.v1beta1.forklift.konveyor.io,OvirtVolumePopulator.v1beta1.forklift.konveyor.io,Plan.v1beta1.forklift.konveyor.io,Provider.v1beta1.forklift.konveyor.io,StorageMap.v1beta1.forklift.konveyor.io"
     channel: release-v2.7
     sourceNamespace: openshift-marketplace
