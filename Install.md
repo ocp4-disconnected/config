@@ -80,7 +80,7 @@ This guide covers the process for installing Red Hat OpenShift 4.15+ on Red Hat 
 
   2. Navigate to the Playbooks Directory:
       ```bash
-      cd ocp4-disconnected-config/playbooks
+      cd config/playbooks
       ```
 
   3. Install Required Ansible Collections( 1st time/connected system ): 

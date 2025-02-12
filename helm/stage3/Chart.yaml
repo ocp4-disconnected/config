@@ -1,6 +1,6 @@
 apiVersion: v2
-name: ocpDay2
-description: A chart to apply the day 2 operations to a new cluster. Intended to be used with GitOps/Argo to keep in sync.
+name: ocpstage3
+description: A chart to apply stage 3 configurations to the new cluster
 
 # A chart can be either an 'application' or a 'library' chart.
 #

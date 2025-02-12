@@ -23,6 +23,7 @@ content_generation_disconnected_operators:
 
 ## AdditionalImages for oc-mirror to pull. Include version
 content_generation_additionalImages:
+  - name: quay.io/openshift/origin-cli:latest
   - name: registry.redhat.io/ubi8/ubi:latest
   - name: registry.redhat.io/ubi9/ubi:latest
   - name: quay.io/noseka1/toolbox-container:full

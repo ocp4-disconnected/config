@@ -1,18 +1,12 @@
 # General cluster-level information
-cluster:
-  # Used in the proxy to specify the certs to use there.
-  # Used in proxy-custom-ca-cm.yaml in turn used by proxy.yaml
-  ca:
-#    # true if you have a cert and want to set it, false to skip setting a cluster ca.
+# cluster:
+#   ca:
 #    configMapName: cluster-proxy-ca
 #    content: |- # The cluster's CA
 #      ----- CA Content ------
 #      ......
 #      ----- end content ----
-#  # Ingress related configuraiton.
-#  # Used in:
-#  #  - ingress-certs-secret.yaml
-#  #  - ingress-controller.yaml
+#  # Ingress related configuration.
 #  ingress:
 #    secretName: ingress-cert
 #    cert: |- # The content of the ssl cert to use for ingress
@@ -23,61 +17,29 @@ cluster:
 #      ----- cert content ----
 #      .....
 #      ----- cert content ----
-# TODO:: doublecheck updated from site
-# Configuration for NodeNetworkConfigurationPolicy
-# Used in:
-#  - nmstate-nncp-nodes.yaml
-#  - nmstate-nncp-bond.yaml
 
-compliance:
-  enabled: true
-  name: compliance-operator
-  catalog_source: cs-redhat-operator-index-v4-16
-  target_namespace: openshift-compliance
 
-mtv:
-  enabled: true
-  catalog_source: cs-redhat-operator-index-v4-16
-  target_namespace: openshift-mtv
-  controller_max_vm_inflight: 20
-  # these values will need to be replaced by actual vcenter info in order to pull over VMs from that source
-  provider:
-    name: mtv-provider
-    secret: mtv-secret
-    url: https://mtv-url/sdk
-    endpoint: mtv-endpoint
-    init_image: mtv-registry/init/image:1
-
-namespace:
-  - ns: openshift-mtv
-  - ns: openshift-nmstate
-
-nmstate:
-  enabled: true
-  catalog_source: cs-redhat-operator-index-v4-16
-  target_namespace: openshift-nmstate
-
-nncps:
-  bond:
-    name: bond0
-    bond:
-      ports:
-        - ens2f0
-        - ens2f1
-        - ens3f0
-        - ens3f1
-        # etc
-    vlans:
-      - id: 677
-      - id: 58
-      - id: 670
-      # etc
-  nodes:
-    - name: bond-ips
-      node: master-0
-      vlans:
-        - id: 672
-          ip: 192.168.1.1
+# nncps:
+#   bond:
+#     name: bond0
+#     bond:
+#       ports:
+#         - ens2f0
+#         - ens2f1
+#         - ens3f0
+#         - ens3f1
+#         # etc
+#     vlans:
+#       - id: 677
+#       - id: 58
+#       - id: 670
+#       # etc
+#   nodes:
+#     - name: bond-ips
+#       node: master-0
+#       vlans:
+#         - id: 672
+#           ip: 192.168.1.1
 #  - name: bond-ips-2
 #    node: worker-0
 #    vlans:
@@ -85,12 +47,8 @@ nncps:
 #        ip: 192.168.1.2 # TODO:: specify
   # ... TODO:: fill out
 
-# LDAP configuration.
-# Used in:
-#  - ldap-accounts.yaml
-#  - ldap-bind-secret.yaml
-#  - ldap-oauth-provider.yaml
-ldap:
+# # LDAP configuration.
+# ldap:
 #  # The name of the LDAPSyncConfig (ldap-accounts.yaml)
 #  syncConfigName: foo
 #  accountName: sAMAccountName
@@ -110,23 +68,20 @@ ldap:
 
 # Chrony configuration.
 # The chrony configuration defined in configContent is applied to all OCP nodes with each of the roles specified.
-# Used in:
-#  - chrony-configuration.yaml
-chrony:
-  roles:
-    - role: master
-    - role: worker
-  configContent: |-
-    # EXAMPLE chrony config
-    server pool.ntp.org iburst
-    driftfile /var/lib/chrony/drift
-    makestep 10 3
-    rtcsync
+# chrony:
+#   roles:
+#     - role: master
+#     - role: worker
+#   configContent: |-
+#     # EXAMPLE chrony config
+#     server pool.ntp.org iburst
+#     driftfile /var/lib/chrony/drift
+#     makestep 10 3
+#     rtcsync
 
 # Storage settings for the cluster.
-# Used in trident-sc.yaml, trident-nad.yaml
 storage:
-  # The location of the trident/netapp host
+#   # The location of the trident/netapp host
   provisioner: csi.trident.netapp.io
   nad:
     mgmtAddress: "192.168.1.10/24"

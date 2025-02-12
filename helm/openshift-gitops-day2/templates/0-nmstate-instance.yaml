@@ -1,8 +1,9 @@
+{{- if (.Values.nmstate) -}}
+{{- with .Values.nmstate }}
 # Defines a nmstate instance using the nmstate operator
 apiVersion: nmstate.io/v1
 kind: NMState
 metadata:
   name: nmstate
-  annotations:
-    argocd.argoproj.io/sync-wave: "4"
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
+{{- end -}}
+{{- end -}}

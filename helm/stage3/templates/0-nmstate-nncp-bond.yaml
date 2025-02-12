@@ -1,3 +1,4 @@
+{{- if ((.Values.nncps).bond) -}}
 {{- with .Values.nncps.bond }}
 # Defines the standard bond to use in the other nncps configuration
 # Referenced in nmstate-nncp-nodes.yaml
@@ -5,9 +6,6 @@ apiVersion: nmstate.io/v1
 kind: NodeNetworkConfigurationPolicy
 metadata:
   name: {{ .name }}
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
-    argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 spec:
   desiredState:
     interfaces:
@@ -33,5 +31,6 @@ spec:
         name: br-{{ $.Values.nncps.bond.name }}.{{ $curVlan.id }}
         state: up
         type: linux-bridge 
+{{- end -}}
 {{- end -}}
 {{- end -}}

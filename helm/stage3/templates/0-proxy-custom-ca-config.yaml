@@ -1,3 +1,4 @@
+{{- if ((.Values.cluster).ca) -}}
 {{- with .Values.cluster.ca }}
 ---
 # This optionally specifies a CA to use in a cluster-wide CA.
@@ -6,8 +7,6 @@ kind: ConfigMap
 metadata:
   name: {{ .configMapName  }}
   namespace: openshift-config
-  annotations:
-    argocd.argoproj.io/sync-wave: "5"
 data:
   ca-bundle.crt: |
 {{ .content | indent 4 }}
@@ -25,3 +24,4 @@ spec:
     name: {{ .configMapName }}
 
 {{- end }}
+{{- end -}}

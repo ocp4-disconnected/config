@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.0.2RC3]
+### Added
+- image to addtional images, for checking operator install status
+
+### Changed
+- argo sync policy for day2
+- defaults/set operator source location
+- set default connected cluster to false
+
+### Fixed
+- references to old repo
+- day2 vars arithmetic expression, needs to be literal
+
 ## [1.0.2RC2]
 ### Added
 - looping templates in helm day1 helm chart to create the required objects for operators specified in the values file
